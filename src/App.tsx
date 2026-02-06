@@ -2,14 +2,17 @@ import styled from "styled-components";
 
 const AppShell = styled.main`
   min-height: 100vh;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1.5rem, 4vw, 3rem);
   background: #f7f7fb;
 `;
 
 const Card = styled.section`
   text-align: center;
-  padding: 2rem 3rem;
+  width: min(720px, 100%);
+  padding: clamp(1.5rem, 4vw, 3rem);
   background: #fff;
   border: 1px solid #eee;
   border-radius: 12px;
@@ -18,12 +21,13 @@ const Card = styled.section`
 
 const Title = styled.h1`
   margin: 0 0 0.5rem;
-  font-size: 2.5rem;
+  font-size: clamp(2rem, 5vw, 3rem);
   color: #111;
 `;
 
 const SubTitle = styled.p`
   margin: 0;
+  font-size: clamp(1rem, 2.5vw, 1.125rem);
   color: #555;
 `;
 
