@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { incrementOpenCount } from "./storage/settings";
+import { incrementOpenCount, subscribeConfig } from "./storage/settings";
 
 const AppShell = styled.main`
   min-height: 100vh;
@@ -43,8 +43,19 @@ export default function App() {
   const [openCount, setOpenCount] = useState(0);
 
   useEffect(() => {
-    const next = incrementOpenCount();
-    setOpenCount(next.openCount);
+    let cancelled = false;
+    incrementOpenCount().then((next) => {
+      if (!cancelled) setOpenCount(next.openCount);
+    });
+
+    const unsubscribe = subscribeConfig((config) => {
+      if (!cancelled) setOpenCount(config.openCount);
+    });
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
   }, []);
 
   return (
