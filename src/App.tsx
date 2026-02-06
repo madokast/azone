@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import styled from "styled-components";
+import { incrementOpenCount } from "./storage/settings";
 
 const AppShell = styled.main`
   min-height: 100vh;
@@ -31,12 +33,26 @@ const SubTitle = styled.p`
   color: #555;
 `;
 
+const CountLine = styled.p`
+  margin: 1rem 0 0;
+  font-size: 0.95rem;
+  color: #666;
+`;
+
 export default function App() {
+  const [openCount, setOpenCount] = useState(0);
+
+  useEffect(() => {
+    const next = incrementOpenCount();
+    setOpenCount(next.openCount);
+  }, []);
+
   return (
     <AppShell>
       <Card>
         <Title>Hello World</Title>
         <SubTitle>React + TypeScript + Vite + styled-components</SubTitle>
+        <CountLine>Open count: {openCount}</CountLine>
       </Card>
     </AppShell>
   );
