@@ -9,6 +9,35 @@ export default defineConfig({
       registerType: "autoUpdate",
       injectRegister: "auto",
       includeAssets: ["pwa.svg"],
+      workbox: {
+        runtimeCaching: [
+          // S3 ListObjectsV2: never cache
+          {
+            urlPattern: ({ url, request }) =>
+              request.method === "GET" &&
+              url.searchParams.get("list-type") === "2",
+            handler: "NetworkOnly"
+          },
+          // Cache "resource-like" URLs: last path segment contains \w.\w
+          {
+            urlPattern: ({ url, request }) => {
+              if (request.method !== "GET") return false;
+              if (url.searchParams.get("list-type") === "2") return false;
+              const lastSegment = url.pathname.split("/").pop() || "";
+              return /\w\.\w/.test(lastSegment);
+            },
+            handler: "CacheFirst",
+            options: {
+              cacheName: "storage-objects",
+              expiration: {
+                maxEntries: 1000,
+                maxAgeSeconds: 60 * 60 * 24 * 365
+              },
+              cacheableResponse: { statuses: [0, 200] }
+            }
+          }
+        ]
+      },
       manifest: {
         name: "React Hello World",
         short_name: "HelloPWA",
