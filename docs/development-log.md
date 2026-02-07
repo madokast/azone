@@ -16,3 +16,4 @@
 - Refactored settings into a module structure (schema/core/ui/s3/stats)
 - Added config docs/comments and split stats helper for open count
 - Replaced styled-components UI with Ionic React components
+- Added Ionic side menu with push behavior and menu button
