@@ -67,7 +67,6 @@ export default function App() {
     const root = document.documentElement;
     const body = document.body;
     const applyTheme = (isDark: boolean) => {
-      console.log("[theme] apply", { theme, isDark });
       const className = "ion-palette-dark";
       root.classList.toggle(className, isDark);
       body.classList.toggle(className, isDark);
@@ -89,7 +88,6 @@ export default function App() {
     const handleChange = (event: MediaQueryListEvent) =>
       applyTheme(event.matches);
 
-    console.log("[theme] system", { matches: media.matches });
     applyTheme(media.matches);
 
     if (media.addEventListener) {
