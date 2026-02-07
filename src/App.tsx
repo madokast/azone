@@ -85,9 +85,7 @@ export default function App() {
       media.addEventListener("change", handleChange);
       return () => media.removeEventListener("change", handleChange);
     }
-
-    media.addListener(handleChange);
-    return () => media.removeListener(handleChange);
+    return;
   }, [theme]);
 
   const handleContentClick = () => {
