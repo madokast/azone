@@ -12,12 +12,20 @@ import {
   IonMenuButton,
   IonMenuToggle,
   IonPage,
+  IonSelect,
+  IonSelectOption,
   IonTitle,
   IonText,
   IonToolbar,
 } from "@ionic/react";
 import { menuController } from "@ionic/core";
-import { incrementOpenCount, subscribeConfig } from "./storage/settings";
+import {
+  getConfig,
+  incrementOpenCount,
+  setTheme as persistTheme,
+  subscribeConfig,
+  type UiTheme,
+} from "./storage/settings";
 
 const MENU_ID = "main-menu";
 const CONTENT_ID = "main-content";
@@ -28,15 +36,23 @@ const menuStyle = {
 export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [openCount, setOpenCount] = useState(0);
+  const [theme, setTheme] = useState<UiTheme>("system");
 
   useEffect(() => {
     let cancelled = false;
+    const initialConfig = getConfig();
+    const initialTheme = (initialConfig.ui?.theme ?? "system") as UiTheme;
+    if (!cancelled) setTheme(initialTheme);
+
     incrementOpenCount().then((next) => {
       if (!cancelled) setOpenCount(next.openCount);
     });
 
     const unsubscribe = subscribeConfig((config) => {
-      if (!cancelled) setOpenCount(config.openCount);
+      if (cancelled) return;
+      setOpenCount(config.openCount);
+      const nextTheme = (config.ui?.theme ?? "system") as UiTheme;
+      setTheme(nextTheme);
     });
 
     return () => {
@@ -44,6 +60,46 @@ export default function App() {
       unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+
+    const root = document.documentElement;
+    const body = document.body;
+    const applyTheme = (isDark: boolean) => {
+      console.log("[theme] apply", { theme, isDark });
+      const className = "ion-palette-dark";
+      root.classList.toggle(className, isDark);
+      body.classList.toggle(className, isDark);
+      root.style.colorScheme = isDark ? "dark" : "light";
+      body.style.colorScheme = isDark ? "dark" : "light";
+    };
+
+    if (theme === "dark") {
+      applyTheme(true);
+      return;
+    }
+
+    if (theme === "light") {
+      applyTheme(false);
+      return;
+    }
+
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = (event: MediaQueryListEvent) =>
+      applyTheme(event.matches);
+
+    console.log("[theme] system", { matches: media.matches });
+    applyTheme(media.matches);
+
+    if (media.addEventListener) {
+      media.addEventListener("change", handleChange);
+      return () => media.removeEventListener("change", handleChange);
+    }
+
+    media.addListener(handleChange);
+    return () => media.removeListener(handleChange);
+  }, [theme]);
 
   const handleContentClick = () => {
     if (!isMenuOpen) return;
@@ -73,6 +129,23 @@ export default function App() {
                 <IonLabel>Home</IonLabel>
               </IonItem>
             </IonMenuToggle>
+            <IonItem>
+              <IonLabel>Theme</IonLabel>
+              <IonSelect
+                value={theme}
+                interface="popover"
+                onIonChange={(event) => {
+                  const value = event.detail.value as UiTheme;
+                  setTheme(value);
+                  void persistTheme(value);
+                }}
+                slot="end"
+              >
+                <IonSelectOption value="system">System</IonSelectOption>
+                <IonSelectOption value="light">Light</IonSelectOption>
+                <IonSelectOption value="dark">Dark</IonSelectOption>
+              </IonSelect>
+            </IonItem>
           </IonList>
         </IonContent>
       </IonMenu>

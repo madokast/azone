@@ -2,8 +2,10 @@
  * Settings module schema for local-only app configuration.
  * Keep this small and serializable.
  */
+export type UiTheme = "light" | "dark" | "system";
+
 export type UiConfig = {
-  theme?: "light" | "dark";
+  theme?: UiTheme;
   language?: string;
 };
 
@@ -28,6 +30,6 @@ export const CONFIG_VERSION = 1 as const;
 export const defaultConfig: AppConfig = {
   version: CONFIG_VERSION,
   openCount: 0,
-  ui: {},
+  ui: { theme: "system" },
   s3: {}
 };

@@ -17,3 +17,4 @@
 - Added config docs/comments and split stats helper for open count
 - Replaced styled-components UI with Ionic React components
 - Added Ionic side menu with push behavior and menu button
+- Added theme preference (light/dark/system) with menu selector
