@@ -12,3 +12,6 @@
 - Added multi-tab config sync and conflict handling
 - Enabled single-file build output via Vite plugin
 - Ignored generated build artifacts in .gitignore
+
+- Refactored settings into a module structure (schema/core/ui/s3/stats)
+- Added config docs/comments and split stats helper for open count
