@@ -1,19 +1,12 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useState } from "react";
 import {
   IonApp,
   IonButtons,
   IonContent,
   IonFooter,
   IonHeader,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonMenu,
   IonMenuButton,
-  IonMenuToggle,
   IonPage,
-  IonSelect,
-  IonSelectOption,
   IonTitle,
   IonText,
   IonToolbar,
@@ -26,12 +19,10 @@ import {
   subscribeConfig,
   type UiTheme,
 } from "./storage/settings";
+import { AppMenu } from "./components/layout/AppMenu";
 
 const MENU_ID = "main-menu";
 const CONTENT_ID = "main-content";
-const menuStyle = {
-  "--width": "80vw",
-} as CSSProperties;
 
 export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -106,47 +97,16 @@ export default function App() {
 
   return (
     <IonApp>
-      <IonMenu
-        menuId={MENU_ID}
+      <AppMenu
         contentId={CONTENT_ID}
-        type="push"
-        swipeGesture={true}
-        style={menuStyle}
-        onIonDidOpen={() => setIsMenuOpen(true)}
-        onIonDidClose={() => setIsMenuOpen(false)}
-      >
-        <IonHeader>
-          <IonToolbar>
-            <IonTitle>Menu</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        <IonContent>
-          <IonList>
-            <IonMenuToggle>
-              <IonItem button detail={false}>
-                <IonLabel>Home</IonLabel>
-              </IonItem>
-            </IonMenuToggle>
-            <IonItem>
-              <IonLabel>Theme</IonLabel>
-              <IonSelect
-                value={theme}
-                interface="popover"
-                onIonChange={(event) => {
-                  const value = event.detail.value as UiTheme;
-                  setTheme(value);
-                  void persistTheme(value);
-                }}
-                slot="end"
-              >
-                <IonSelectOption value="system">System</IonSelectOption>
-                <IonSelectOption value="light">Light</IonSelectOption>
-                <IonSelectOption value="dark">Dark</IonSelectOption>
-              </IonSelect>
-            </IonItem>
-          </IonList>
-        </IonContent>
-      </IonMenu>
+        menuId={MENU_ID}
+        theme={theme}
+        onThemeChange={(value) => {
+          setTheme(value);
+          void persistTheme(value);
+        }}
+        onMenuOpenChange={setIsMenuOpen}
+      />
       <IonPage id={CONTENT_ID} onClick={handleContentClick}>
         <IonHeader>
           <IonToolbar>
