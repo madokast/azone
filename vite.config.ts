@@ -10,8 +10,16 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       injectRegister: "auto",
+      devOptions: {
+        enabled: true
+      },
       includeAssets: ["pwa.svg"],
       workbox: {
+        mode: "development",
+        navigateFallback: "index.html",
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
         runtimeCaching: [
           // S3 ListObjectsV2: never cache
           {
