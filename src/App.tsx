@@ -113,7 +113,6 @@ export default function App() {
           message="Starting"
           duration={2500}
           position="top"
-          cssClass="starting-toast"
           onDidDismiss={() => setShowStartingToast(false)}
         />
         <IonHeader>
