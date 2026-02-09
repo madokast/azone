@@ -1,0 +1,3 @@
+.starting-toast::part(message) {
+  text-align: center;
+}
