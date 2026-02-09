@@ -9,6 +9,7 @@ import {
   IonPage,
   IonTitle,
   IonText,
+  IonToast,
   IonToolbar,
 } from "@ionic/react";
 import { menuController } from "@ionic/core";
@@ -28,6 +29,7 @@ export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [openCount, setOpenCount] = useState(0);
   const [theme, setTheme] = useState<UiTheme>("system");
+  const [showStartingToast, setShowStartingToast] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -106,6 +108,13 @@ export default function App() {
         onMenuOpenChange={setIsMenuOpen}
       />
       <IonPage id={CONTENT_ID} onClick={handleContentClick}>
+        <IonToast
+          isOpen={showStartingToast}
+          message="Starting"
+          duration={2500}
+          position="top"
+          onDidDismiss={() => setShowStartingToast(false)}
+        />
         <IonHeader>
           <IonToolbar>
             <IonButtons slot="start">
