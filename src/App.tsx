@@ -24,6 +24,7 @@ import { AppMenu } from "./components/layout/AppMenu";
 
 const MENU_ID = "main-menu";
 const CONTENT_ID = "main-content";
+const FOOTER_ID = "main-footer";
 
 export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -112,7 +113,8 @@ export default function App() {
           isOpen={showStartingToast}
           message="Starting"
           duration={2500}
-          position="top"
+          position="bottom"
+          positionAnchor={FOOTER_ID}
           onDidDismiss={() => setShowStartingToast(false)}
         />
         <IonHeader>
@@ -126,7 +128,7 @@ export default function App() {
         <IonContent className="ion-padding">
           <IonText>React + TypeScript + Vite + Ionic React</IonText>
         </IonContent>
-        <IonFooter>
+        <IonFooter id={FOOTER_ID}>
           <IonToolbar>
             <IonText className="ion-padding-start">
               Open count: {openCount}
