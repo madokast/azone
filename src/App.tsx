@@ -1,18 +1,10 @@
 import { useEffect, useState } from "react";
 import {
-  IonApp,
-  IonButtons,
-  IonContent,
-  IonFooter,
-  IonHeader,
-  IonMenuButton,
-  IonPage,
-  IonTitle,
-  IonText,
-  IonToast,
-  IonToolbar,
-} from "@ionic/react";
-import { menuController } from "@ionic/core";
+  Button,
+  NavBar,
+  SafeArea,
+  Toast,
+} from "antd-mobile";
 import {
   getConfig,
   incrementOpenCount,
@@ -22,15 +14,10 @@ import {
 } from "./storage/settings";
 import { AppMenu } from "./components/layout/AppMenu";
 
-const MENU_ID = "main-menu";
-const CONTENT_ID = "main-content";
-const FOOTER_ID = "main-footer";
-
 export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [openCount, setOpenCount] = useState(0);
   const [theme, setTheme] = useState<UiTheme>("system");
-  const [showStartingToast, setShowStartingToast] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -56,86 +43,105 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    Toast.show({
+      content: "Starting",
+      duration: 2500,
+      position: "bottom",
+    });
+  }, []);
+
+  useEffect(() => {
     if (typeof window === "undefined" || typeof document === "undefined") return;
 
     const root = document.documentElement;
     const body = document.body;
-    const applyTheme = (isDark: boolean) => {
-      const className = "ion-palette-dark";
-      root.classList.toggle(className, isDark);
-      body.classList.toggle(className, isDark);
-      root.style.colorScheme = isDark ? "dark" : "light";
-      body.style.colorScheme = isDark ? "dark" : "light";
+    const applyTheme = (next: "light" | "dark") => {
+      root.setAttribute("data-prefers-color-scheme", next);
+      root.style.colorScheme = next;
+      body.style.colorScheme = next;
     };
 
     if (theme === "dark") {
-      applyTheme(true);
+      applyTheme("dark");
       return;
     }
 
     if (theme === "light") {
-      applyTheme(false);
+      applyTheme("light");
       return;
     }
 
     const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = (event: MediaQueryListEvent) =>
-      applyTheme(event.matches);
+    const syncFromSystem = (isDark: boolean) =>
+      applyTheme(isDark ? "dark" : "light");
+    const handleChange = (event: MediaQueryListEvent) => {
+      syncFromSystem(event.matches);
+    };
 
-    applyTheme(media.matches);
+    syncFromSystem(media.matches);
 
     if (media.addEventListener) {
       media.addEventListener("change", handleChange);
       return () => media.removeEventListener("change", handleChange);
     }
+
+    if (media.addListener) {
+      media.addListener(handleChange);
+      return () => media.removeListener(handleChange);
+    }
+
     return;
   }, [theme]);
 
-  const handleContentClick = () => {
-    if (!isMenuOpen) return;
-    void menuController.close(MENU_ID);
-  };
-
   return (
-    <IonApp>
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        background: "var(--adm-color-background)",
+        color: "var(--adm-color-text)",
+      }}
+    >
       <AppMenu
-        contentId={CONTENT_ID}
-        menuId={MENU_ID}
+        open={isMenuOpen}
         theme={theme}
         onThemeChange={(value) => {
           setTheme(value);
           void persistTheme(value);
         }}
-        onMenuOpenChange={setIsMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
       />
-      <IonPage id={CONTENT_ID} onClick={handleContentClick}>
-        <IonToast
-          isOpen={showStartingToast}
-          message="Starting"
-          duration={2500}
-          position="bottom"
-          positionAnchor={FOOTER_ID}
-          onDidDismiss={() => setShowStartingToast(false)}
-        />
-        <IonHeader>
-          <IonToolbar>
-            <IonButtons slot="start">
-              <IonMenuButton />
-            </IonButtons>
-            <IonTitle>Hello World</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        <IonContent className="ion-padding">
-          <IonText>React + TypeScript + Vite + Ionic React</IonText>
-        </IonContent>
-        <IonFooter id={FOOTER_ID}>
-          <IonToolbar>
-            <IonText className="ion-padding-start">
-              Open count: {openCount}
-            </IonText>
-          </IonToolbar>
-        </IonFooter>
-      </IonPage>
-    </IonApp>
+
+      <NavBar
+        back={null}
+        left={
+          <Button
+            fill="none"
+            size="small"
+            onClick={() => setIsMenuOpen(true)}
+          >
+            Menu
+          </Button>
+        }
+      >
+        Hello World
+      </NavBar>
+
+      <div style={{ flex: 1, padding: 16 }}>
+        React + TypeScript + Vite + Ant Design Mobile
+      </div>
+
+      <div
+        style={{
+          padding: "12px 16px",
+          borderTop: "1px solid var(--adm-color-border)",
+          background: "var(--adm-color-box)",
+        }}
+      >
+        Open count: {openCount}
+      </div>
+      <SafeArea position="bottom" />
+    </div>
   );
 }

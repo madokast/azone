@@ -1,77 +1,64 @@
-import { type CSSProperties } from "react";
-import {
-  IonContent,
-  IonHeader,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonMenu,
-  IonMenuToggle,
-  IonSelect,
-  IonSelectOption,
-  IonTitle,
-  IonToolbar,
-} from "@ionic/react";
+import { List, Popup, SafeArea, Selector } from "antd-mobile";
 import { type UiTheme } from "../../storage/settings";
 
 type AppMenuProps = {
-  contentId: string;
-  menuId: string;
+  open: boolean;
   theme: UiTheme;
   onThemeChange: (next: UiTheme) => void;
-  onMenuOpenChange: (isOpen: boolean) => void;
+  onClose: () => void;
 };
 
-const menuStyle = {
-  "--width": "80vw",
-} as CSSProperties;
+const themeOptions = [
+  { label: "System", value: "system" },
+  { label: "Light", value: "light" },
+  { label: "Dark", value: "dark" },
+];
 
 export function AppMenu({
-  contentId,
-  menuId,
+  open,
   theme,
   onThemeChange,
-  onMenuOpenChange,
+  onClose,
 }: AppMenuProps) {
   return (
-    <IonMenu
-      menuId={menuId}
-      contentId={contentId}
-      type="push"
-      swipeGesture={true}
-      style={menuStyle}
-      onIonDidOpen={() => onMenuOpenChange(true)}
-      onIonDidClose={() => onMenuOpenChange(false)}
+    <Popup
+      visible={open}
+      position="left"
+      onMaskClick={onClose}
+      onClose={onClose}
+      bodyStyle={{ width: "80vw", height: "100vh" }}
     >
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Menu</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent>
-        <IonList>
-          <IonMenuToggle>
-            <IonItem button detail={false}>
-              <IonLabel>Home</IonLabel>
-            </IonItem>
-          </IonMenuToggle>
-          <IonItem>
-            <IonLabel>Theme</IonLabel>
-            <IonSelect
-              value={theme}
-              interface="popover"
-              onIonChange={(event) =>
-                onThemeChange(event.detail.value as UiTheme)
-              }
-              slot="end"
-            >
-              <IonSelectOption value="system">System</IonSelectOption>
-              <IonSelectOption value="light">Light</IonSelectOption>
-              <IonSelectOption value="dark">Dark</IonSelectOption>
-            </IonSelect>
-          </IonItem>
-        </IonList>
-      </IonContent>
-    </IonMenu>
+      <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+        <div
+          style={{
+            fontSize: 18,
+            fontWeight: 600,
+            padding: "16px",
+            borderBottom: "1px solid var(--adm-color-border)",
+          }}
+        >
+          Menu
+        </div>
+
+        <List>
+          <List.Item onClick={onClose}>Home</List.Item>
+          <List.Item>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div>Theme</div>
+              <Selector
+                options={themeOptions}
+                value={[theme]}
+                onChange={(values) => {
+                  const [next] = values;
+                  if (next) onThemeChange(next as UiTheme);
+                }}
+              />
+            </div>
+          </List.Item>
+        </List>
+
+        <SafeArea position="bottom" />
+      </div>
+    </Popup>
   );
 }
