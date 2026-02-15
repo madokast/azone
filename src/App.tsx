@@ -99,6 +99,7 @@ export default function App() {
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
+        // 使用主题变量，亮色/暗色模式会自动切换
         background: "var(--adm-color-background)",
         color: "var(--adm-color-text)",
       }}
