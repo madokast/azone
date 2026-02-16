@@ -3,7 +3,6 @@ import {
   Button,
   NavBar,
   SafeArea,
-  Toast,
 } from "antd-mobile";
 import {
   getConfig,
@@ -13,6 +12,7 @@ import {
   type UiTheme,
 } from "./storage/settings";
 import { AppMenu } from "./components/layout/AppMenu";
+import { showToast } from "./ui/toast";
 
 export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -43,11 +43,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    Toast.show({
-      content: "Starting",
-      duration: 2500,
-      position: "bottom",
-    });
+    showToast("Starting");
   }, []);
 
   useEffect(() => {
