@@ -42,9 +42,8 @@ export function AppMenu({
 
         <List>
           <List.Item onClick={onClose}>Home</List.Item>
-          <List.Item>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <div>Theme</div>
+          <List.Item
+            extra={
               <Selector
                 options={themeOptions}
                 value={[theme]}
@@ -53,7 +52,9 @@ export function AppMenu({
                   if (next) onThemeChange(next as UiTheme);
                 }}
               />
-            </div>
+            }
+          >
+            Theme
           </List.Item>
         </List>
 
