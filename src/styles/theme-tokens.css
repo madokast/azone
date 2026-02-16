@@ -1,0 +1,11 @@
+/*
+ * App theme token bridge.
+ * Keep all antd-mobile token coupling in this file, then expose stable
+ * `--app-*` semantic variables for application code.
+ */
+:root {
+  --app-color-bg: var(--adm-color-background);
+  --app-color-text: var(--adm-color-text);
+  --app-color-border: var(--adm-color-border);
+  --app-color-surface: var(--adm-color-box);
+}

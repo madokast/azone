@@ -1,5 +1,6 @@
 import { List, Popup, SafeArea, Selector } from "antd-mobile";
 import { type UiTheme } from "../../storage/settings";
+import { appColor } from "../../styles/theme-tokens";
 
 type AppMenuProps = {
   open: boolean;
@@ -34,7 +35,7 @@ export function AppMenu({
             fontSize: 18,
             fontWeight: 600,
             padding: "16px",
-            borderBottom: "1px solid var(--adm-color-border)",
+            borderBottom: `1px solid ${appColor.border}`,
           }}
         >
           Menu

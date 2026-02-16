@@ -13,6 +13,7 @@ import {
 } from "./storage/settings";
 import { AppMenu } from "./components/layout/AppMenu";
 import { showToast } from "./ui/toast";
+import { appColor } from "./styles/theme-tokens";
 
 export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -96,8 +97,8 @@ export default function App() {
         display: "flex",
         flexDirection: "column",
         // 使用主题变量，亮色/暗色模式会自动切换
-        background: "var(--adm-color-background)",
-        color: "var(--adm-color-text)",
+        background: appColor.bg,
+        color: appColor.text,
       }}
     >
       <AppMenu
@@ -132,8 +133,8 @@ export default function App() {
       <div
         style={{
           padding: "12px 16px",
-          borderTop: "1px solid var(--adm-color-border)",
-          background: "var(--adm-color-box)",
+          borderTop: `1px solid ${appColor.border}`,
+          background: appColor.surface,
         }}
       >
         Open count: {openCount}
