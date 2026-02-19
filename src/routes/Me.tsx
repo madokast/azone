@@ -1,4 +1,4 @@
-import { Divider, Form, Segmented } from 'antd-mobile';
+import { Form, Segmented } from 'antd-mobile';
 import { type UiTheme } from '../storage/settings';
 
 type MeProps = {
@@ -8,14 +8,13 @@ type MeProps = {
 
 export default function Me({ theme, onThemeChange }: MeProps) {
   return (
-    <div>
+    <div style={{ padding: 16 }}>
       {/* 统计信息区域 */}
       <div style={{ padding: 16 }}>
         <p>开发中...</p>
       </div>
       
-      {/* 分割线 */}
-      <Divider />
+      <h1>Settings</h1>
       
       {/* 设置区域 */}
       <Form layout='horizontal'>
