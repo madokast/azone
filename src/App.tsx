@@ -3,28 +3,26 @@ import {
   getConfig,
   incrementOpenCount,
   subscribeConfig,
+  setTheme as persistTheme,
   type UiTheme,
 } from "./storage/settings";
-import { showToast } from "./ui/toast";
+import { showToast } from "./components/toast";
 import AppRouter from "./routes";
 
 export default function App() {
-  const [, setOpenCount] = useState(0);
-  const [theme, setTheme] = useState<UiTheme>("system");
+  const [theme, setTheme] = useState<UiTheme>(() => {
+    const initialConfig = getConfig();
+    return (initialConfig.ui?.theme ?? "system") as UiTheme;
+  });
 
   useEffect(() => {
     let cancelled = false;
-    const initialConfig = getConfig();
-    const initialTheme = (initialConfig.ui?.theme ?? "system") as UiTheme;
-    if (!cancelled) setTheme(initialTheme);
-
     incrementOpenCount().then((next) => {
-      if (!cancelled) setOpenCount(next.openCount);
+      if (!cancelled) showToast(`Starting (${next.openCount}) UI Theme: ${theme}`);
     });
 
     const unsubscribe = subscribeConfig((config) => {
       if (cancelled) return;
-      setOpenCount(config.openCount);
       const nextTheme = (config.ui?.theme ?? "system") as UiTheme;
       setTheme(nextTheme);
     });
@@ -33,10 +31,6 @@ export default function App() {
       cancelled = true;
       unsubscribe();
     };
-  }, []);
-
-  useEffect(() => {
-    showToast("Starting");
   }, []);
 
   useEffect(() => {
@@ -74,15 +68,19 @@ export default function App() {
       return () => media.removeEventListener("change", handleChange);
     }
 
-    if (media.addListener) {
-      media.addListener(handleChange);
-      return () => media.removeListener(handleChange);
+    if (media.addEventListener) {
+      media.addEventListener("change", handleChange);
+      return () => media.removeEventListener("change", handleChange);
     }
 
     return;
   }, [theme]);
 
   return (
-    <AppRouter theme={theme} onThemeChange={setTheme} />
+    <AppRouter theme={theme} onThemeChange={nextTheme => {
+      setTheme(nextTheme);
+      persistTheme(nextTheme);
+      showToast(`Theme changed (${nextTheme})`);
+    }} />
   );
 }

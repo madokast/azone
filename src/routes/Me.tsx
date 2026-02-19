@@ -26,8 +26,10 @@ export default function Me({ theme, onThemeChange }: MeProps) {
               { label: 'Light', value: 'light' },
               { label: 'Dark', value: 'dark' }
             ]}
-            value={theme}
-            onChange={onThemeChange}
+            defaultValue={theme}
+            onChange={(next) => {
+              onThemeChange(next as UiTheme);
+            }}
           />
         </Form.Item>
       </Form>
