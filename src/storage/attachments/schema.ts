@@ -15,11 +15,6 @@ export type Attachment = {
   mimeType: string;
   
   /**
-   * Size of the attachment in bytes
-   */
-  size: number;
-  
-  /**
    * URL to the thumbnail version of the attachment
    */
   thumbnailUrl: string;

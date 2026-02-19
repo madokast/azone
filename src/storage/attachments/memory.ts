@@ -43,7 +43,6 @@ export class MemoryAttachmentService implements AttachmentService {
     const attachment: Attachment = {
       id,
       mimeType: file.type || 'application/octet-stream',
-      size: file.size,
       thumbnailUrl: `/thumbnail/${id}`,
       sourceUrl: `/source/${id}`,
     };
