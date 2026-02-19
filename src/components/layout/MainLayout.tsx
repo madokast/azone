@@ -2,8 +2,14 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { NavBar, TabBar } from 'antd-mobile';
 import { useState, useEffect } from 'react';
 import { AppOutline, PicturesOutline, UserSetOutline } from 'antd-mobile-icons';
+import { type UiTheme } from '../../storage/settings';
 
-export default function MainLayout() {
+type MainLayoutProps = {
+  theme: UiTheme;
+  onThemeChange: (next: UiTheme) => void;
+};
+
+export default function MainLayout({ theme, onThemeChange }: MainLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const path = location.pathname;
@@ -44,7 +50,7 @@ export default function MainLayout() {
         {/* 例如，当访问 /home 时，Outlet 会渲染 Home 组件 */}
         {/* 当访问 /media 时，Outlet 会渲染 Media 组件 */}
         {/* 当访问 /me 时，Outlet 会渲染 Me 组件 */}
-        <Outlet />
+        <Outlet context={{ theme, onThemeChange }} />
       </div>
 
       <TabBar 

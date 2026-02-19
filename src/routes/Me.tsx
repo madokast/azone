@@ -1,13 +1,36 @@
-import { Button } from 'antd-mobile';
+import { Divider, Form, Segmented } from 'antd-mobile';
+import { type UiTheme } from '../storage/settings';
 
-export default function Me() {
+type MeProps = {
+  theme: UiTheme;
+  onThemeChange: (next: UiTheme) => void;
+};
+
+export default function Me({ theme, onThemeChange }: MeProps) {
   return (
-    <div style={{ padding: 16 }}>
-      <h1>我的页面</h1>
-      <p>这是个人中心页面，用于展示个人信息</p>
-      <Button block color='primary' style={{ margin: '16px 0' }}>
-        个人中心按钮
-      </Button>
+    <div>
+      {/* 统计信息区域 */}
+      <div style={{ padding: 16 }}>
+        <p>开发中...</p>
+      </div>
+      
+      {/* 分割线 */}
+      <Divider />
+      
+      {/* 设置区域 */}
+      <Form layout='horizontal'>
+        <Form.Item name='theme' label='主题' childElementPosition='right'>
+          <Segmented
+            options={[
+              { label: 'System', value: 'system' },
+              { label: 'Light', value: 'light' },
+              { label: 'Dark', value: 'dark' }
+            ]}
+            value={theme}
+            onChange={onThemeChange}
+          />
+        </Form.Item>
+      </Form>
     </div>
   );
 }

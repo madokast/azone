@@ -83,6 +83,6 @@ export default function App() {
   }, [theme]);
 
   return (
-    <AppRouter />
+    <AppRouter theme={theme} onThemeChange={setTheme} />
   );
 }

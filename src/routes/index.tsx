@@ -5,8 +5,14 @@ import Me from './Me';
 import Post from './Post';
 import MainLayout from '../components/layout/MainLayout';
 import DetailLayout from '../components/layout/DetailLayout';
+import { type UiTheme } from '../storage/settings';
 
-export default function AppRouter() {
+type AppRouterProps = {
+  theme: UiTheme;
+  onThemeChange: (next: UiTheme) => void;
+};
+
+export default function AppRouter({ theme, onThemeChange }: AppRouterProps) {
   return (
     <BrowserRouter>
       <Routes>
@@ -14,10 +20,10 @@ export default function AppRouter() {
         <Route path="/" element={<Navigate to="/home" replace />} />
 
         {/* 带 TabBar */}
-        <Route element={<MainLayout />}>
+        <Route element={<MainLayout theme={theme} onThemeChange={onThemeChange} />}>
           <Route path="/home" element={<Home />} />
           <Route path="/media" element={<Media />} />
-          <Route path="/me" element={<Me />} />
+          <Route path="/me" element={<Me theme={theme} onThemeChange={onThemeChange} />} />
         </Route>
 
         {/* 无 TabBar */}
