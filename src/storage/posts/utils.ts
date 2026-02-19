@@ -1,4 +1,4 @@
-import type { PostService, Post } from './index';
+import type { PostService } from './index';
 
 /**
  * Generates a random string of specified length.
@@ -23,24 +23,19 @@ function generateRandomString(length: number): string {
  * @param postService The PostService instance to use for creating posts.
  * @param number The number of random posts to create.
  * @param maxContentSize The maximum length of content for each post (default: 256).
- * @returns A promise that resolves to an array of created posts.
+ * @returns A promise that resolves when all posts are created.
  */
 export async function createRandomPosts(
   postService: PostService,
   number: number,
   maxContentSize: number = 256
-): Promise<Post[]> {
-  const createdPosts = [];
-  
+): Promise<void> {
   for (let i = 0; i < number; i++) {
     // Generate random content length between 1 and maxContentSize
     const contentLength = Math.floor(Math.random() * maxContentSize) + 1;
     const randomContent = generateRandomString(contentLength);
     
     // Create post using the provided PostService
-    const post = await postService.createPost({ content: randomContent });
-    createdPosts.push(post);
+    await postService.createPost({ content: randomContent });
   }
-  
-  return createdPosts;
 }
