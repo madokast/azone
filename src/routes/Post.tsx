@@ -54,7 +54,6 @@ export default function Post({
       )}
       {articleMode && (
         <>
-          <h1 style={{ fontSize: 24, marginBottom: 12 }}>文章详情</h1>
           <p style={{ fontSize: 16, lineHeight: 1.5, marginBottom: 16 }}>
             {content}
           </p>

@@ -9,7 +9,9 @@ export default function DetailLayout() {
       <NavBar
         back="返回"
         onBack={() => navigate(-1)}
-      />
+      >
+        文章详情
+      </NavBar>
 
       <div style={{ flex: 1 }}>
         <Outlet />
