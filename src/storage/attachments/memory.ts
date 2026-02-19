@@ -10,16 +10,31 @@ export class MemoryAttachmentService implements AttachmentService {
   /**
    * Gets an attachment by its ID.
    * Note: This method only constructs URLs and doesn't access the network.
+   * If the attachment is not found, generates a random image attachment.
    * @param id The ID of the attachment to retrieve.
    * @returns A promise that resolves to the attachment.
-   * @throws Error if the attachment is not found.
    */
   getAttachment(id: string): Promise<Attachment> {
     const attachment = this.attachments.get(id);
     if (attachment) {
       return Promise.resolve(attachment);
     }
-    return Promise.reject(new Error(`Attachment with ID ${id} not found`));
+    
+    // Generate random image attachment if not found
+    const randomWidth = Math.floor(Math.random() * 601) + 600; // 600-1200
+    const randomHeight = Math.floor(Math.random() * 601) + 600; // 600-1200
+    
+    const randomAttachment: Attachment = {
+      id,
+      mimeType: 'image/jpeg',
+      thumbnailUrl: `https://picsum.photos/160/160?random=${id}`,
+      sourceUrl: `https://picsum.photos/${randomWidth}/${randomHeight}?random=${id}`,
+    };
+    
+    // Store the generated attachment in memory
+    this.attachments.set(id, randomAttachment);
+    
+    return Promise.resolve(randomAttachment);
   }
 
   /**
