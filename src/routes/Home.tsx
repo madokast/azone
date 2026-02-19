@@ -3,7 +3,7 @@ import { List } from 'antd-mobile';
 
 export default function Home() {
   return (
-    <List header='最新动态'>
+    <List>
       <List.Item>
         <Post id="1" articleMode={false} />
       </List.Item>
