@@ -1,6 +1,6 @@
 /**
  * Attachment model for file attachments.
- * Contains basic file metadata.
+ * Contains basic file metadata and URLs.
  */
 export type Attachment = {
   /**
@@ -13,4 +13,19 @@ export type Attachment = {
    * Example: "image/jpeg", "application/pdf"
    */
   mimeType: string;
+  
+  /**
+   * Size of the attachment in bytes
+   */
+  size: number;
+  
+  /**
+   * URL to the thumbnail version of the attachment (if applicable)
+   */
+  thumbnailUrl?: string;
+  
+  /**
+   * URL to the original source of the attachment
+   */
+  sourceUrl: string;
 };
