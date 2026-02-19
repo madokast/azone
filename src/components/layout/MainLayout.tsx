@@ -40,6 +40,10 @@ export default function MainLayout() {
       </NavBar>
 
       <div style={{ flex: 1 }}>
+        {/* Outlet 是 React Router DOM 中的组件，用于在嵌套路由中渲染子路由的内容 */}
+        {/* 例如，当访问 /home 时，Outlet 会渲染 Home 组件 */}
+        {/* 当访问 /media 时，Outlet 会渲染 Media 组件 */}
+        {/* 当访问 /me 时，Outlet 会渲染 Me 组件 */}
         <Outlet />
       </div>
 
