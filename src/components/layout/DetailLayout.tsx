@@ -7,10 +7,9 @@ export default function DetailLayout() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <NavBar
-        back="返回"
         onBack={() => navigate(-1)}
       >
-        文章详情
+        Detail
       </NavBar>
 
       <div style={{ flex: 1 }}>

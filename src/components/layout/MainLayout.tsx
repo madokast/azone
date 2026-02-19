@@ -40,9 +40,9 @@ export default function MainLayout({ theme, onThemeChange }: MainLayoutProps) {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <NavBar back={null}>
-        {path === '/home' && '首页'}
-        {path === '/media' && '媒体'}
-        {path === '/me' && '我的'}
+        {path === '/home' && 'Home'}
+        {path === '/media' && 'Media'}
+        {path === '/me' && 'Me'}
       </NavBar>
 
       <div style={{ flex: 1 }}>

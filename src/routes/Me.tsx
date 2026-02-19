@@ -19,7 +19,7 @@ export default function Me({ theme, onThemeChange }: MeProps) {
       
       {/* 设置区域 */}
       <Form layout='horizontal'>
-        <Form.Item name='theme' label='主题' childElementPosition='right'>
+        <Form.Item name='theme' label='Theme' childElementPosition='right'>
           <Segmented
             options={[
               { label: 'System', value: 'system' },
