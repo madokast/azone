@@ -1,0 +1,17 @@
+.tab-bar-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #1677ff, transparent);
+  border-radius: 3px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tab-bar-item.active::after {
+  opacity: 1;
+}
