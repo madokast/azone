@@ -6,6 +6,7 @@ import type { Attachment, AttachmentService } from './index';
  */
 export class MemoryAttachmentService implements AttachmentService {
   private attachments = new Map<string, Attachment>();
+  private objectUrls = new Map<string, string[]>(); // Store object URLs for cleanup
 
   /**
    * Gets an attachment by its ID.
@@ -30,6 +31,14 @@ export class MemoryAttachmentService implements AttachmentService {
   deleteAttachment(id: string): Promise<boolean> {
     const existed = this.attachments.has(id);
     if (existed) {
+      // Revoke object URLs if they exist
+      const urls = this.objectUrls.get(id);
+      if (urls) {
+        urls.forEach(url => {
+          URL.revokeObjectURL(url);
+        });
+        this.objectUrls.delete(id);
+      }
       this.attachments.delete(id);
     }
     return Promise.resolve(existed);
@@ -42,16 +51,37 @@ export class MemoryAttachmentService implements AttachmentService {
    */
   uploadAttachment(file: File): Promise<string> {
     const id = crypto.randomUUID();
+    let sourceUrl: string;
+    let thumbnailUrl: string;
+    const urlsToStore: string[] = [];
     
-    // Create attachment with mock URLs for testing
+    // Check if file is an image
+    const isImage = file.type.startsWith('image/');
+    
+    if (isImage) {
+      // For images: create object URLs for both source and thumbnail
+      sourceUrl = URL.createObjectURL(file);
+      // Thumbnail: using the same object URL for now (not compressed)
+      // TODO: Implement actual thumbnail compression
+      thumbnailUrl = URL.createObjectURL(file);
+      urlsToStore.push(sourceUrl, thumbnailUrl);
+    } else {
+      // For non-images: create object URL only for source, use default thumbnail
+      sourceUrl = URL.createObjectURL(file);
+      thumbnailUrl = '/thumbnail/unknow-file.svg';
+      urlsToStore.push(sourceUrl);
+    }
+    
+    // Create attachment
     const attachment: Attachment = {
       id,
       mimeType: file.type || 'application/octet-stream',
-      thumbnailUrl: `/thumbnail/${id}`,
-      sourceUrl: `/source/${id}`,
+      thumbnailUrl,
+      sourceUrl,
     };
 
     this.attachments.set(id, attachment);
+    this.objectUrls.set(id, urlsToStore);
     return Promise.resolve(id);
   }
 
@@ -59,7 +89,14 @@ export class MemoryAttachmentService implements AttachmentService {
    * Clears all attachments from memory (for testing purposes).
    */
   clear(): void {
+    // Revoke all object URLs
+    this.objectUrls.forEach(urls => {
+      urls.forEach(url => {
+        URL.revokeObjectURL(url);
+      });
+    });
     this.attachments.clear();
+    this.objectUrls.clear();
   }
 
   /**
