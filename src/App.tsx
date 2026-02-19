@@ -1,23 +1,15 @@
 import { useEffect, useState } from "react";
 import {
-  Button,
-  NavBar,
-  SafeArea,
-} from "antd-mobile";
-import {
   getConfig,
   incrementOpenCount,
-  setTheme as persistTheme,
   subscribeConfig,
   type UiTheme,
 } from "./storage/settings";
-import { AppMenu } from "./components/layout/AppMenu";
 import { showToast } from "./ui/toast";
-import { appColor } from "./styles/theme-tokens";
+import AppRouter from "./routes";
 
 export default function App() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [openCount, setOpenCount] = useState(0);
+  const [, setOpenCount] = useState(0);
   const [theme, setTheme] = useState<UiTheme>("system");
 
   useEffect(() => {
@@ -91,55 +83,6 @@ export default function App() {
   }, [theme]);
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        // 使用主题变量，亮色/暗色模式会自动切换
-        background: appColor.bg,
-        color: appColor.text,
-      }}
-    >
-      <AppMenu
-        open={isMenuOpen}
-        theme={theme}
-        onThemeChange={(value) => {
-          setTheme(value);
-          void persistTheme(value);
-        }}
-        onClose={() => setIsMenuOpen(false)}
-      />
-
-      <NavBar
-        back={null}
-        left={
-          <Button
-            fill="none"
-            size="small"
-            onClick={() => setIsMenuOpen(true)}
-          >
-            Menu
-          </Button>
-        }
-      >
-        Hello World
-      </NavBar>
-
-      <div style={{ flex: 1, padding: 16 }}>
-        React + TypeScript + Vite + Ant Design Mobile
-      </div>
-
-      <div
-        style={{
-          padding: "12px 16px",
-          borderTop: `1px solid ${appColor.border}`,
-          background: appColor.surface,
-        }}
-      >
-        Open count: {openCount}
-      </div>
-      <SafeArea position="bottom" />
-    </div>
+    <AppRouter />
   );
 }
