@@ -26,13 +26,8 @@ export default function Post({
   return (
     <div 
       style={{ 
-        padding: articleMode ? 16 : 12,
-        cursor: !articleMode && typeof id === 'string' && id !== '示例文章' ? 'pointer' : 'default',
-        border: !articleMode ? '1px solid #e1e1e1' : 'none',
-        borderRadius: !articleMode ? 16 : 0,
-        backgroundColor: !articleMode ? '#ffffff' : 'transparent',
-        boxShadow: !articleMode ? '0 1px 3px rgba(0, 0, 0, 0.05)' : 'none',
-        transition: !articleMode ? 'background-color 0.2s ease' : 'none'
+        padding: articleMode ? 16 : '16px 0',
+        cursor: !articleMode && typeof id === 'string' && id !== '示例文章' ? 'pointer' : 'default'
       }}
       onClick={handleClick}
     >
