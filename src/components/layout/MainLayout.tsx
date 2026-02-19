@@ -1,6 +1,7 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { NavBar, TabBar, SafeArea } from 'antd-mobile';
 import { useState, useEffect } from 'react';
+import { AppOutline, PicturesOutline, UserSetOutline } from 'antd-mobile-icons';
 
 export default function MainLayout() {
   const navigate = useNavigate();
@@ -49,16 +50,16 @@ export default function MainLayout() {
       >
         <TabBar.Item
           key="home"
-          icon={<img src="/tab-bar/home.svg" style={{ width: 24, height: 24 }} />}
+          icon={<AppOutline />}
           badge={1}
         />
         <TabBar.Item
           key="media"
-          icon={<img src="/tab-bar/media.svg" style={{ width: 24, height: 24 }} />}
+          icon={<PicturesOutline />}
         />
         <TabBar.Item
           key="me"
-          icon={<img src="/tab-bar/me.svg" style={{ width: 24, height: 24 }} />}
+          icon={<UserSetOutline />}
         />
       </TabBar>
     </div>
