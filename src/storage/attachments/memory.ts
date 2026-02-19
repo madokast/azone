@@ -25,20 +25,20 @@ export class MemoryAttachmentService implements AttachmentService {
   /**
    * Deletes an attachment by its ID.
    * @param id The ID of the attachment to delete.
-   * @returns A promise that resolves to true if the attachment was deleted successfully, false otherwise.
+   * @returns A promise that resolves when the attachment is deleted successfully.
+   * @throws Error if the attachment is not found.
    */
-  deleteAttachment(id: string): Promise<boolean> {
-    const existed = this.attachments.has(id);
-    if (existed) {
-      const attachment = this.attachments.get(id);
-      if (attachment) {
-        // Only revoke sourceUrl, as thumbnailUrl is either the same object URL (for images)
-        // or a static URL (for non-images) that doesn't need revocation
-        URL.revokeObjectURL(attachment.sourceUrl);
-      }
-      this.attachments.delete(id);
+  deleteAttachment(id: string): Promise<void> {
+    const attachment = this.attachments.get(id);
+    if (!attachment) {
+      return Promise.reject(new Error(`Attachment with ID ${id} not found`));
     }
-    return Promise.resolve(existed);
+    
+    // Revoke object URL
+    URL.revokeObjectURL(attachment.sourceUrl);
+    // Delete from map
+    this.attachments.delete(id);
+    return Promise.resolve();
   }
 
   /**

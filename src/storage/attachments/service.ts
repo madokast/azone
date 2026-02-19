@@ -16,9 +16,10 @@ export interface AttachmentService {
   /**
    * Deletes an attachment by its ID.
    * @param id The ID of the attachment to delete.
-   * @returns A promise that resolves to true if the attachment was deleted successfully, false otherwise.
+   * @returns A promise that resolves when the attachment is deleted successfully.
+   * @throws Error if the attachment is not found.
    */
-  deleteAttachment(id: string): Promise<boolean>;
+  deleteAttachment(id: string): Promise<void>;
 
   /**
    * Uploads a file and creates an attachment.
