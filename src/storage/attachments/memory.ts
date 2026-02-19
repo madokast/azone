@@ -48,21 +48,19 @@ export class MemoryAttachmentService implements AttachmentService {
    */
   uploadAttachment(file: File): Promise<string> {
     const id = crypto.randomUUID();
-    let sourceUrl: string;
+    // Create object URL for source
+    const sourceUrl = URL.createObjectURL(file);
     let thumbnailUrl: string;
     
     // Check if file is an image
     const isImage = file.type.startsWith('image/');
     
     if (isImage) {
-      // For images: create object URL once and use it for both source and thumbnail
-      sourceUrl = URL.createObjectURL(file);
-      // Thumbnail: using the same object URL for now (not compressed)
+      // For images: use the same object URL for thumbnail (not compressed)
       // TODO: Implement actual thumbnail compression
       thumbnailUrl = sourceUrl;
     } else {
-      // For non-images: create object URL only for source, use default thumbnail
-      sourceUrl = URL.createObjectURL(file);
+      // For non-images: use default thumbnail
       thumbnailUrl = '/thumbnail/unknow-file.svg';
     }
     
