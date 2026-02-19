@@ -47,10 +47,10 @@ export default function MainLayout() {
         <Outlet />
       </div>
 
-      <SafeArea position="bottom" />
       <TabBar 
         activeKey={activeKey}
         onChange={handleTabBarChange}
+        safeArea
       >
         <TabBar.Item
           key="home"
