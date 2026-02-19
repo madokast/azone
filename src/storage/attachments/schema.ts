@@ -20,9 +20,9 @@ export type Attachment = {
   size: number;
   
   /**
-   * URL to the thumbnail version of the attachment (if applicable)
+   * URL to the thumbnail version of the attachment
    */
-  thumbnailUrl?: string;
+  thumbnailUrl: string;
   
   /**
    * URL to the original source of the attachment
