@@ -23,20 +23,17 @@ export default function MainLayout() {
         <TabBar.Item
           key="home"
           icon={<img src="/tab-bar/home.svg" style={{ width: 24, height: 24 }} />}
-          title="首页"
           badge={1}
           onClick={() => navigate('/home')}
         />
         <TabBar.Item
           key="media"
           icon={<img src="/tab-bar/media.svg" style={{ width: 24, height: 24 }} />}
-          title="媒体"
           onClick={() => navigate('/media')}
         />
         <TabBar.Item
           key="me"
           icon={<img src="/tab-bar/me.svg" style={{ width: 24, height: 24 }} />}
-          title="我的"
           onClick={() => navigate('/me')}
         />
       </TabBar>
