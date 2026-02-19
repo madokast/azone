@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './Home';
 import Media from './Media';
 import Me from './Me';
@@ -10,6 +10,9 @@ export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* 根路径重定向到首页 */}
+        <Route path="/" element={<Navigate to="/home" replace />} />
+
         {/* 带 TabBar */}
         <Route element={<MainLayout />}>
           <Route path="/home" element={<Home />} />
@@ -22,8 +25,8 @@ export default function AppRouter() {
           <Route path="/home/post/:id" element={<Post articleMode />} />
         </Route>
 
-        {/* 默认重定向到首页 */}
-        <Route path="*" element={<Home />} />
+        {/* 其他路径重定向到首页 */}
+        <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
     </BrowserRouter>
   );
