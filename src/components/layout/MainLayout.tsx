@@ -33,7 +33,7 @@ export default function MainLayout() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <NavBar>
+      <NavBar back={null}>
         {path === '/home' && '首页'}
         {path === '/media' && '媒体'}
         {path === '/me' && '我的'}
