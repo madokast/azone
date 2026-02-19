@@ -32,7 +32,7 @@ export default function Post({
       onClick={handleClick}
     >
       {!articleMode && (
-        <div style={{ marginBottom: 8 }}>
+        <div style={{ margin: 0 }}>
           <p 
             style={{ 
               fontSize: 14, 
