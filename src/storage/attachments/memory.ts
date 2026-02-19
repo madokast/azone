@@ -11,11 +11,15 @@ export class MemoryAttachmentService implements AttachmentService {
    * Gets an attachment by its ID.
    * Note: This method only constructs URLs and doesn't access the network.
    * @param id The ID of the attachment to retrieve.
-   * @returns A promise that resolves to the attachment if found, null otherwise.
+   * @returns A promise that resolves to the attachment.
+   * @throws Error if the attachment is not found.
    */
-  getAttachment(id: string): Promise<Attachment | null> {
+  getAttachment(id: string): Promise<Attachment> {
     const attachment = this.attachments.get(id);
-    return Promise.resolve(attachment || null);
+    if (attachment) {
+      return Promise.resolve(attachment);
+    }
+    return Promise.reject(new Error(`Attachment with ID ${id} not found`));
   }
 
   /**

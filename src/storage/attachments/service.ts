@@ -9,9 +9,9 @@ export interface AttachmentService {
    * Gets an attachment by its ID.
    * Note: This method only constructs URLs and doesn't access the network.
    * @param id The ID of the attachment to retrieve.
-   * @returns A promise that resolves to the attachment if found, null otherwise.
+   * @returns A promise that resolves to the attachment.
    */
-  getAttachment(id: string): Promise<Attachment | null>;
+  getAttachment(id: string): Promise<Attachment>;
 
   /**
    * Deletes an attachment by its ID.
