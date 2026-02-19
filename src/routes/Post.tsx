@@ -26,7 +26,7 @@ export default function Post({
   return (
     <div 
       style={{ 
-        padding: articleMode ? 16 : '16px 0',
+        padding: articleMode ? 16 : 0,
         cursor: !articleMode && typeof id === 'string' && id !== '示例文章' ? 'pointer' : 'default'
       }}
       onClick={handleClick}
