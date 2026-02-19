@@ -1,7 +1,6 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { NavBar, TabBar, SafeArea } from 'antd-mobile';
 import { useState, useEffect } from 'react';
-import './MainLayout.css';
 
 export default function MainLayout() {
   const navigate = useNavigate();
@@ -45,7 +44,6 @@ export default function MainLayout() {
 
       <SafeArea position="bottom" />
       <TabBar 
-        style={{ borderTop: '1px solid #f0f0f0' }}
         activeKey={activeKey}
         onChange={handleTabBarChange}
       >
@@ -53,41 +51,14 @@ export default function MainLayout() {
           key="home"
           icon={<img src="/tab-bar/home.svg" style={{ width: 24, height: 24 }} />}
           badge={1}
-          className={`tab-bar-item ${activeKey === 'home' ? 'active' : ''}`}
-          style={{
-            position: 'relative',
-            paddingBottom: '8px'
-          }}
-          activeStyle={{
-            position: 'relative',
-            paddingBottom: '8px'
-          }}
         />
         <TabBar.Item
           key="media"
           icon={<img src="/tab-bar/media.svg" style={{ width: 24, height: 24 }} />}
-          className={`tab-bar-item ${activeKey === 'media' ? 'active' : ''}`}
-          style={{
-            position: 'relative',
-            paddingBottom: '8px'
-          }}
-          activeStyle={{
-            position: 'relative',
-            paddingBottom: '8px'
-          }}
         />
         <TabBar.Item
           key="me"
           icon={<img src="/tab-bar/me.svg" style={{ width: 24, height: 24 }} />}
-          className={`tab-bar-item ${activeKey === 'me' ? 'active' : ''}`}
-          style={{
-            position: 'relative',
-            paddingBottom: '8px'
-          }}
-          activeStyle={{
-            position: 'relative',
-            paddingBottom: '8px'
-          }}
         />
       </TabBar>
     </div>
