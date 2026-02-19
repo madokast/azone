@@ -1,4 +1,4 @@
-import { Form, Segmented } from 'antd-mobile';
+import { Divider, Form, List, Segmented, Space, Tag } from 'antd-mobile';
 import { type UiTheme } from '../storage/settings';
 
 type MeProps = {
@@ -9,14 +9,12 @@ type MeProps = {
 export default function Me({ theme, onThemeChange }: MeProps) {
   return (
     <div style={{ padding: 16 }}>
-      {/* 统计信息区域 */}
-      <div style={{ padding: 16 }}>
-        <p>开发中...</p>
-      </div>
-      
-      <h1>Settings</h1>
-      
-      {/* 设置区域 */}
+      <Space>
+        <Tag color='primary' fill='outline'>开发中</Tag>
+      </Space>
+
+      <Divider>Settings</Divider>
+
       <Form layout='horizontal'>
         <Form.Item name='theme' label='Theme' childElementPosition='right'>
           <Segmented
