@@ -16,6 +16,7 @@ export class MemoryPostService implements PostService {
     const newPost: Post = {
       id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
+      attachmentIds: null,
       ...postData,
     };
 
