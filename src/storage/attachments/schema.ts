@@ -13,9 +13,4 @@ export type Attachment = {
    * Example: "image/jpeg", "application/pdf"
    */
   mimeType: string;
-  
-  /**
-   * Size of the attachment in bytes
-   */
-  size: number;
 };
