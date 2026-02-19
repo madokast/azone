@@ -1,5 +1,5 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { NavBar, TabBar, SafeArea } from 'antd-mobile';
+import { NavBar, TabBar } from 'antd-mobile';
 import { useState, useEffect } from 'react';
 import { AppOutline, PicturesOutline, UserSetOutline } from 'antd-mobile-icons';
 
