@@ -9,3 +9,10 @@
   --app-color-border: var(--adm-color-border);
   --app-color-surface: var(--adm-color-box);
 }
+
+.no-select {
+  user-select: none;      /* 标准写法 */
+  -webkit-user-select: none; /* Safari / Chrome / Opera */
+  -moz-user-select: none;    /* Firefox */
+  -ms-user-select: none;     /* IE10+ */
+}

@@ -1,41 +1,25 @@
-import { useState } from 'react';
 import { type Post as PostType } from '../storage/posts';
+import { useState } from 'react';
 
 interface PostProps {
   post: PostType;
 }
 
 export default function Post({ post }: PostProps) {
+  const collapseSize = 100;
   const [expanded, setExpanded] = useState(false);
-
-  const handleClick = () => {
-    if (!expanded) {
-      setExpanded(true);
-    }
-  };
 
   return (
     <div style={{ margin: 0 }}>
-      <p 
-        onClick={handleClick}
-        style={{ 
-          fontSize: 14, 
-          lineHeight: 1.4, 
-          marginBottom: 8,
-          cursor: 'pointer',
-          ...(!expanded && {
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis'
-          })
-        }}
-      >
-        {post.content}
+      <p>
+        {expanded ? post.content : `${post.content.slice(0, collapseSize)}...`}
       </p>
-      <div style={{ fontSize: 12, color: '#6e6e6e' }}>
+      <div style={{ fontSize: 12, color: '#6e6e6e' }} className='no-select'>
         {post.createdAt}
+        <span>{" "}</span>
+        <span hidden={post.content.length <= collapseSize} onClick={() => setExpanded(!expanded)} style={{ cursor: 'pointer' }}>
+          {expanded ? 'Show Less' : 'Show More'}
+        </span>
       </div>
     </div>
   );
