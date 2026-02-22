@@ -18,7 +18,6 @@ export default function Publish({ onPublish }: PublishProps) {
   return (
     <div style={{
       padding: 16,
-      background: '#fff',
       borderRadius: 8,
       boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
     }}>

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import Post from '../components/Post';
-import { List, InfiniteScroll } from 'antd-mobile';
+import { List, InfiniteScroll, Button, Popup } from 'antd-mobile';
 import { createRandomPosts, PostServiceIns, type Post as PostType } from '../storage/posts';
+import Publish from '../components/Publish';
 
 export default function Home() {
   const [data, setData] = useState<PostType[]>([]);
@@ -44,6 +45,9 @@ export default function Home() {
     }
   }
 
+  // publish popup
+  const [publishVisible, setPublishVisible] = useState(false);
+
   return (
     <>
       <List>
@@ -54,6 +58,29 @@ export default function Home() {
         ))}
       </List>
       <InfiniteScroll loadMore={loadMore} hasMore={hasMore} />
+
+      <div style={{
+        position: 'fixed',
+        bottom: 100,
+        right: 100,
+      }} hidden={publishVisible}>
+        <Button
+          color='primary'
+          fill='outline'
+          onClick={() => setPublishVisible(true)}
+        >
+          Post
+        </Button>
+      </div>
+
+      <Popup
+        visible={publishVisible}
+        onMaskClick={() => setPublishVisible(false)}
+        position='bottom'
+      >
+        <Publish onPublish={(s)=>{}} />
+      </Popup>
+
     </>
   );
 }
