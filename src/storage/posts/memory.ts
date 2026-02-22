@@ -1,5 +1,6 @@
 import type { Post, PostService, CreatePostData } from './index';
 import { generateId } from '../utils';
+import { formatDate } from './utils';
 
 /**
  * In-memory implementation of PostService for testing purposes.
@@ -16,7 +17,7 @@ export class MemoryPostService implements PostService {
   createPost(postData: CreatePostData): Promise<Post> {
     const newPost: Post = {
       id: generateId(),
-      createdAt: new Date().toISOString(),
+      createdAt: formatDate(new Date()),
       attachmentIds: null,
       ...postData,
     };
