@@ -3,12 +3,15 @@ import { useEffect, useState } from 'react';
 
 import { Button, Image, Space } from 'antd-mobile';
 import { Attachment, AttachmentServiceIns } from '../storage/attachments';
+import AttachmentViewer from './AttachmentViewer';
 
 interface PostProps {
   post: PostType;
 }
 
 export default function Post({ post }: PostProps) {
+
+  // 控制内容和附件的显示/折叠
   const collapseContentSize = 100;
   const collapseAttachmentSize = 3;
   const [expanded, setExpanded] = useState(false);
@@ -32,18 +35,35 @@ export default function Post({ post }: PostProps) {
     ? attachments.slice(0, collapseAttachmentSize) 
     : attachments;
 
+  // 控制附件查看器的显示/隐藏
+  const [attachmentViewerVisible, setAttachmentViewerVisible] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
   return (
     <div style={{ margin: 0 }}>
+      {/* 内容 */}
       <p>{displayContent}</p>
       
+      {/* 附件 */}
       {attachments.length > 0 && (
         <Space wrap>
-          {displayAttachments.map((attachment) => (
-            <Image key={attachment.id} src={attachment.thumbnailUrl} width={100} height={100} fit='cover' />
+          {displayAttachments.map((attachment, index) => (
+            <Image
+              key={attachment.id}
+              src={attachment.thumbnailUrl}
+              width={100}
+              height={100}
+              fit='cover'
+              onClick={() => {
+                setCurrentIndex(index);
+                setAttachmentViewerVisible(true);
+              }}
+            />
           ))}
         </Space>
       )}
       
+      {/* 原信息 */}
       <div style={{ fontSize: 12, color: '#6e6e6e' }} className='no-select'>
         {post.createdAt}
         <span> </span>
@@ -58,6 +78,13 @@ export default function Post({ post }: PostProps) {
           </Button>
         )}
       </div>
+
+      <AttachmentViewer
+        attachments={attachments}
+        visible={attachmentViewerVisible}
+        currentIndex={currentIndex}
+        onClose={() => setAttachmentViewerVisible(false)}
+      />
     </div>
   );
 }
