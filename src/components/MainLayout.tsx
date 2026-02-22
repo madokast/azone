@@ -3,6 +3,7 @@ import { NavBar, TabBar } from 'antd-mobile';
 import { useState, useEffect } from 'react';
 import { AppOutline, PicturesOutline, UserSetOutline } from 'antd-mobile-icons';
 import { type UiTheme } from '../storage/settings';
+import { appColor } from '../styles/theme-tokens'
 
 type MainLayoutProps = {
   theme: UiTheme;
@@ -53,7 +54,7 @@ export default function MainLayout({ theme, onThemeChange }: MainLayoutProps) {
         <Outlet context={{ theme, onThemeChange }} />
       </div>
 
-      <div style={{ position: 'sticky', bottom: 0 }}>
+      <div style={{ position: 'sticky', bottom: 0, backgroundColor: appColor.bg }}>
         <TabBar
           activeKey={activeKey}
           onChange={handleTabBarChange}
