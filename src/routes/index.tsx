@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './Home';
 import Media from './Media';
 import Me from './Me';
-import MainLayout from '../components/layout/MainLayout';
+import MainLayout from '../components/MainLayout';
 import { type UiTheme } from '../storage/settings';
 
 type AppRouterProps = {
