@@ -1,15 +1,31 @@
+import { useState, useEffect } from 'react';
+import { PostServiceIns } from '../storage/posts';
+import { showToast } from '../components/toast';
+
 interface PostProps {
-  id?: string;
-  content?: string;
-  createdAt?: string;
+  id: string;
 }
 
-export default function Post({ 
-  id: propId, 
-  content = '这是文章的内容，包含很多文字，在非文章模式下只会展示两行，在文章模式下会全部展示。这是文章的内容，包含很多文字，在非文章模式下只会展示两行，在文章模式下会全部展示。',
-  createdAt = new Date().toLocaleString()
-}: PostProps) {
-  const id = propId || '示例文章';
+export default function Post({ id }: PostProps) {
+  const [content, setContent] = useState('加载中...');
+  const [createdAt, setCreatedAt] = useState('');
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      const post = await PostServiceIns.getPost(id);
+      if (!post) {
+        const errorMessage = `Post with ID ${id} not found`;
+        setContent(`Error: ${errorMessage}`);
+        setCreatedAt('');
+        showToast(errorMessage);
+        return;
+      }
+      setContent(post.content);
+      setCreatedAt(post.createdAt);
+    };
+
+    fetchPost();
+  }, [id]);
 
   return (
     <div style={{ margin: 0 }}>
