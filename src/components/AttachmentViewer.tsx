@@ -1,4 +1,4 @@
-import { ImageViewer, Button } from 'antd-mobile';
+import { ImageViewer, Button, AutoCenter  } from 'antd-mobile';
 import { type Attachment } from '../storage/attachments';
 import { isImageMimeType, isVideoMimeType } from '../storage/attachments';
 
@@ -37,13 +37,20 @@ export default function AttachmentViewer({
     if (isImageMimeType(attachment.mimeType)) return null;
 
     return (
-      <Button
-        color='primary'
-        fill='none'
-        onClick={() => handleDownload(index)}
-      >
-        Download
-      </Button>
+      <div style={{
+        marginBottom: 40
+      }}>
+      <AutoCenter>
+        <Button
+          color='primary'
+          fill='solid'
+          shape='rounded'
+          onClick={() => handleDownload(index)}
+        >
+          Download
+        </Button>
+      </AutoCenter>
+      </div>
     );
   };
 

@@ -24,14 +24,18 @@ export class MemoryAttachmentService implements AttachmentService {
     // Generate random image attachment if not found
     const randomWidth = Math.floor(Math.random() * 601) + 600; // 600-1200
     const randomHeight = Math.floor(Math.random() * 601) + 600; // 600-1200
+
+    const isVideo = Math.random() > 0.5;
     
     const randomAttachment: Attachment = {
       id,
-      mimeType: 'image/jpeg',
+      mimeType: isVideo ? 'video/mp4' : 'image/jpeg',
       thumbnailUrl: `https://picsum.photos/160/160?random=${id}`,
-      sourceUrl: `https://picsum.photos/${randomWidth}/${randomHeight}?random=${id}`,
+      sourceUrl: isVideo ?
+        "https://mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*uYT7SZwhJnUAAAAAAAAAAAAADgCCAQ" :
+        `https://picsum.photos/${randomWidth}/${randomHeight}?random=${id}`,
     };
-    
+
     // Store the generated attachment in memory
     this.attachments.set(id, randomAttachment);
     
