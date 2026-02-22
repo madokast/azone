@@ -1,10 +1,7 @@
+import { type Post as PostType } from '../storage/posts';
+
 interface PostProps {
-  post: {
-    id: string;
-    content: string;
-    createdAt: string;
-    attachmentIds?: string[] | null;
-  };
+  post: PostType;
 }
 
 export default function Post({ post }: PostProps) {
