@@ -1,24 +1,25 @@
-import { useState } from 'react';
 import { ImageViewer, Space, Image } from 'antd-mobile';
 import { type Attachment } from '../storage/attachments';
 import { isImageMimeType, isVideoMimeType } from '../storage/attachments';
 
 interface AttachmentViewerProps {
   attachments: Attachment[];
+  visible: boolean;
+  currentIndex: number;
+  onOpen: (index: number) => void;
+  onClose: () => void;
 }
 
-export default function AttachmentViewer({ attachments }: AttachmentViewerProps) {
-  const [visible, setVisible] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
-
+export default function AttachmentViewer({ 
+  attachments, 
+  visible, 
+  currentIndex, 
+  onOpen, 
+  onClose 
+}: AttachmentViewerProps) {
   const images = attachments.map(attachment => 
     isImageMimeType(attachment.mimeType) ? attachment.sourceUrl : attachment.thumbnailUrl
   );
-
-  const handleClick = (index: number) => {
-    setCurrentIndex(index);
-    setVisible(true);
-  };
 
   const handleDownload = (index: number) => {
     const attachment = attachments[index];
@@ -98,7 +99,7 @@ export default function AttachmentViewer({ attachments }: AttachmentViewerProps)
             width={100}
             height={100}
             fit='cover'
-            onClick={() => handleClick(index)}
+            onClick={() => onOpen(index)}
             style={{ cursor: 'pointer' }}
           />
         ))}
@@ -110,9 +111,7 @@ export default function AttachmentViewer({ attachments }: AttachmentViewerProps)
         defaultIndex={currentIndex}
         imageRender={imageRender}
         renderFooter={renderFooter}
-        onClose={() => {
-          setVisible(false);
-        }}
+        onClose={onClose}
       />
     </>
   );
