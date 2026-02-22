@@ -2,7 +2,7 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { NavBar, TabBar } from 'antd-mobile';
 import { useState, useEffect } from 'react';
 import { AppOutline, PicturesOutline, UserSetOutline } from 'antd-mobile-icons';
-import { type UiTheme } from '../../storage/settings';
+import { type UiTheme } from '../storage/settings';
 
 type MainLayoutProps = {
   theme: UiTheme;
@@ -13,7 +13,7 @@ export default function MainLayout({ theme, onThemeChange }: MainLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const path = location.pathname;
-  
+
   // 根据路径设置初始激活的 key
   const getActiveKey = () => {
     if (path === '/home') return 'home';
@@ -21,14 +21,14 @@ export default function MainLayout({ theme, onThemeChange }: MainLayoutProps) {
     if (path === '/me') return 'me';
     return 'home';
   };
-  
+
   const [activeKey, setActiveKey] = useState(getActiveKey());
-  
+
   // 当路径变化时更新激活状态
   useEffect(() => {
     setActiveKey(getActiveKey());
   }, [path]);
-  
+
   // 处理 TabBar 变化
   const handleTabBarChange = (key: string) => {
     setActiveKey(key);
@@ -53,25 +53,27 @@ export default function MainLayout({ theme, onThemeChange }: MainLayoutProps) {
         <Outlet context={{ theme, onThemeChange }} />
       </div>
 
-      <TabBar 
-        activeKey={activeKey}
-        onChange={handleTabBarChange}
-        safeArea
-      >
-        <TabBar.Item
-          key="home"
-          icon={<AppOutline />}
-          badge={1}
-        />
-        <TabBar.Item
-          key="media"
-          icon={<PicturesOutline />}
-        />
-        <TabBar.Item
-          key="me"
-          icon={<UserSetOutline />}
-        />
-      </TabBar>
+      <div style={{ position: 'sticky', bottom: 0 }}>
+        <TabBar
+          activeKey={activeKey}
+          onChange={handleTabBarChange}
+          safeArea
+        >
+          <TabBar.Item
+            key="home"
+            icon={<AppOutline />}
+            badge={1}
+          />
+          <TabBar.Item
+            key="media"
+            icon={<PicturesOutline />}
+          />
+          <TabBar.Item
+            key="me"
+            icon={<UserSetOutline />}
+          />
+        </TabBar>
+      </div>
     </div>
   );
 }
