@@ -1,32 +1,13 @@
-import { useState, useEffect } from 'react';
-import { PostServiceIns } from '../storage/posts';
-import { showToast } from '../components/toast';
-
 interface PostProps {
-  id: string;
+  post: {
+    id: string;
+    content: string;
+    createdAt: string;
+    attachmentIds?: string[] | null;
+  };
 }
 
-export default function Post({ id }: PostProps) {
-  const [content, setContent] = useState('加载中...');
-  const [createdAt, setCreatedAt] = useState('');
-
-  useEffect(() => {
-    const fetchPost = async () => {
-      const post = await PostServiceIns.getPost(id);
-      if (!post) {
-        const errorMessage = `Post with ID ${id} not found`;
-        setContent(`Error: ${errorMessage}`);
-        setCreatedAt('');
-        showToast(errorMessage);
-        return;
-      }
-      setContent(post.content);
-      setCreatedAt(post.createdAt);
-    };
-
-    fetchPost();
-  }, [id]);
-
+export default function Post({ post }: PostProps) {
   return (
     <div style={{ margin: 0 }}>
       <p 
@@ -41,10 +22,10 @@ export default function Post({ id }: PostProps) {
           textOverflow: 'ellipsis'
         }}
       >
-        {content}
+        {post.content}
       </p>
       <div style={{ fontSize: 12, color: '#6e6e6e' }}>
-        {createdAt}
+        {post.createdAt}
       </div>
     </div>
   );
