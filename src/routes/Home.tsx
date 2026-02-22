@@ -13,7 +13,7 @@ export default function Home() {
   useEffect(() => {
     const fetchInitialPosts = async () => {
       try {
-        await createRandomPosts(PostServiceIns, 20, 10240);
+        await createRandomPosts(PostServiceIns, 20, 256);
         const initialPosts = await PostServiceIns.getPosts(1, pageSize);
         setData(initialPosts);
         setHasMore(initialPosts.length === pageSize);
