@@ -9,7 +9,7 @@ export default function Home() {
     <List>
       {postIds.map((id) => (
         <List.Item key={id}>
-          <Post id={id.toString()} articleMode={false} />
+          <Post id={id.toString()} />
         </List.Item>
       ))}
     </List>
