@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import Post from './Post';
+import Post from '../components/Post';
 import { List, InfiniteScroll } from 'antd-mobile';
 import { createRandomPosts, PostServiceIns, type Post as PostType } from '../storage/posts';
 
