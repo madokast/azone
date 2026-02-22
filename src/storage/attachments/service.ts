@@ -22,6 +22,13 @@ export interface AttachmentService {
   deleteAttachment(id: string): Promise<void>;
 
   /**
+   * Gets multiple attachments by their IDs.
+   * @param ids The IDs of the attachments to retrieve.
+   * @returns A promise that resolves to an array of attachments.
+   */
+  getAttachments(ids: string[]): Promise<Attachment[]>;
+
+  /**
    * Uploads a file and creates an attachment.
    * @param file The file to upload.
    * @returns A promise that resolves to the ID of the created attachment.

@@ -39,6 +39,15 @@ export class MemoryAttachmentService implements AttachmentService {
   }
 
   /**
+   * Gets multiple attachments by their IDs.
+   * @param ids The IDs of the attachments to retrieve.
+   * @returns A promise that resolves to an array of attachments.
+   */
+  getAttachments(ids: string[]): Promise<Attachment[]> {
+    return Promise.all(ids.map(id => this.getAttachment(id)));
+  }
+
+  /**
    * Deletes an attachment by its ID.
    * @param id The ID of the attachment to delete.
    * @returns A promise that resolves when the attachment is deleted successfully.
