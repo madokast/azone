@@ -41,6 +41,7 @@ export default function MainLayout({ theme, onThemeChange }: MainLayoutProps) {
   // 处理滚动事件
   const lastScrollY = useRef(0);
   const [tabBarOpacity, setTabBarOpacity] = useState(1);
+  const [hideTabBar, setHideTabBar] = useState(false);
   useEffect(() => {
     const handleScroll = () => {
       const currScrollY = window.scrollY;
@@ -54,6 +55,15 @@ export default function MainLayout({ theme, onThemeChange }: MainLayoutProps) {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+  useEffect(() => {
+    if (tabBarOpacity === 0) {
+      setTimeout(() => {
+        setHideTabBar(true);
+      }, 300);
+    } else {
+      setHideTabBar(false);
+    }
+  }, [tabBarOpacity]);
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -71,7 +81,13 @@ export default function MainLayout({ theme, onThemeChange }: MainLayoutProps) {
         <Outlet context={{ theme, onThemeChange }} />
       </div>
 
-      <div style={{ position: 'sticky', bottom: 0, backgroundColor: appColor.bg, opacity: tabBarOpacity, transition: 'opacity 0.3s ease' }}>
+      <div style={{
+        position: 'sticky',
+        bottom: 0,
+        backgroundColor: appColor.bg,
+        opacity: tabBarOpacity,
+        transition: 'opacity 1s ease'
+      }} hidden={hideTabBar}>
         <TabBar
           activeKey={activeKey}
           onChange={handleTabBarChange}

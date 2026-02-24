@@ -90,7 +90,7 @@ export default function Home() {
         bottom: 100,
         right: 100,
         opacity: postBottomOpacity,
-        transition: 'opacity 0.3s ease'
+        transition: 'opacity 1s ease'
       }} hidden={publishVisible || hidePostBottom}>
         <Button
           color='primary'
