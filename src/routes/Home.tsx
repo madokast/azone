@@ -12,20 +12,20 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
- const fetchInitialPosts = async () => {
-      try {
-        if (await PostServiceIns.getPostCount() === 0) {
-          await createRandomPosts(PostServiceIns, 20, 256);
-        }
-        const initialPosts = await PostServiceIns.getPosts(1, pageSize);
-        setData(initialPosts);
-        setHasMore(initialPosts.length === pageSize);
-      } catch (error) {
-        console.error('Error fetching initial posts:', error);
-      } finally {
-        setLoading(false);
+  const fetchInitialPosts = async () => {
+    try {
+      if (await PostServiceIns.getPostCount() === 0) {
+        await createRandomPosts(PostServiceIns, 20, 256);
       }
-    };
+      const initialPosts = await PostServiceIns.getPosts(1, pageSize);
+      setData(initialPosts);
+      setHasMore(initialPosts.length === pageSize);
+    } catch (error) {
+      console.error('Error fetching initial posts:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchInitialPosts();
@@ -114,7 +114,7 @@ export default function Home() {
           PostServiceIns.createPost({ content: s }).then(() => {
             fetchInitialPosts();
           });
-        }} />
+        }} focus={publishVisible} />
       </Popup>
 
     </>

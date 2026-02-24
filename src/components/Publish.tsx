@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { TextArea, Button, Space } from 'antd-mobile';
+import { TextAreaRef } from 'antd-mobile/es/components/text-area';
 
 interface PublishProps {
   onPublish: (content: string) => void;
+  focus: boolean;
 }
 
-export default function Publish({ onPublish }: PublishProps) {
+export default function Publish({ onPublish, focus }: PublishProps) {  
   const [content, setContent] = useState('');
 
   const handleSubmit = () => {
@@ -15,6 +17,20 @@ export default function Publish({ onPublish }: PublishProps) {
     }
   };
 
+  const textAreaRef = useRef<TextAreaRef>(null);
+  useEffect(() => {
+    if (textAreaRef.current) {
+      if (focus) {
+        // 添加延迟确保组件完全渲染和可见
+        setTimeout(() => {
+          textAreaRef.current?.focus();
+        }, 100);
+      } else {
+        textAreaRef.current.blur();
+      }
+    }
+  }, [focus]);
+
   return (
     <div style={{
       padding: 16,
@@ -22,7 +38,7 @@ export default function Publish({ onPublish }: PublishProps) {
       boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
     }}>
       <TextArea
-        placeholder="输入内容..."
+        ref={textAreaRef}
         value={content}
         onChange={setContent}
         autoSize={{ minRows: 2, maxRows: 8 }}
