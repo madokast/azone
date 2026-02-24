@@ -1,12 +1,15 @@
+import { useRef, useEffect } from 'react';
 import { ImageViewer, Button, AutoCenter  } from 'antd-mobile';
 import { type Attachment } from '../storage/attachments';
 import { isImageMimeType, isVideoMimeType } from '../storage/attachments';
+import { MultiImageViewerRef } from 'antd-mobile';
 
 interface AttachmentViewerProps {
   attachments: Attachment[];
   visible: boolean;
   currentIndex: number;
-  onClose: () => void;
+  onClose?: () => void;
+  viewContainer?: HTMLElement;
 }
 
 export default function AttachmentViewer({
@@ -14,8 +17,14 @@ export default function AttachmentViewer({
   visible,
   currentIndex,
   onClose,
+  viewContainer,
 }: AttachmentViewerProps) {
   if (attachments.length === 0) return null;
+
+  const ref = useRef<MultiImageViewerRef>(null);
+  useEffect(() => {
+    ref.current?.swipeTo(currentIndex);
+  }, [visible, currentIndex]);
 
   const images = attachments.map(attachment =>
     isImageMimeType(attachment.mimeType) ? attachment.sourceUrl : attachment.thumbnailUrl
@@ -82,6 +91,8 @@ export default function AttachmentViewer({
       imageRender={imageRender}
       renderFooter={renderFooter}
       onClose={onClose}
+      getContainer={viewContainer ?? null}
+      ref={ref}
     />
   );
 }

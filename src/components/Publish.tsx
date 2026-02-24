@@ -1,22 +1,53 @@
 import { useRef, useState, useEffect } from 'react';
-import { TextArea, Button, Space } from 'antd-mobile';
+import { TextArea, Button, Space, Image } from 'antd-mobile';
 import { TextAreaRef } from 'antd-mobile/es/components/text-area';
-import { PictureOutline, UploadOutline } from 'antd-mobile-icons';
+import { UploadOutline, PictureOutline, PlayOutline } from 'antd-mobile-icons';
 import { CreatePostData } from '../storage/posts';
+import { Attachment } from '../storage/attachments';
+import { isImageMimeType } from '../storage/attachments';
+import AttachmentViewer from './AttachmentViewer';
+
+
 
 interface PublishProps {
   onPublish: (post: CreatePostData) => void;
   onChange: (post: CreatePostData) => void;
   focus: boolean;
+  imageSize?: string;
 }
 
-export default function Publish({ onPublish, onChange, focus }: PublishProps) {
+export default function Publish({ onPublish, onChange, focus, imageSize = "90px" }: PublishProps) {
   const [content, setContent] = useState('');
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
 
   const handlePostChange = ({ content }: CreatePostData) => {
     setContent(content);
     onChange({ content });
   };
+
+  // 附件选择
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const handleMediaInput = (files: File[]) => {
+    const newAttachments = files.map((file) => {
+      let thumbnailUrl = '/thumbnail/unknow-file.svg';
+      let sourceUrl = URL.createObjectURL(file);
+      if (isImageMimeType(file.type)) {
+        thumbnailUrl = sourceUrl;
+      }
+      return {
+        id: file.name.replace(/\.[^/.]+$/, ""), // 文件名作为ID
+        mimeType: file.type,
+        thumbnailUrl,
+        sourceUrl,
+      } as Attachment;
+    });
+    setAttachments([...attachments, ...newAttachments]);
+  };
+
+  // 控制附件查看器的显示/隐藏
+  const [attachmentViewerVisible, setAttachmentViewerVisible] = useState(false);
+  const [attachmentCurrentIndex, setAttachmentCurrentIndex] = useState(0);
 
   const handleSubmit = () => {
     if (content.trim()) {
@@ -44,6 +75,7 @@ export default function Publish({ onPublish, onChange, focus }: PublishProps) {
       borderRadius: 8,
       boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
     }}>
+      {/* 内容输入 */}
       <TextArea
         ref={textAreaRef}
         value={content}
@@ -51,28 +83,81 @@ export default function Publish({ onPublish, onChange, focus }: PublishProps) {
         autoSize={{ minRows: 2, maxRows: 8 }}
       />
 
-      {/* 图片媒体 */}
-      <Space block>
+      {/* 媒体上传（不可见）*/}
+      <input
+        type="file"
+        multiple
+        accept="image/*,video/*"
+        onChange={(e) => handleMediaInput(Array.from(e.target.files || []))}
+        ref={imageInputRef}
+        style={{ display: 'none' }}
+      />
+      <input
+        type="file"
+        multiple
+        accept="*"
+        onChange={(e) => handleMediaInput(Array.from(e.target.files || []))}
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+      />
 
-      </Space>
+      {/* 附件 */}
+      {attachments.length > 0 && (
+        <Space wrap>
+          {attachments.map((attachment, index) => (
+            <Image
+              key={attachment.id}
+              src={attachment.thumbnailUrl}
+              width={imageSize}
+              height={imageSize}
+              fit='cover'
+              onClick={() => {
+                setAttachmentCurrentIndex(index);
+                setAttachmentViewerVisible(true);
+              }}
+            />
+          ))}
+        </Space>
+      )}
+
 
       {/* 控制 */}
       <Space justify="end" block>
+        {/* 图片视频选择 */}
         <Button
           color="primary"
           fill="none"
+          onClick={() => imageInputRef.current?.click()}
         >
           <PictureOutline />
         </Button>
+
+        <Button
+          color="primary"
+          fill="none"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <UploadOutline />
+        </Button>
+
         <Button
           color="primary"
           fill="none"
           onClick={handleSubmit}
           disabled={!content.trim()}
         >
-          <UploadOutline />
+          <PlayOutline />
         </Button>
       </Space>
+
+      {/* 图片预览 */}
+      <AttachmentViewer
+        attachments={attachments}
+        visible={attachmentViewerVisible}
+        currentIndex={attachmentCurrentIndex}
+        onClose={() => setAttachmentViewerVisible(false)}
+        viewContainer={document.body}
+      />
     </div>
   );
 }

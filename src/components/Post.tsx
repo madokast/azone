@@ -7,9 +7,10 @@ import AttachmentViewer from './AttachmentViewer';
 
 interface PostProps {
   post: PostType;
+  imageSize?: string;
 }
 
-export default function Post({ post }: PostProps) {
+export default function Post({ post, imageSize = "90px" }: PostProps) {
 
   // 控制内容和附件的显示/折叠
   const collapseContentSize = 100;
@@ -51,8 +52,8 @@ export default function Post({ post }: PostProps) {
             <Image
               key={attachment.id}
               src={attachment.thumbnailUrl}
-              width={100}
-              height={100}
+              width={imageSize}
+              height={imageSize}
               fit='cover'
               onClick={() => {
                 setCurrentIndex(index);
@@ -63,7 +64,7 @@ export default function Post({ post }: PostProps) {
         </Space>
       )}
       
-      {/* 原信息 */}
+      {/* 元信息 */}
       <div style={{ fontSize: 12, color: '#6e6e6e' }} className='no-select'>
         {post.createdAt}
         <span> </span>
