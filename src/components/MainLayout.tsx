@@ -1,6 +1,6 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { NavBar, TabBar } from 'antd-mobile';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AppOutline, PicturesOutline, UserSetOutline } from 'antd-mobile-icons';
 import { type UiTheme } from '../storage/settings';
 import { appColor } from '../styles/theme-tokens'
@@ -38,6 +38,23 @@ export default function MainLayout({ theme, onThemeChange }: MainLayoutProps) {
     if (key === 'me') navigate('/me');
   };
 
+  // 处理滚动事件
+  const lastScrollY = useRef(0);
+  const [tabBarOpacity, setTabBarOpacity] = useState(1);
+  useEffect(() => {
+    const handleScroll = () => {
+      const currScrollY = window.scrollY;
+      // 当滚动方向为上时，显示 TabBar；否则隐藏
+      setTabBarOpacity(currScrollY > lastScrollY.current ? 0 : 1);
+      lastScrollY.current = currScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <NavBar back={null}>
@@ -54,7 +71,7 @@ export default function MainLayout({ theme, onThemeChange }: MainLayoutProps) {
         <Outlet context={{ theme, onThemeChange }} />
       </div>
 
-      <div style={{ position: 'sticky', bottom: 0, backgroundColor: appColor.bg }}>
+      <div style={{ position: 'sticky', bottom: 0, backgroundColor: appColor.bg, opacity: tabBarOpacity, transition: 'opacity 0.3s ease' }}>
         <TabBar
           activeKey={activeKey}
           onChange={handleTabBarChange}
