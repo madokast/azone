@@ -6,7 +6,6 @@ import { viteSingleFile } from "vite-plugin-singlefile";
 export default defineConfig({
   plugins: [
     react(),
-    viteSingleFile(),
     VitePWA({
       registerType: "autoUpdate",
       injectRegister: "auto",
@@ -14,6 +13,7 @@ export default defineConfig({
         enabled: true
       },
       includeAssets: ["pwa.svg"],
+      minify: true,
       workbox: {
         mode: "development",
         navigateFallback: "index.html",
