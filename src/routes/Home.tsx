@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Post from '../components/Post';
 import { List, InfiniteScroll, Button, Popup } from 'antd-mobile';
 import { createRandomPosts, PostServiceIns, type Post as PostType } from '../storage/posts';
 import Publish from '../components/Publish';
+import { AddOutline } from 'antd-mobile-icons';
 
 export default function Home() {
   const [data, setData] = useState<PostType[]>([]);
@@ -45,8 +46,33 @@ export default function Home() {
     }
   }
 
-  // publish popup
+  // post bottom and publish popup
   const [publishVisible, setPublishVisible] = useState(false);
+  const lastScrollY = useRef(0);
+  const [hidePostBottom, setHidePostBottom] = useState(false);
+  const [postBottomOpacity, setPostBottomOpacity] = useState(1);
+  useEffect(() => {
+    const handleScroll = () => {
+      const currScrollY = window.scrollY;
+      // 当滚动方向为上时，隐藏发布按钮；否则显示
+      setPostBottomOpacity(currScrollY > lastScrollY.current ? 0 : 1);
+      lastScrollY.current = currScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+  useEffect(() => {
+    if (postBottomOpacity === 0) {
+      setTimeout(() => {
+        setHidePostBottom(true);
+      }, 300);
+    } else {
+      setHidePostBottom(false);
+    }
+  }, [postBottomOpacity]);
 
   return (
     <>
@@ -63,13 +89,16 @@ export default function Home() {
         position: 'fixed',
         bottom: 100,
         right: 100,
-      }} hidden={publishVisible}>
+        opacity: postBottomOpacity,
+        transition: 'opacity 0.3s ease'
+      }} hidden={publishVisible || hidePostBottom}>
         <Button
           color='primary'
           fill='outline'
+          shape='rounded'
           onClick={() => setPublishVisible(true)}
         >
-          Post
+          <AddOutline />
         </Button>
       </div>
 
@@ -78,7 +107,7 @@ export default function Home() {
         onMaskClick={() => setPublishVisible(false)}
         position='bottom'
       >
-        <Publish onPublish={(s)=>{}} />
+        <Publish onPublish={(s) => { }} />
       </Popup>
 
     </>
