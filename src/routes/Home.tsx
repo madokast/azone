@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Post from '../components/Post';
-import { List, InfiniteScroll, Button, Popup } from 'antd-mobile';
+import { List, InfiniteScroll, Button, Popup, Badge } from 'antd-mobile';
 import { createRandomPosts, PostServiceIns, type Post as PostType } from '../storage/posts';
 import Publish from '../components/Publish';
 import { AddOutline } from 'antd-mobile-icons';
@@ -48,7 +48,7 @@ export default function Home() {
     }
   }
 
-  // post bottom and publish popup
+  // 发布按钮及其弹窗
   const [publishVisible, setPublishVisible] = useState(false);
   const lastScrollY = useRef(0);
   const [hidePostBottom, setHidePostBottom] = useState(false);
@@ -76,6 +76,10 @@ export default function Home() {
     }
   }, [postBottomOpacity]);
 
+  // 按钮显示未发布信息长度
+  const [postLength, setPostLength] = useState(0);
+
+
   return (
     <>
       <List>
@@ -96,11 +100,13 @@ export default function Home() {
       }} hidden={publishVisible || hidePostBottom}>
         <Button
           color='primary'
-          fill='outline'
+          fill='none'
           shape='rounded'
           onClick={() => setPublishVisible(true)}
         >
+          <Badge content={postLength}>
           <AddOutline />
+          </Badge>
         </Button>
       </div>
 
@@ -109,12 +115,14 @@ export default function Home() {
         onMaskClick={() => setPublishVisible(false)}
         position='bottom'
       >
-        <Publish onPublish={(s) => {
+        <Publish 
+        onPublish={async (post) => {
           setPublishVisible(false);
-          PostServiceIns.createPost({ content: s }).then(() => {
-            fetchInitialPosts();
-          });
-        }} focus={publishVisible} />
+          await PostServiceIns.createPost(post);
+          fetchInitialPosts();
+        }}
+        onChange={({ content }) => setPostLength(content.length)}
+        focus={publishVisible} />
       </Popup>
 
     </>

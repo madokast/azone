@@ -2,19 +2,26 @@ import { useRef, useState, useEffect } from 'react';
 import { TextArea, Button, Space } from 'antd-mobile';
 import { TextAreaRef } from 'antd-mobile/es/components/text-area';
 import { PictureOutline, UploadOutline } from 'antd-mobile-icons';
+import { CreatePostData } from '../storage/posts';
 
 interface PublishProps {
-  onPublish: (content: string) => void;
+  onPublish: (post: CreatePostData) => void;
+  onChange: (post: CreatePostData) => void;
   focus: boolean;
 }
 
-export default function Publish({ onPublish, focus }: PublishProps) {
+export default function Publish({ onPublish, onChange, focus }: PublishProps) {
   const [content, setContent] = useState('');
+
+  const handlePostChange = ({ content }: CreatePostData) => {
+    setContent(content);
+    onChange({ content });
+  };
 
   const handleSubmit = () => {
     if (content.trim()) {
-      onPublish(content.trim());
-      setContent('');
+      onPublish({ content });
+      handlePostChange({ content: '' });
     }
   };
 
@@ -40,7 +47,7 @@ export default function Publish({ onPublish, focus }: PublishProps) {
       <TextArea
         ref={textAreaRef}
         value={content}
-        onChange={setContent}
+        onChange={(content) => handlePostChange({ content })}
         autoSize={{ minRows: 2, maxRows: 8 }}
       />
 
