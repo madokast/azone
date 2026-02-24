@@ -1,5 +1,4 @@
 import type { PostService } from './index';
-import { generateId } from '../utils';
 import { Attachment } from '../attachments';
 
 /**

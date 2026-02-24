@@ -6,7 +6,7 @@ import { CreatePostData } from '../storage/posts';
 import { Attachment } from '../storage/attachments';
 import { isImageMimeType } from '../storage/attachments';
 import AttachmentViewer from './AttachmentViewer';
-
+import { unknowFileIcon } from '../assets';
 
 
 interface PublishProps {
@@ -30,7 +30,7 @@ export default function Publish({ onPublish, onChange, focus, imageSize = "90px"
   const fileInputRef = useRef<HTMLInputElement>(null);
   const handleMediaInput = (files: File[]) => {
     const newAttachments = files.map((file) => {
-      let thumbnailUrl = '/thumbnail/unknow-file.svg';
+      let thumbnailUrl = unknowFileIcon;
       let sourceUrl = URL.createObjectURL(file);
       if (isImageMimeType(file.type)) {
         thumbnailUrl = sourceUrl;

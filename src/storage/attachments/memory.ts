@@ -1,5 +1,6 @@
 import type { Attachment, AttachmentService } from './index';
 import { generateId } from '../utils';
+import { unknowFileIcon } from '../../assets';
 
 /**
  * In-memory implementation of AttachmentService for testing purposes.
@@ -76,7 +77,7 @@ export class MemoryAttachmentService implements AttachmentService {
       thumbnailUrl = sourceUrl;
     } else {
       // For non-images: use default thumbnail
-      thumbnailUrl = '/thumbnail/unknow-file.svg';
+      thumbnailUrl = unknowFileIcon;
     }
 
     this.attachments.set(id, {
