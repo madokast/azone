@@ -23,7 +23,7 @@ export default function Post({ post, imageSize = "90px" }: PostProps) {
     if (post.attachmentIds && post.attachmentIds.length > 0) {
       AttachmentServiceIns.getAttachments(post.attachmentIds)
         .then(setAttachments)
-        .catch((error) => showToast('Error fetching attachments:', error));
+        .catch((error) => showToast(`${error}`));
     }
   }, [post.attachmentIds]);
 

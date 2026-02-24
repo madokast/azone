@@ -18,7 +18,7 @@ export default function App() {
   useEffect(() => {
     let cancelled = false;
     incrementOpenCount().then((next) => {
-      if (!cancelled) showToast(`Starting (${next.openCount}) UI Theme: ${theme}`);
+      if (!cancelled) showToast(`Starting (${next.openCount})`);
     });
 
     const unsubscribe = subscribeConfig((config) => {
@@ -80,7 +80,7 @@ export default function App() {
     <AppRouter theme={theme} onThemeChange={nextTheme => {
       setTheme(nextTheme);
       persistTheme(nextTheme);
-      showToast(`Theme changed (${nextTheme})`);
+      showToast(`(${nextTheme})`);
     }} />
   );
 }

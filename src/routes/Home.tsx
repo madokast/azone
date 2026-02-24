@@ -4,6 +4,7 @@ import { List, InfiniteScroll, Button, Popup, Badge } from 'antd-mobile';
 import { createRandomPosts, PostServiceIns, type Post as PostType } from '../storage/posts';
 import Publish from '../components/Publish';
 import { AddOutline } from 'antd-mobile-icons';
+import { showToast } from '../components/toast';
 
 export default function Home() {
   const [data, setData] = useState<PostType[]>([]);
@@ -117,8 +118,12 @@ export default function Home() {
       >
         <Publish 
         onPublish={async (post) => {
+          await PostServiceIns.createPost(post).then(() => {
+            showToast('Published');
+          }).catch((error) => {
+            showToast(`${error}`);
+          });
           setPublishVisible(false);
-          await PostServiceIns.createPost(post);
           fetchInitialPosts();
         }}
         onChange={({ content }) => setPostLength(content.length)}
