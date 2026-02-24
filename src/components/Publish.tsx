@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
-import { TextArea, Button, Space, Image } from 'antd-mobile';
+import { TextArea, Button, Space, Image, Grid } from 'antd-mobile';
 import { TextAreaRef } from 'antd-mobile/es/components/text-area';
-import { UploadOutline, PictureOutline, PlayOutline } from 'antd-mobile-icons';
+import { UploadOutline, PictureOutline, PlayOutline, DeleteOutline } from 'antd-mobile-icons';
 import { CreatePostData } from '../storage/posts';
 import { Attachment } from '../storage/attachments';
 import { isImageMimeType } from '../storage/attachments';
@@ -45,14 +45,24 @@ export default function Publish({ onPublish, onChange, focus, imageSize = "90px"
     setAttachments([...attachments, ...newAttachments]);
   };
 
+  const handleCleanAttachment = () => {
+    attachments.forEach((attachment) => URL.revokeObjectURL(attachment.sourceUrl));
+    setAttachments([]);
+  };
+
   // 控制附件查看器的显示/隐藏
   const [attachmentViewerVisible, setAttachmentViewerVisible] = useState(false);
   const [attachmentCurrentIndex, setAttachmentCurrentIndex] = useState(0);
 
   const handleSubmit = () => {
     if (content.trim()) {
-      onPublish({ content });
+      const publishAttachments = attachments.map((attachment) => {
+        const {id, ...rest} = attachment;
+        return rest;
+      });
+      onPublish({ content, attachments: publishAttachments });
       handlePostChange({ content: '' });
+      handleCleanAttachment();
     }
   };
 
@@ -122,33 +132,54 @@ export default function Publish({ onPublish, onChange, focus, imageSize = "90px"
 
 
       {/* 控制 */}
-      <Space justify="end" block>
-        {/* 图片视频选择 */}
-        <Button
-          color="primary"
-          fill="none"
-          onClick={() => imageInputRef.current?.click()}
-        >
-          <PictureOutline />
-        </Button>
+      <Grid columns={2}>
+        <Grid.Item>
+          <Space justify="start" block>
+            {/* 图片视频选择 */}
+            <Button
+              color="primary"
+              fill="none"
+              onClick={() => imageInputRef.current?.click()}
+            >
+              <PictureOutline />
+            </Button>
 
-        <Button
-          color="primary"
-          fill="none"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <UploadOutline />
-        </Button>
+            {/* 文件选择 */}
+            <Button
+              color="primary"
+              fill="none"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <UploadOutline />
+            </Button>
 
-        <Button
-          color="primary"
-          fill="none"
-          onClick={handleSubmit}
-          disabled={!content.trim()}
-        >
-          <PlayOutline />
-        </Button>
-      </Space>
+            {/* 清空媒体资源 */}
+            <Button
+              color="primary"
+              fill="none"
+              onClick={handleCleanAttachment}
+              disabled={attachments.length === 0}
+            >
+              <DeleteOutline />
+            </Button>
+          </Space>
+        </Grid.Item>
+        <Grid.Item>
+          <Space justify="end" block>
+
+            {/* 发送 */}
+            <Button
+              color="primary"
+              fill="none"
+              onClick={handleSubmit}
+              disabled={!content.trim()}
+            >
+              <PlayOutline />
+            </Button>
+          </Space>
+        </Grid.Item>
+      </Grid>
+
 
       {/* 图片预览 */}
       <AttachmentViewer

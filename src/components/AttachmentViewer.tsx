@@ -79,7 +79,7 @@ export default function AttachmentViewer({
         </div>
       );
     }
-
+    // 图片使用默认渲染
     return undefined;
   };
 

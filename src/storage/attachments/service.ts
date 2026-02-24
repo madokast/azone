@@ -29,9 +29,9 @@ export interface AttachmentService {
   getAttachments(ids: string[]): Promise<Attachment[]>;
 
   /**
-   * Uploads a file and creates an attachment.
-   * @param file The file to upload.
+   * Uploads attachment.sourceUrl and creates an attachment.
+   * @param attachment The attachment to upload.
    * @returns A promise that resolves to the ID of the created attachment.
    */
-  uploadAttachment(file: File): Promise<string>;
+  uploadAttachment(attachment: Omit<Attachment, 'id'>): Promise<string>;
 }

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Button, Image, Space } from 'antd-mobile';
 import { Attachment, AttachmentServiceIns } from '../storage/attachments';
 import AttachmentViewer from './AttachmentViewer';
+import { showToast } from './toast';
 
 interface PostProps {
   post: PostType;
@@ -20,7 +21,9 @@ export default function Post({ post, imageSize = "90px" }: PostProps) {
 
   useEffect(() => {
     if (post.attachmentIds && post.attachmentIds.length > 0) {
-      AttachmentServiceIns.getAttachments(post.attachmentIds).then(setAttachments);
+      AttachmentServiceIns.getAttachments(post.attachmentIds)
+        .then(setAttachments)
+        .catch((error) => showToast('Error fetching attachments:', error));
     }
   }, [post.attachmentIds]);
 

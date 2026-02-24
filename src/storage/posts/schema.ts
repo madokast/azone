@@ -1,6 +1,5 @@
-/**
- * Post model for personal usage.
- */
+import { Attachment } from "../attachments";
+
 export type Post = {
   id: string;
   createdAt: string;
@@ -10,3 +9,8 @@ export type Post = {
    */
   attachmentIds: string[] | null;
 };
+
+export type CreatePostData = {
+  content: string;
+  attachments?: Omit<Attachment, 'id'>[] | null;
+}

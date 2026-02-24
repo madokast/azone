@@ -1,7 +1,7 @@
 import { createMemoryPostService } from "./memory";
 
-export type { Post } from "./schema";
-export type { PostService, CreatePostData } from "./service";
+export type { Post, CreatePostData } from "./schema";
+export type { PostService } from "./service";
 
 // Global singleton post service instance
 export const PostServiceIns = createMemoryPostService();

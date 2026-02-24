@@ -1,13 +1,4 @@
-import type { Post } from './schema';
-
-/**
- * Data structure for creating a new post.
- * - content: Required field
- * - id: Forbidden (auto-generated)
- * - createdAt: Forbidden (auto-generated)
- * - Other fields: Optional (for future extensions)
- */
-export type CreatePostData = Omit<Partial<Post>, 'id' | 'createdAt'> & { content: string };
+import type { Post, CreatePostData } from './schema';
 
 /**
  * Post service interface for CRUD operations on posts.

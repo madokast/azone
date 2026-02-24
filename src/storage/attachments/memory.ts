@@ -20,26 +20,8 @@ export class MemoryAttachmentService implements AttachmentService {
     if (attachment) {
       return Promise.resolve(attachment);
     }
-    
-    // Generate random image attachment if not found
-    const randomWidth = Math.floor(Math.random() * 601) + 600; // 600-1200
-    const randomHeight = Math.floor(Math.random() * 601) + 600; // 600-1200
 
-    const isVideo = Math.random() > 0.5;
-    
-    const randomAttachment: Attachment = {
-      id,
-      mimeType: isVideo ? 'video/mp4' : 'image/jpeg',
-      thumbnailUrl: `https://picsum.photos/160/160?random=${id}`,
-      sourceUrl: isVideo ?
-        "https://mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*uYT7SZwhJnUAAAAAAAAAAAAADgCCAQ" :
-        `https://picsum.photos/${randomWidth}/${randomHeight}?random=${id}`,
-    };
-
-    // Store the generated attachment in memory
-    this.attachments.set(id, randomAttachment);
-    
-    return Promise.resolve(randomAttachment);
+    throw new Error(`Attachment with ID ${id} not found`);
   }
 
   /**
@@ -71,18 +53,22 @@ export class MemoryAttachmentService implements AttachmentService {
   }
 
   /**
-   * Uploads a file and creates an attachment.
-   * @param file The file to upload.
+   * Uploads an attachment.
+   * @param attachment The attachment to upload.
    * @returns A promise that resolves to the ID of the created attachment.
    */
-  uploadAttachment(file: File): Promise<string> {
+  async uploadAttachment(attachment: Omit<Attachment, 'id'>): Promise<string> {
     const id = generateId();
     // Create object URL for source
-    const sourceUrl = URL.createObjectURL(file);
+    let sourceUrl = attachment.sourceUrl;
     let thumbnailUrl: string;
     
+    if (sourceUrl.startsWith('blob:')) {
+      sourceUrl = URL.createObjectURL(await fetch(sourceUrl).then(res => res.blob()));
+    }
+
     // Check if file is an image
-    const isImage = file.type.startsWith('image/');
+    const isImage = attachment.mimeType.startsWith('image/');
     
     if (isImage) {
       // For images: use the same object URL for thumbnail (not compressed)
@@ -92,16 +78,13 @@ export class MemoryAttachmentService implements AttachmentService {
       // For non-images: use default thumbnail
       thumbnailUrl = '/thumbnail/unknow-file.svg';
     }
-    
-    // Create attachment
-    const attachment: Attachment = {
-      id,
-      mimeType: file.type || 'application/octet-stream',
-      thumbnailUrl,
-      sourceUrl,
-    };
 
-    this.attachments.set(id, attachment);
+    this.attachments.set(id, {
+      id,
+      mimeType: attachment.mimeType,
+      sourceUrl,
+      thumbnailUrl,
+    } as Attachment);
     return Promise.resolve(id);
   }
 

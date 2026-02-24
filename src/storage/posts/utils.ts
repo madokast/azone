@@ -1,5 +1,6 @@
 import type { PostService } from './index';
 import { generateId } from '../utils';
+import { Attachment } from '../attachments';
 
 /**
  * Generates a random string of specified length.
@@ -10,12 +11,12 @@ function generateRandomString(length: number): string {
   const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 !@#$%^&*()_+-=[]{}|;:,.<>?';
   let result = '';
   const charsetLength = charset.length;
-  
+
   for (let i = 0; i < length; i++) {
     const randomIndex = Math.floor(Math.random() * charsetLength);
     result += charset[randomIndex];
   }
-  
+
   return result;
 }
 
@@ -39,33 +40,46 @@ export async function createRandomPosts(
     // Generate random content length between 1 and maxContentSize
     const contentLength = Math.floor(Math.random() * maxContentSize) + 1;
     const randomContent = generateRandomString(contentLength);
-    
+
     // Generate attachment IDs if needed
-    let attachmentIds: string[] | null = null;
+    let attachments: Omit<Attachment, 'id'>[] | null = null;
     if (Math.random() < attachmentRate) {
       const attachmentCount = Math.floor(Math.random() * maxAttachmentNumber) + 1;
-      attachmentIds = [];
+      attachments = [];
       for (let j = 0; j < attachmentCount; j++) {
-        attachmentIds.push(generateId());
+        // Generate random image attachment if not found
+        const randomWidth = Math.floor(Math.random() * 601) + 600; // 600-1200
+        const randomHeight = Math.floor(Math.random() * 601) + 600; // 600-1200
+
+        const isVideo = Math.random() > 0.5;
+
+        const randomAttachment: Omit<Attachment, 'id'> = {
+          mimeType: isVideo ? 'video/mp4' : 'image/jpeg',
+          thumbnailUrl: `https://picsum.photos/160/160?random=${i*maxAttachmentNumber+j}`,
+          sourceUrl: isVideo ?
+            "https://mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*uYT7SZwhJnUAAAAAAAAAAAAADgCCAQ" :
+            `https://picsum.photos/${randomWidth}/${randomHeight}?random=${i*maxAttachmentNumber+j}`,
+        };
+        attachments.push(randomAttachment);
       }
     }
-    
+
     // Create post using the provided PostService
-    await postService.createPost({ 
+    await postService.createPost({
       content: randomContent,
-      attachmentIds 
+      attachments,
     });
   }
 }
 
 
 export function formatDate(date: Date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
-    
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
