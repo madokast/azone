@@ -1,13 +1,14 @@
 import { useRef, useState, useEffect } from 'react';
 import { TextArea, Button, Space } from 'antd-mobile';
 import { TextAreaRef } from 'antd-mobile/es/components/text-area';
+import { PictureOutline, UploadOutline } from 'antd-mobile-icons';
 
 interface PublishProps {
   onPublish: (content: string) => void;
   focus: boolean;
 }
 
-export default function Publish({ onPublish, focus }: PublishProps) {  
+export default function Publish({ onPublish, focus }: PublishProps) {
   const [content, setContent] = useState('');
 
   const handleSubmit = () => {
@@ -17,17 +18,16 @@ export default function Publish({ onPublish, focus }: PublishProps) {
     }
   };
 
+  // 文本区域自动聚焦
   const textAreaRef = useRef<TextAreaRef>(null);
   useEffect(() => {
-    if (textAreaRef.current) {
-      if (focus) {
-        // 添加延迟确保组件完全渲染和可见
-        setTimeout(() => {
-          textAreaRef.current?.focus();
-        }, 100);
-      } else {
-        textAreaRef.current.blur();
-      }
+    if (focus) {
+      // 添加延迟确保组件完全渲染和可见
+      setTimeout(() => {
+        textAreaRef.current?.focus();
+      }, 100);
+    } else {
+      textAreaRef.current?.blur();
     }
   }, [focus]);
 
@@ -42,22 +42,28 @@ export default function Publish({ onPublish, focus }: PublishProps) {
         value={content}
         onChange={setContent}
         autoSize={{ minRows: 2, maxRows: 8 }}
-        style={{
-          marginBottom: 16,
-          borderRadius: 4
-        }}
       />
-      <Space direction="vertical" style={{ width: '100%' }}>
+
+      {/* 图片媒体 */}
+      <Space block>
+
+      </Space>
+
+      {/* 控制 */}
+      <Space justify="end" block>
         <Button
           color="primary"
-          fill="solid"
+          fill="none"
+        >
+          <PictureOutline />
+        </Button>
+        <Button
+          color="primary"
+          fill="none"
           onClick={handleSubmit}
           disabled={!content.trim()}
-          style={{
-            width: '100%'
-          }}
         >
-          发送
+          <UploadOutline />
         </Button>
       </Space>
     </div>
