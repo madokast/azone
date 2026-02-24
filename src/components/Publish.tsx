@@ -25,7 +25,7 @@ export default function Publish({ onPublish }: PublishProps) {
         placeholder="输入内容..."
         value={content}
         onChange={setContent}
-        rows={4}
+        autoSize={{ minRows: 2, maxRows: 8 }}
         style={{
           marginBottom: 16,
           borderRadius: 4
