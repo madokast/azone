@@ -22,7 +22,7 @@ export class MemoryPostService implements PostService {
       ...postData,
     };
 
-    this.posts.push(newPost);
+    this.posts.unshift(newPost);
     return Promise.resolve(newPost);
   }
 
@@ -52,7 +52,7 @@ export class MemoryPostService implements PostService {
    * @returns A promise that resolves to an array of all posts.
    */
   getAllPosts(): Promise<Post[]> {
-    return Promise.resolve([...this.posts]);
+    return Promise.resolve(this.posts.slice());
   }
 
   /**

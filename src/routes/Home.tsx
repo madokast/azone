@@ -12,10 +12,11 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
-  useEffect(() => {
-    const fetchInitialPosts = async () => {
+ const fetchInitialPosts = async () => {
       try {
-        await createRandomPosts(PostServiceIns, 20, 256);
+        if (await PostServiceIns.getPostCount() === 0) {
+          await createRandomPosts(PostServiceIns, 20, 256);
+        }
         const initialPosts = await PostServiceIns.getPosts(1, pageSize);
         setData(initialPosts);
         setHasMore(initialPosts.length === pageSize);
@@ -26,6 +27,7 @@ export default function Home() {
       }
     };
 
+  useEffect(() => {
     fetchInitialPosts();
   }, []);
 
@@ -107,7 +109,12 @@ export default function Home() {
         onMaskClick={() => setPublishVisible(false)}
         position='bottom'
       >
-        <Publish onPublish={(s) => { }} />
+        <Publish onPublish={(s) => {
+          setPublishVisible(false);
+          PostServiceIns.createPost({ content: s }).then(() => {
+            fetchInitialPosts();
+          });
+        }} />
       </Popup>
 
     </>
