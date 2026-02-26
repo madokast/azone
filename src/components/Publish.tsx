@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { TextArea, Button, Space, Image, Grid } from 'antd-mobile';
 import { TextAreaRef } from 'antd-mobile/es/components/text-area';
 import { UploadOutline, PictureOutline, PlayOutline, DeleteOutline } from 'antd-mobile-icons';
-import { CreatePostData } from '../services/posts';
+import { CreatePostDto } from '../services/posts';
 import { Attachment } from '../services/attachments';
 import { isImageMimeType } from '../services/attachments';
 import AttachmentViewer from './AttachmentViewer';
@@ -10,8 +10,8 @@ import { unknowFileIcon } from '../assets';
 
 
 interface PublishProps {
-  onPublish: (post: CreatePostData) => void;
-  onChange: (post: CreatePostData) => void;
+  onPublish: (post: CreatePostDto) => void;
+  onChange: (post: CreatePostDto) => void;
   focus: boolean;
   imageSize?: string;
 }
@@ -20,7 +20,7 @@ export default function Publish({ onPublish, onChange, focus, imageSize = "90px"
   const [content, setContent] = useState('');
   const [attachments, setAttachments] = useState<Attachment[]>([]);
 
-  const handlePostChange = ({ content }: CreatePostData) => {
+  const handlePostChange = ({ content }: CreatePostDto) => {
     setContent(content);
     onChange({ content });
   };

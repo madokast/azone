@@ -2,7 +2,7 @@
  * Attachment model for file attachments.
  * Contains basic file metadata and URLs.
  */
-export type Attachment = {
+export interface Attachment {
   /**
    * Unique identifier for the attachment
    */
@@ -23,4 +23,4 @@ export type Attachment = {
    * URL to the original source of the attachment
    */
   sourceUrl: string;
-};
+}

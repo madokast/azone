@@ -1,4 +1,4 @@
-import type { Post, PostService, CreatePostData } from './index';
+import type { Post, PostService, CreatePostDto } from './index';
 import { generateId } from '../utils';
 import { formatDate } from './utils';
 
@@ -16,7 +16,7 @@ export class MemoryPostService implements PostService {
    * @param postData The post data as a key-value pair object.
    * @returns A promise that resolves to the created post.
    */
-  async createPost(postData: CreatePostData): Promise<Post> {
+  async createPost(postData: CreatePostDto): Promise<Post> {
 
     const attachmentIds = await Promise.all(
       (postData.attachments || []).map(attachment => AttachmentServiceIns.uploadAttachment(attachment))

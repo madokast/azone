@@ -1,4 +1,4 @@
-import type { Post, CreatePostData } from './schema';
+import type { Post, CreatePostDto } from './schema';
 
 /**
  * Post service interface for CRUD operations on posts.
@@ -10,7 +10,7 @@ export interface PostService {
    * @param postData The post data as a key-value pair object.
    * @returns A promise that resolves to the created post.
    */
-  createPost(postData: CreatePostData): Promise<Post>;
+  createPost(postData: CreatePostDto): Promise<Post>;
 
   /**
    * Deletes a post by its ID.
