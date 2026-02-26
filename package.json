@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.997.0",
     "antd-mobile": "^5.42.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
