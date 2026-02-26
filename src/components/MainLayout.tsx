@@ -2,7 +2,7 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { NavBar, TabBar } from 'antd-mobile';
 import { useState, useEffect, useRef } from 'react';
 import { AppOutline, PicturesOutline, UserSetOutline } from 'antd-mobile-icons';
-import { type UiTheme } from '../storage/settings';
+import { type UiTheme } from '../services/settings';
 import { appColor } from '../styles/theme-tokens'
 
 type MainLayoutProps = {

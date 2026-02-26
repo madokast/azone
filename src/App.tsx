@@ -5,7 +5,7 @@ import {
   subscribeConfig,
   setTheme as persistTheme,
   type UiTheme,
-} from "./storage/settings";
+} from "./services/settings";
 import { showToast } from "./components/toast";
 import AppRouter from "./routes";
 

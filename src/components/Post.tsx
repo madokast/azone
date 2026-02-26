@@ -1,8 +1,8 @@
-import { type Post as PostType } from '../storage/posts';
+import { type Post as PostType } from '../services/posts';
 import { useEffect, useState } from 'react';
 
 import { Button, Image, Space } from 'antd-mobile';
-import { Attachment, AttachmentServiceIns } from '../storage/attachments';
+import { Attachment, AttachmentServiceIns } from '../services/attachments';
 import AttachmentViewer from './AttachmentViewer';
 import { showToast } from './toast';
 

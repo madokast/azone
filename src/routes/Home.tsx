@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Post from '../components/Post';
 import { List, InfiniteScroll, Button, Popup, Badge } from 'antd-mobile';
-import { createRandomPosts, PostServiceIns, type Post as PostType } from '../storage/posts';
+import { createRandomPosts, PostServiceIns, type Post as PostType } from '../services/posts';
 import Publish from '../components/Publish';
 import { AddOutline } from 'antd-mobile-icons';
 import { showToast } from '../components/toast';

@@ -1,5 +1,5 @@
 import { Divider, Form, Segmented, Space, Tag } from 'antd-mobile';
-import { type UiTheme } from '../storage/settings';
+import { type UiTheme } from '../services/settings';
 
 type MeProps = {
   theme: UiTheme;

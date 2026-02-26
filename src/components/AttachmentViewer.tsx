@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { ImageViewer, Button, AutoCenter  } from 'antd-mobile';
-import { type Attachment } from '../storage/attachments';
-import { isImageMimeType, isVideoMimeType } from '../storage/attachments';
+import { type Attachment } from '../services/attachments';
+import { isImageMimeType, isVideoMimeType } from '../services/attachments';
 import { MultiImageViewerRef } from 'antd-mobile';
 
 interface AttachmentViewerProps {

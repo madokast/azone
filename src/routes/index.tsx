@@ -3,7 +3,7 @@ import Home from './Home';
 import Media from './Media';
 import Me from './Me';
 import MainLayout from '../components/MainLayout';
-import { type UiTheme } from '../storage/settings';
+import { type UiTheme } from '../services/settings';
 
 type AppRouterProps = {
   theme: UiTheme;

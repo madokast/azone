@@ -2,9 +2,9 @@ import { useRef, useState, useEffect } from 'react';
 import { TextArea, Button, Space, Image, Grid } from 'antd-mobile';
 import { TextAreaRef } from 'antd-mobile/es/components/text-area';
 import { UploadOutline, PictureOutline, PlayOutline, DeleteOutline } from 'antd-mobile-icons';
-import { CreatePostData } from '../storage/posts';
-import { Attachment } from '../storage/attachments';
-import { isImageMimeType } from '../storage/attachments';
+import { CreatePostData } from '../services/posts';
+import { Attachment } from '../services/attachments';
+import { isImageMimeType } from '../services/attachments';
 import AttachmentViewer from './AttachmentViewer';
 import { unknowFileIcon } from '../assets';
 
