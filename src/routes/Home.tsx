@@ -6,6 +6,8 @@ import Publish from '../components/Publish';
 import { AddOutline } from 'antd-mobile-icons';
 import { showToast } from '../components/toast';
 
+let randomPosts = false;
+
 export default function Home() {
   const [data, setData] = useState<PostType[]>([]);
   const [hasMore, setHasMore] = useState(true);
@@ -15,8 +17,9 @@ export default function Home() {
 
   const fetchInitialPosts = async () => {
     try {
-      if (await PostServiceIns.getPostCount() === 0) {
+      if (!randomPosts) {
         await createRandomPosts(PostServiceIns, 20, 256);
+        randomPosts = true;
       }
       const initialPosts = await PostServiceIns.getPosts(1, pageSize);
       setData(initialPosts);

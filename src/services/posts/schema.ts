@@ -1,4 +1,5 @@
 import { Attachment } from "../attachments";
+import { MetaAttachment } from "../attachments/schema";
 
 export interface Post {
   id: string;
@@ -7,7 +8,7 @@ export interface Post {
   /**
    * Array of attachment IDs, can be null if no attachments
    */
-  attachmentIds: string[] | null;
+  attachments?: MetaAttachment[] | null;
 }
 
 export interface CreatePostDto {

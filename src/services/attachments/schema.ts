@@ -1,9 +1,5 @@
-/**
- * Attachment model for file attachments.
- * Contains basic file metadata and URLs.
- */
-export interface Attachment {
-  /**
+export interface MetaAttachment {
+    /**
    * Unique identifier for the attachment
    */
   id: string;
@@ -13,7 +9,9 @@ export interface Attachment {
    * Example: "image/jpeg", "application/pdf"
    */
   mimeType: string;
-  
+}
+
+export interface Attachment extends MetaAttachment {
   /**
    * URL to the thumbnail version of the attachment
    */
@@ -24,3 +22,11 @@ export interface Attachment {
    */
   sourceUrl: string;
 }
+
+export const Attachments = {
+  dispose(attachment: Attachment) {
+    URL.revokeObjectURL(attachment.thumbnailUrl);
+    URL.revokeObjectURL(attachment.sourceUrl);
+  }
+}
+

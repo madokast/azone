@@ -20,12 +20,12 @@ export default function Post({ post, imageSize = "90px" }: PostProps) {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
 
   useEffect(() => {
-    if (post.attachmentIds && post.attachmentIds.length > 0) {
-      AttachmentServiceIns.getAttachments(post.attachmentIds)
+    if (post.attachments && post.attachments.length > 0) {
+      AttachmentServiceIns.getAttachments(post.attachments)
         .then(setAttachments)
         .catch((error) => showToast(`${error}`));
     }
-  }, [post.attachmentIds]);
+  }, [post.attachments]);
 
   const shouldCollapseContent = post.content.length > collapseContentSize;
   const shouldCollapseAttachment = attachments.length > collapseAttachmentSize;
