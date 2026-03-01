@@ -13,9 +13,8 @@ export class StoragePostService implements PostService {
         this.rootDir = rootDir;
     }
 
-
     private getPath(id: string) {
-        return `${this.rootDir}/${id}.dat`;
+        // TODO yyyy/mm/dd/id.dat
     }
 
     async createPost(postData: CreatePostDto): Promise<void> {
