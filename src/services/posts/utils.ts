@@ -33,7 +33,8 @@ export async function createRandomPosts(
   number: number,
   maxContentSize: number = 256,
   attachmentRate: number = 0.5,
-  maxAttachmentNumber: number = 9
+  maxAttachmentNumber: number = 9,
+  attachments: Omit<Attachment, 'id'>[] | null = null
 ): Promise<void> {
   for (let i = 0; i < number; i++) {
     // Generate random content length between 1 and maxContentSize
@@ -41,25 +42,26 @@ export async function createRandomPosts(
     const randomContent = generateRandomString(contentLength);
 
     // Generate attachment IDs if needed
-    let attachments: Omit<Attachment, 'id'>[] | null = null;
-    if (Math.random() < attachmentRate) {
-      const attachmentCount = Math.floor(Math.random() * maxAttachmentNumber) + 1;
-      attachments = [];
-      for (let j = 0; j < attachmentCount; j++) {
-        // Generate random image attachment if not found
-        const randomWidth = Math.floor(Math.random() * 601) + 600; // 600-1200
-        const randomHeight = Math.floor(Math.random() * 601) + 600; // 600-1200
+    if (attachments === null) {
+      if (Math.random() < attachmentRate) {
+        const attachmentCount = Math.floor(Math.random() * maxAttachmentNumber) + 1;
+        attachments = [];
+        for (let j = 0; j < attachmentCount; j++) {
+          // Generate random image attachment if not found
+          const randomWidth = Math.floor(Math.random() * 601) + 600; // 600-1200
+          const randomHeight = Math.floor(Math.random() * 601) + 600; // 600-1200
 
-        const isVideo = Math.random() > 0.5;
+          const isVideo = Math.random() > 0.5;
 
-        const randomAttachment: Omit<Attachment, 'id'> = {
-          mimeType: isVideo ? 'video/mp4' : 'image/jpeg',
-          thumbnailUrl: `https://picsum.photos/160/160?random=${i*maxAttachmentNumber+j}`,
-          sourceUrl: isVideo ?
-            "https://mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*uYT7SZwhJnUAAAAAAAAAAAAADgCCAQ" :
-            `https://picsum.photos/${randomWidth}/${randomHeight}?random=${i*maxAttachmentNumber+j}`,
-        };
-        attachments.push(randomAttachment);
+          const randomAttachment: Omit<Attachment, 'id'> = {
+            mimeType: isVideo ? 'video/mp4' : 'image/jpeg',
+            thumbnailUrl: `https://picsum.photos/160/160?random=${i * maxAttachmentNumber + j}`,
+            sourceUrl: isVideo ?
+              "https://mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*uYT7SZwhJnUAAAAAAAAAAAAADgCCAQ" :
+              `https://picsum.photos/${randomWidth}/${randomHeight}?random=${i * maxAttachmentNumber + j}`,
+          };
+          attachments.push(randomAttachment);
+        }
       }
     }
 
