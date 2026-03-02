@@ -2,14 +2,17 @@ import { type Post as PostType } from '../services/posts';
 import { useEffect, useState } from 'react';
 
 import { Button, Image, Space } from 'antd-mobile';
-import { Attachment, AttachmentServiceIns } from '../services/attachments';
+import { Attachment, MemoryAttachmentServiceIns, isImageMimeType } from '../services/attachments';
 import AttachmentViewer from './AttachmentViewer';
 import { showToast } from './toast';
+import { unknowFileIcon, unknowPicIcon } from '../assets';
 
 interface PostProps {
   post: PostType;
   imageSize?: string;
 }
+
+const attachmentLoadingFlag = "loading";
 
 export default function Post({ post, imageSize = "90px" }: PostProps) {
 
@@ -19,13 +22,30 @@ export default function Post({ post, imageSize = "90px" }: PostProps) {
   const [expanded, setExpanded] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
 
-  useEffect(() => {
-    if (post.attachments && post.attachments.length > 0) {
-      AttachmentServiceIns.getAttachments(post.attachments)
-        .then(setAttachments)
-        .catch((error) => showToast(`${error}`));
-    }
-  }, [post.attachments]);
+useEffect(() => {
+  if (!post.attachments || post.attachments.length === 0) return;
+
+  // 构造初始附件
+  const initial = post.attachments.map(attachment => ({
+    ...attachment,
+    sourceUrl: attachmentLoadingFlag,
+    thumbnailUrl: isImageMimeType(attachment.mimeType)
+      ? unknowPicIcon
+      : unknowFileIcon,
+  } as Attachment));
+
+  setAttachments(initial);
+
+  // 异步加载
+  initial.forEach((attachment, index) => {
+    MemoryAttachmentServiceIns.getAttachment(attachment).then((loaded) => {
+      setAttachments(prev =>
+        prev.map((att, i) => i === index ? loaded : att)
+      );
+    }).catch((error) => showToast(`${error}`));
+  });
+
+}, [post.attachments]);
 
   const shouldCollapseContent = post.content.length > collapseContentSize;
   const shouldCollapseAttachment = attachments.length > collapseAttachmentSize;
@@ -59,8 +79,10 @@ export default function Post({ post, imageSize = "90px" }: PostProps) {
               height={imageSize}
               fit='cover'
               onClick={() => {
-                setCurrentIndex(index);
-                setAttachmentViewerVisible(true);
+                if (attachment.sourceUrl !== attachmentLoadingFlag) {
+                  setCurrentIndex(index);
+                  setAttachmentViewerVisible(true);
+                }
               }}
             />
           ))}
