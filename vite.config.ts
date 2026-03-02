@@ -11,7 +11,6 @@ export default defineConfig({
       devOptions: {
         enabled: true
       },
-      includeAssets: ["pwa.svg"],
       minify: true,
       workbox: {
         mode: "development",
@@ -19,6 +18,8 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
+        globPatterns: ["**\/*.{js,wasm,css,html,svg,webmanifest}"], // 要预缓存的文件匹配模式
+        globIgnores: ["**\/node_modules\/**\/*"], // 忽略的文件
         runtimeCaching: [
           // S3 ListObjectsV2: never cache
           {

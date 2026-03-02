@@ -13,8 +13,11 @@ export class StoragePostService implements PostService {
         this.rootDir = rootDir;
     }
 
-    private getPath(id: string) {
+    private getPath(id: string):string  {
         // TODO yyyy/mm/dd/id.dat
+        console.log(this.rootDir);
+        console.log(id);
+        throw new Error('Method not implemented.');
     }
 
     async createPost(postData: CreatePostDto): Promise<void> {
@@ -49,6 +52,7 @@ export class StoragePostService implements PostService {
     }
 
     getPosts(page: number, pageSize: number): Promise<Post[]> {
+        console.log(page, pageSize);
         throw new Error('Method not implemented.');
     }
 }

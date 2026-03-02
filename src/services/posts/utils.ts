@@ -48,9 +48,6 @@ export async function createRandomPosts(
         attachments = [];
         for (let j = 0; j < attachmentCount; j++) {
           // Generate random image attachment if not found
-          const randomWidth = Math.floor(Math.random() * 601) + 600; // 600-1200
-          const randomHeight = Math.floor(Math.random() * 601) + 600; // 600-1200
-
           const isVideo = Math.random() > 0.8;
 
           const randomAttachment: Omit<Attachment, 'id'> = {
@@ -58,7 +55,7 @@ export async function createRandomPosts(
             thumbnailUrl: `https://picsum.photos/seed/${j}/160/160`,
             sourceUrl: isVideo ?
               "https://mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*uYT7SZwhJnUAAAAAAAAAAAAADgCCAQ" :
-              `https://picsum.photos/seed/${j}/${randomWidth}/${randomHeight}`,
+              `https://picsum.photos/seed/${j}/1080/720`,
           };
           attachments.push(randomAttachment);
         }
