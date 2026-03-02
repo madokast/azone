@@ -1,6 +1,4 @@
-import { ObjectStorage } from "./interface";
-
-
+import { ListOptions, ObjectStorage } from "./interface";
 
 export default class MemoryObjectStorage implements ObjectStorage {
 
@@ -30,8 +28,9 @@ export default class MemoryObjectStorage implements ObjectStorage {
         this.storage.delete(path)
     }
 
-    async *list(prefix: string): AsyncIterable<string> {
+    async *list(prefix: string, options?: ListOptions): AsyncIterable<string> {
         if (!prefix.endsWith("/")) prefix += "/"
+        options = { file: true, directory: true, ...options }
 
         const seenDirs = new Set<string>()
 
@@ -45,13 +44,17 @@ export default class MemoryObjectStorage implements ObjectStorage {
 
             if (i === -1) {
                 // 文件
-                yield prefix + rest
+                if (options.file) {
+                    yield prefix + rest;
+                }
             } else {
                 // 子目录
-                const dir = prefix + rest.slice(0, i + 1)
-                if (!seenDirs.has(dir)) {
-                    seenDirs.add(dir)
-                    yield dir
+                if (options.directory) {
+                    const dir = prefix + rest.slice(0, i + 1)
+                    if (!seenDirs.has(dir)) {
+                        seenDirs.add(dir)
+                        yield dir
+                    }
                 }
             }
         }
