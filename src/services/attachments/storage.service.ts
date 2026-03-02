@@ -1,5 +1,5 @@
 import { isImageMimeType, type Attachment, type AttachmentService } from './index';
-import { generateId } from '../utils';
+import { generateId } from '../identifier';
 import { unknowFileIcon } from '../../assets';
 import { ObjectStorageIns } from '../object-storage';
 import { Attachments, MetaAttachment } from './schema';

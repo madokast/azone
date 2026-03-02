@@ -1,11 +1,4 @@
-/**
- * Utility functions for storage operations.
- */
 
-/**
- * Generates an ID in the format yyyyMMdd-hhmmss-{random 6-character alphanumeric}.
- * @returns A formatted ID string.
- */
 export function generateId(): string {
   const now = new Date();
   
@@ -25,4 +18,23 @@ export function generateId(): string {
   }
   
   return `${year}${month}${day}-${hours}${minutes}${seconds}-${randomPart}`;
+}
+
+export function extractDate(id: string): Date {
+  const [datePart, timePart, _] = id.split('-')
+  const year = parseInt(datePart.slice(0, 4))
+  const month = parseInt(datePart.slice(4, 6)) - 1 // Month is 0-indexed
+  const day = parseInt(datePart.slice(6, 8))
+  const hours = parseInt(timePart.slice(0, 2))
+  const minutes = parseInt(timePart.slice(2, 4))
+  const seconds = parseInt(timePart.slice(4, 6))
+  return new Date(year, month, day, hours, minutes, seconds)
+}
+
+export function extractYYYYMMDD(id: string): { year: string, month: string, day: string } {
+  const dataPart = id.split('-')[0]
+  const year = dataPart.slice(0, 4)
+  const month = dataPart.slice(4, 6)
+  const day = dataPart.slice(6, 8)
+  return { year, month, day }
 }

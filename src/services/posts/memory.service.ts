@@ -1,5 +1,5 @@
 import type { Post, PostService, CreatePostDto } from './index';
-import { generateId } from '../utils';
+import { generateId } from '../identifier';
 import { formatDate } from './utils';
 
 import { AttachmentServiceIns } from '../attachments';

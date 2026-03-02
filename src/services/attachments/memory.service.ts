@@ -1,5 +1,5 @@
 import type { Attachment, AttachmentService } from './index';
-import { generateId } from '../utils';
+import { generateId } from '../identifier';
 import { unknowFileIcon } from '../../assets';
 import { Attachments, MetaAttachment } from './schema';
 
