@@ -60,6 +60,20 @@ export default defineConfig({
               },
               cacheableResponse: { statuses: [0, 200] }
             }
+          },
+          // Cache url contains "picsum.photos"
+          {
+            urlPattern: ({ url, request }) =>
+              request.method === "GET" && url.hostname.includes("picsum.photos"),
+            handler: "CacheFirst",
+            options: {
+              cacheName: "picsum-photos",
+              expiration: {
+                maxEntries: 1000,
+                maxAgeSeconds: 60 * 60 * 24 * 365
+              },
+              cacheableResponse: { statuses: [0, 200] }
+            }
           }
         ]
       },

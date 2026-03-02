@@ -51,14 +51,14 @@ export async function createRandomPosts(
           const randomWidth = Math.floor(Math.random() * 601) + 600; // 600-1200
           const randomHeight = Math.floor(Math.random() * 601) + 600; // 600-1200
 
-          const isVideo = Math.random() > 0.5;
+          const isVideo = Math.random() > 0.8;
 
           const randomAttachment: Omit<Attachment, 'id'> = {
             mimeType: isVideo ? 'video/mp4' : 'image/jpeg',
-            thumbnailUrl: `https://picsum.photos/160/160?random=${i * maxAttachmentNumber + j}`,
+            thumbnailUrl: `https://picsum.photos/seed/${j}/160/160`,
             sourceUrl: isVideo ?
               "https://mdn.alipayobjects.com/huamei_iwk9zp/afts/file/A*uYT7SZwhJnUAAAAAAAAAAAAADgCCAQ" :
-              `https://picsum.photos/${randomWidth}/${randomHeight}?random=${i * maxAttachmentNumber + j}`,
+              `https://picsum.photos/seed/${j}/${randomWidth}/${randomHeight}`,
           };
           attachments.push(randomAttachment);
         }
