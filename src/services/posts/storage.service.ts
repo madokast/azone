@@ -4,13 +4,16 @@ import { formatDate } from './utils';
 
 import { AttachmentServiceIns } from '../attachments';
 import { ObjectStorageIns } from '../object-storage';
+import { ObjectStorage } from '../object-storage/interface';
 
 export default class StoragePostService implements PostService {
-    public readonly rootDir: string;
-    public posts: Post[] = [];
+    private readonly rootDir: string;
+    private objectStorage: ObjectStorage;
+    private posts: Post[] = [];
 
-    constructor(rootDir: string) {
+    constructor(rootDir: string, objectStorage: ObjectStorage|null = null) {
         this.rootDir = rootDir;
+        this.objectStorage = objectStorage || ObjectStorageIns;
     }
 
     public getPath(id: string): string {
@@ -18,21 +21,22 @@ export default class StoragePostService implements PostService {
         return `${this.rootDir}/${yyyy}/${mm}/${dd}/${id}.dat`;
     }
 
-    public async createPost(postData: CreatePostDto): Promise<void> {
+    public async createPost(postData: CreatePostDto, now: Date | null = null): Promise<void> {
         const attachments = await Promise.all(
             (postData.attachments || []).map(
                 attachment => AttachmentServiceIns.uploadAttachment(attachment))
         );
 
+        now = now || new Date();
         const newPost: Post = {
-            id: generateId(),
-            createdAt: formatDate(new Date()),
+            id: generateId(now),
+            createdAt: formatDate(now),
             content: postData.content,
             attachments: attachments,
         };
 
         const path = this.getPath(newPost.id);
-        await ObjectStorageIns.put(path, new ReadableStream({
+        await this.objectStorage.put(path, new ReadableStream({
             start(controller) {
                 const encoder = new TextEncoder();
                 controller.enqueue(encoder.encode(JSON.stringify(newPost)));
@@ -44,7 +48,7 @@ export default class StoragePostService implements PostService {
 
     public async deletePost(id: string): Promise<void> {
         const path = this.getPath(id);
-        await ObjectStorageIns.delete(path);
+        await this.objectStorage.delete(path);
 
         this.posts = this.posts.filter(post => post.id !== id);
     }
@@ -73,9 +77,9 @@ export default class StoragePostService implements PostService {
             const month = date.getMonth() + 1;
             const day = date.getDate();
             const dayDir = `${this.rootDir}/${year}/${month}/${day}`;
-            const allPostPaths: string[] = await ObjectStorageIns.list(dayDir);
+            const allPostPaths: string[] = await this.objectStorage.list(dayDir);
             for (const postPath of allPostPaths) {
-                const postData = await ObjectStorageIns.get(postPath);
+                const postData = await this.objectStorage.get(postPath);
                 const postText = await new Response(postData).text();
                 const post: Post = JSON.parse(postText);
                 posts.push(post);
@@ -92,17 +96,17 @@ export default class StoragePostService implements PostService {
     // 获取需要加载 post 时，搜索的日期
     public async nextLoadPostDate(): Promise<Date | null> {
         if (this.posts.length == 0) {
-            const allYearDirs: string[] = await ObjectStorageIns.list(this.rootDir);
+            const allYearDirs: string[] = await this.objectStorage.list(this.rootDir);
             if (allYearDirs.length == 0) return null;
             allYearDirs.sort((a, b) => b.localeCompare(a)); // 按年份降序排序
             while (allYearDirs.length > 0) {
                 const yearDir = allYearDirs.pop()!;
-                const allMonthDirs: string[] = await ObjectStorageIns.list(yearDir);
+                const allMonthDirs: string[] = await this.objectStorage.list(yearDir);
                 if (allMonthDirs.length == 0) continue;
                 allMonthDirs.sort((a, b) => b.localeCompare(a)); // 按月份降序排序
                 while (allMonthDirs.length > 0) {
                     const monthDir = allMonthDirs.pop()!;
-                    const allDayDirs: string[] = await ObjectStorageIns.list(monthDir);
+                    const allDayDirs: string[] = await this.objectStorage.list(monthDir);
                     if (allDayDirs.length == 0) continue;
                     allDayDirs.sort((a, b) => b.localeCompare(a)); // 按日期降序排序
                     let dayDir = getPathName(allDayDirs[0]);
@@ -124,23 +128,23 @@ export default class StoragePostService implements PostService {
     }
 
     public async oldestDate(): Promise<Date | null> {
-        const allYearDirs: string[] = await ObjectStorageIns.list(this.rootDir);
+        const allYearDirs: string[] = await this.objectStorage.list(this.rootDir);
         console.log(`allYearDirs: ${allYearDirs}`)
         if (allYearDirs.length == 0) return null;
-        allYearDirs.sort((a, b) => a.localeCompare(b)); // 按年份升序排序
+        allYearDirs.sort((a, b) => b.localeCompare(a)); // 按年份降序排序
         while (allYearDirs.length > 0) {
-            const yearDir = allYearDirs.pop()!;
-            const allMonthDirs: string[] = await ObjectStorageIns.list(yearDir);
+            const yearDir = allYearDirs.pop()!; // 最老的年份
+            const allMonthDirs: string[] = await this.objectStorage.list(yearDir);
             console.log(`allMonthDirs: ${allMonthDirs}`)
             if (allMonthDirs.length == 0) continue;
-            allMonthDirs.sort((a, b) => a.localeCompare(b)); // 按月份升序排序
+            allMonthDirs.sort((a, b) => b.localeCompare(a)); // 按月份降序排序
             while (allMonthDirs.length > 0) {
                 const monthDir = allMonthDirs.pop()!;
-                const allDayDirs: string[] = await ObjectStorageIns.list(monthDir);
+                const allDayDirs: string[] = await this.objectStorage.list(monthDir);
                 console.log(`allDayDirs: ${allDayDirs}`)
                 if (allDayDirs.length == 0) continue;
-                allDayDirs.sort((a, b) => a.localeCompare(b)); // 按日期升序排序
-                let dayDir = allDayDirs[0];
+                allDayDirs.sort((a, b) => b.localeCompare(a)); // 按日期降序排序
+                let dayDir = allDayDirs.pop()!;
                 if (dayDir.endsWith("/")) {
                     dayDir = dayDir.slice(0, -1);
                 }

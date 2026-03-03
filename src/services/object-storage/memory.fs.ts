@@ -62,4 +62,7 @@ export default class MemoryObjectStorage implements ObjectStorage {
         return paths;
     }
 
+    clear() {
+        this.storage.clear()
+    }
 }
