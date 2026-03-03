@@ -1,6 +1,6 @@
 
-export function generateId(): string {
-  const now = new Date();
+export function generateId(now: Date|null = null): string {
+  now = now || new Date();
   
   // Format date and time
   const year = now.getFullYear().toString();
@@ -31,10 +31,10 @@ export function extractDate(id: string): Date {
   return new Date(year, month, day, hours, minutes, seconds)
 }
 
-export function extractYYYYMMDD(id: string): { year: string, month: string, day: string } {
+export function extractYYYYMMDD(id: string): { yyyy: string, mm: string, dd: string } {
   const dataPart = id.split('-')[0]
-  const year = dataPart.slice(0, 4)
-  const month = dataPart.slice(4, 6)
-  const day = dataPart.slice(6, 8)
-  return { year, month, day }
+  const yyyy = dataPart.slice(0, 4)
+  const mm = dataPart.slice(4, 6)
+  const dd = dataPart.slice(6, 8)
+  return { yyyy, mm, dd }
 }

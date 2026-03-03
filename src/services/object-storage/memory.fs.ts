@@ -28,11 +28,12 @@ export default class MemoryObjectStorage implements ObjectStorage {
         this.storage.delete(path)
     }
 
-    async *list(prefix: string, options?: ListOptions): AsyncIterable<string> {
+    async list(prefix: string, options?: ListOptions): Promise<string[]> {
         if (!prefix.endsWith("/")) prefix += "/"
         options = { file: true, directory: true, ...options }
 
         const seenDirs = new Set<string>()
+        const paths: string[] = []
 
         for (const key of this.storage.keys()) {
             if (!key.startsWith(prefix)) continue
@@ -45,7 +46,7 @@ export default class MemoryObjectStorage implements ObjectStorage {
             if (i === -1) {
                 // 文件
                 if (options.file) {
-                    yield prefix + rest;
+                    paths.push(prefix + rest);
                 }
             } else {
                 // 子目录
@@ -53,11 +54,12 @@ export default class MemoryObjectStorage implements ObjectStorage {
                     const dir = prefix + rest.slice(0, i + 1)
                     if (!seenDirs.has(dir)) {
                         seenDirs.add(dir)
-                        yield dir
+                        paths.push(dir)
                     }
                 }
             }
         }
+        return paths;
     }
 
 }

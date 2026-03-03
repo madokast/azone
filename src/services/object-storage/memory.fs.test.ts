@@ -18,18 +18,12 @@ describe("MemoryObjectStorage", () => {
         await storage.put("/abc/3.txt", string2stream("test"));
         await storage.put("/abc/4.txt", string2stream("test"));
 
-        const files = []
-        for await (const entry of storage.list("/")) {
-            files.push(entry)
-        }
+        const files = await storage.list("/")
         console.log(`list /: ${files}`)
         expect(files).toEqual(["/1.txt", "/2.txt", "/abc/"])
         
 
-        const files2 = []
-        for await (const entry of storage.list("/abc/")) {
-            files2.push(entry)
-        }
+        const files2 = await storage.list("/abc/")
         console.log(`list /abc/: ${files2}`)
         expect(files2).toEqual(["/abc/3.txt", "/abc/4.txt"])
     })

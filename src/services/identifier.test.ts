@@ -27,19 +27,19 @@ describe("extractDate", () => {
 describe("extractYYYYMMDD", () => {
     it("extracts year, month, day from id", () => {
         const id = generateId()
-        const { year, month, day } = extractYYYYMMDD(id)
-        console.log(`Extracted YYYYMMDD: ${year}${month}${day}`)
+        const { yyyy, mm, dd } = extractYYYYMMDD(id)
+        console.log(`Extracted YYYYMMDD: ${yyyy}${mm}${dd}`)
         const date = extractDate(id)
-        if (date.getFullYear().toString() !== year) {
-            console.log(`Year extracted from ID: ${year}`)
+        if (date.getFullYear().toString() !== yyyy) {
+            console.log(`Year extracted from ID: ${yyyy}`)
             throw new Error("Year extracted from ID does not match")
         }
-        if (date.getMonth() + 1 !== parseInt(month)) {
-            console.log(`Month extracted from ID: ${month}`)
+        if (date.getMonth() + 1 !== parseInt(mm)) {
+            console.log(`Month extracted from ID: ${mm}`)
             throw new Error("Month extracted from ID does not match")
         }
-        if (date.getDate() !== parseInt(day)) {
-            console.log(`Day extracted from ID: ${day}`)
+        if (date.getDate() !== parseInt(dd)) {
+            console.log(`Day extracted from ID: ${dd}`)
             throw new Error("Day extracted from ID does not match")
         }
     })
