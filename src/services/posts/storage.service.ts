@@ -96,20 +96,21 @@ export default class StoragePostService implements PostService {
     // 获取需要加载 post 时，搜索的日期
     public async nextLoadPostDate(): Promise<Date | null> {
         if (this.posts.length == 0) {
+            // 找到最新的日期
             const allYearDirs: string[] = await this.objectStorage.list(this.rootDir);
             if (allYearDirs.length == 0) return null;
-            allYearDirs.sort((a, b) => b.localeCompare(a)); // 按年份降序排序
+            allYearDirs.sort((a, b) => a.localeCompare(b)); // 按年份升序排序
             while (allYearDirs.length > 0) {
-                const yearDir = allYearDirs.pop()!;
+                const yearDir = allYearDirs.pop()!; // 最新的年份
                 const allMonthDirs: string[] = await this.objectStorage.list(yearDir);
                 if (allMonthDirs.length == 0) continue;
-                allMonthDirs.sort((a, b) => b.localeCompare(a)); // 按月份降序排序
+                allMonthDirs.sort((a, b) => a.localeCompare(b)); // 按月份升序排序
                 while (allMonthDirs.length > 0) {
-                    const monthDir = allMonthDirs.pop()!;
+                    const monthDir = allMonthDirs.pop()!; // 最新的月份
                     const allDayDirs: string[] = await this.objectStorage.list(monthDir);
                     if (allDayDirs.length == 0) continue;
-                    allDayDirs.sort((a, b) => b.localeCompare(a)); // 按日期降序排序
-                    let dayDir = getPathName(allDayDirs[0]);
+                    allDayDirs.sort((a, b) => a.localeCompare(b)); // 按日期升序排序
+                    let dayDir = allDayDirs.pop()!; // 最新的日期
                     if (dayDir.endsWith("/")) {
                         dayDir = dayDir.slice(0, -1);
                     }
