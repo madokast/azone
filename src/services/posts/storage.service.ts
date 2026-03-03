@@ -98,6 +98,7 @@ export default class StoragePostService implements PostService {
         if (this.posts.length == 0) {
             // 找到最新的日期
             const allYearDirs: string[] = await this.objectStorage.list(this.rootDir);
+            console.log(`allYearDirs: ${allYearDirs}`)
             if (allYearDirs.length == 0) return null;
             allYearDirs.sort((a, b) => a.localeCompare(b)); // 按年份升序排序
             while (allYearDirs.length > 0) {
@@ -121,6 +122,7 @@ export default class StoragePostService implements PostService {
             return null;
         } else {
             const lastPost = this.posts[this.posts.length - 1];
+            console.log(`lastPost: ${lastPost}`)
             const { yyyy, mm, dd } = extractYYYYMMDD(lastPost.id);
             const date = new Date(parseInt(yyyy), parseInt(mm) - 1, parseInt(dd));
             date.setDate(date.getDate() - 1);
@@ -155,6 +157,10 @@ export default class StoragePostService implements PostService {
             }
         }
         return null;
+    }
+
+    public clearPosts(): void {
+        this.posts = [];
     }
 }
 

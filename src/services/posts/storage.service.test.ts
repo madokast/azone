@@ -33,7 +33,7 @@ describe("oldestDate", () => {
         expect(oldest?.getDate()).toBe(now.getDate());
     })
 
-    it("should return the oldest date when posts is not empty", async () => {
+    it("should return the oldest date when posts contain different dates", async () => {
         const service = new StoragePostService("/posts", new MemoryObjectStorage());
         const date20250101 = new Date("2025-01-01")
         const date20240503 = new Date("2024-05-03")
@@ -44,5 +44,41 @@ describe("oldestDate", () => {
         expect(oldest?.getFullYear()).toBe(date20240503.getFullYear());
         expect(oldest?.getMonth()).toBe(date20240503.getMonth());
         expect(oldest?.getDate()).toBe(date20240503.getDate());
+    })
+})
+
+describe("nextLoadPostDate", () => {
+    it("should return null when posts is empty", async () => {
+        const service = new StoragePostService("/posts", new MemoryObjectStorage());
+        const date = await service.nextLoadPostDate();
+        expect(date).toBeNull();
+    })
+
+    it("should return the next load post date when posts is not empty", async () => {
+        const service = new StoragePostService("/posts", new MemoryObjectStorage());
+        const date20260303 = new Date("2026-03-03")
+        await service.createPost({ content: "post1" }, date20260303)
+        await service.createPost({ content: "post2" }, date20260303)
+        service.clearPosts();
+
+        const nextLoadDate = await service.nextLoadPostDate();
+        console.log(`nextLoadDate: ${nextLoadDate}`)
+        expect(nextLoadDate?.getFullYear()).toBe(date20260303.getFullYear());
+        expect(nextLoadDate?.getMonth()).toBe(date20260303.getMonth());
+        expect(nextLoadDate?.getDate()).toBe(date20260303.getDate());
+    })
+
+    it("should return the next load post date when posts contain different dates", async () => {
+        const service = new StoragePostService("/posts", new MemoryObjectStorage());
+        const date20250101 = new Date("2025-01-01")
+        const date20240503 = new Date("2024-05-03")
+        await service.createPost({ content: "post1" }, date20250101)
+        await service.createPost({ content: "post2" }, date20240503)
+        service.clearPosts();
+
+        const nextLoadDate = await service.nextLoadPostDate();
+        expect(nextLoadDate?.getFullYear()).toBe(date20250101.getFullYear());
+        expect(nextLoadDate?.getMonth()).toBe(date20250101.getMonth());
+        expect(nextLoadDate?.getDate()).toBe(date20250101.getDate());
     })
 })
