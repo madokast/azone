@@ -4,7 +4,9 @@ import {
   incrementOpenCount,
   subscribeConfig,
   setTheme as persistTheme,
+  updateS3Config as persistS3Config,
   type UiTheme,
+  S3Config,
 } from "./services/settings";
 import { showToast } from "./components/toast";
 import AppRouter from "./routes";
@@ -13,6 +15,11 @@ export default function App() {
   const [theme, setTheme] = useState<UiTheme>(() => {
     const initialConfig = getConfig();
     return (initialConfig.ui?.theme ?? "system") as UiTheme;
+  });
+
+  const [s3Config, setS3Config] = useState<S3Config>(() => {
+    const initialConfig = getConfig();
+    return initialConfig.s3 ?? {};
   });
 
   useEffect(() => {
@@ -81,6 +88,9 @@ export default function App() {
       setTheme(nextTheme);
       persistTheme(nextTheme);
       showToast(`(${nextTheme})`);
+    }} s3Config={s3Config} onS3ConfigChange={nextS3Config => {
+      setS3Config(nextS3Config);
+      persistS3Config(nextS3Config);
     }} />
   );
 }

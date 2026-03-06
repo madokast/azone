@@ -20,13 +20,3 @@ export async function updateS3Config(
   }));
 }
 
-export async function setS3Endpoint(endpoint: string): Promise<void> {
-  await updateS3Config({ endpoint });
-}
-
-export async function setS3Credentials(
-  accessKeyId: string,
-  secretAccessKey: string
-): Promise<void> {
-  await updateS3Config({ accessKeyId, secretAccessKey });
-}

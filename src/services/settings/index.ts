@@ -23,8 +23,6 @@ export {
 } from "./ui";
 export {
   getS3Config,
-  setS3Credentials,
-  setS3Endpoint,
   updateS3Config,
 } from "./s3";
 export { incrementOpenCount } from "./stats";
