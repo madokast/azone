@@ -1,12 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import Post from '../components/Post';
 import { List, InfiniteScroll, Button, Popup, Badge } from 'antd-mobile';
-import { createRandomPosts, PostServiceIns, type Post as PostType } from '../services/posts';
+import { PostServiceIns, type Post as PostType } from '../services/posts';
 import Publish from '../components/Publish';
 import { AddOutline } from 'antd-mobile-icons';
 import { showToast } from '../components/toast';
-
-let randomPosts = false;
 
 export default function Home() {
   const [data, setData] = useState<PostType[]>([]);
@@ -17,10 +15,6 @@ export default function Home() {
 
   const fetchInitialPosts = async () => {
     try {
-      if (!randomPosts) {
-        await createRandomPosts(PostServiceIns, 5, 256);
-        randomPosts = true;
-      }
       const initialPosts = await PostServiceIns.getPosts(1, pageSize);
       setData(initialPosts);
       setHasMore(initialPosts.length === pageSize);

@@ -2,7 +2,7 @@ import type { Post, PostService, CreatePostDto } from './index';
 import { generateId } from '../identifier';
 import { formatDate } from './utils';
 
-import { MemoryAttachmentServiceIns } from '../attachments';
+import { AttachmentServiceIns } from '../attachments';
 
 /**
  * In-memory implementation of PostService for testing purposes.
@@ -14,7 +14,7 @@ export class MemoryPostService implements PostService {
   async createPost(postData: CreatePostDto): Promise<void> {
 
     const attachments = await Promise.all(
-      (postData.attachments || []).map(attachment => MemoryAttachmentServiceIns.uploadAttachment(attachment))
+      (postData.attachments || []).map(attachment => AttachmentServiceIns.uploadAttachment(attachment))
     );
 
     const newPost: Post = {

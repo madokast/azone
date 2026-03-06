@@ -2,7 +2,7 @@ import { type Post as PostType } from '../services/posts';
 import { useEffect, useState } from 'react';
 
 import { Button, Image, Space } from 'antd-mobile';
-import { Attachment, MemoryAttachmentServiceIns, isImageMimeType } from '../services/attachments';
+import { Attachment, AttachmentServiceIns, isImageMimeType } from '../services/attachments';
 import AttachmentViewer from './AttachmentViewer';
 import { showToast } from './toast';
 import { unknowFileIcon, unknowPicIcon } from '../assets';
@@ -38,7 +38,7 @@ useEffect(() => {
 
   // 异步加载
   initial.forEach((attachment, index) => {
-    MemoryAttachmentServiceIns.getAttachment(attachment).then((loaded) => {
+    AttachmentServiceIns.getAttachment(attachment).then((loaded) => {
       setAttachments(prev =>
         prev.map((att, i) => i === index ? loaded : att)
       );
