@@ -29,15 +29,16 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange }:
   }
 
   const testS3Config = async () => {
-    setS3TestButtonDisabled(true);
-    try {
-      await s3ConnectTest(s3ConfigState);
-      showToast('S3 connect success');
-    } catch (error) {
-      showToast(`S3 connect failed: ${error}`);
-    } finally {
-      setS3TestButtonDisabled(false);
-    }
+    // setS3TestButtonDisabled(true);
+    await s3ConnectTest(s3ConfigState);
+    // try {
+    //   await s3ConnectTest(s3ConfigState);
+    //   showToast('S3 connect success');
+    // } catch (error) {
+    //   showToast(`S3 connect failed: ${error}`);
+    // } finally {
+    //   setS3TestButtonDisabled(false);
+    // }
   }
 
   return (
@@ -101,6 +102,18 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange }:
         </Form.Item>
         <Form.Item name='endpoint' label='endpoint' initialValue={s3Config.endpoint }>
           <Input onChange={(next) => setS3Config({ endpoint: next })} defaultValue={s3Config.endpoint} placeholder='Please input endpoint: https://' />
+        </Form.Item>
+        <Form.Item name='forcePathStyle' label='forcePathStyle' initialValue={s3Config.forcePathStyle}>
+          <Segmented
+            options={[
+              { label: 'True', value: 'true' },
+              { label: 'False', value: 'false' },
+            ]}
+            defaultValue={s3Config.forcePathStyle ? 'true' : 'false'}
+            onChange={(next) => {
+              setS3Config({ forcePathStyle: next === 'true' });
+            }}
+          />
         </Form.Item>
       </Form>
 

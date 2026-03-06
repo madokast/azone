@@ -15,6 +15,7 @@ export type S3Config = {
   bucket?: string;
   accessKeyId?: string;
   secretAccessKey?: string;
+  forcePathStyle?: boolean;
 };
 
 export type AppConfig = {

@@ -7,6 +7,7 @@ export interface S3Config {
     bucket: string;
     accessKeyId: string;
     secretAccessKey: string;
+    forcePathStyle: boolean;
 }
 
 
@@ -18,7 +19,7 @@ export class S3ObjectStorage implements ObjectStorage {
         this.client = new S3Client({
             region: this.config.region,
             endpoint: this.config.endpoint,
-            forcePathStyle: !!this.config.endpoint,
+            forcePathStyle: this.config.forcePathStyle,
             credentials: {
                 accessKeyId: this.config.accessKeyId,
                 secretAccessKey: this.config.secretAccessKey,
@@ -75,9 +76,19 @@ export class S3ObjectStorage implements ObjectStorage {
 }
 
 export async function s3ConnectTest(config: Partial<S3Config>): Promise<void> {
-    if (!config.region || !config.bucket || !config.accessKeyId || !config.secretAccessKey) {
-        throw new Error("S3 config is incomplete");
+    if (!config.region) {
+        throw new Error("S3 region is required");
     }
+    if (!config.bucket) {
+        throw new Error("S3 bucket is required");
+    }
+    if (!config.accessKeyId) {
+        throw new Error("S3 access key ID is required");
+    }
+    if (!config.secretAccessKey) {
+        throw new Error("S3 secret access key is required");
+    }
+    config.forcePathStyle = config.forcePathStyle || false;
     const storage = new S3ObjectStorage(config as S3Config);
     await storage.list("");
 }
