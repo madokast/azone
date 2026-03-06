@@ -22,6 +22,7 @@ export default class MemoryObjectStorage implements ObjectStorage {
     async put(path: string, data: ReadableStream<Uint8Array>): Promise<void> {
         const buffer = await new Response(data).arrayBuffer()
         this.storage.set(path, new Uint8Array(buffer))
+        console.log(`MemoryObjectStorage put ${path}`)
     }
 
     async delete(path: string): Promise<void> {
