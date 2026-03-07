@@ -78,23 +78,13 @@ export default class IndexDBObjectStorage implements ObjectStorage {
         await db.delete(STORE_FILES, key)
     }
 
-    async list(prefix: string, options?: ListOptions): Promise<string[]> {
-        const keys = [prefix]
-        if (options?.file) {
-            keys.push("file")
-        }
-        if (options?.directory) {
-            keys.push("directory")
-        }
-        const key = keys.join("-")
-
+    async list(prefix: string): Promise<string[]> {
         const db = await this.dbPromise
-        let paths = await db.get(STORE_LISTS, key)
+        let paths = await db.get(STORE_LISTS, prefix)
         if (paths === undefined) {
-            paths = await this.proxy.list(prefix, options)
-            await db.put(STORE_LISTS, paths, key)
+            paths = await this.proxy.list(prefix)
+            await db.put(STORE_LISTS, paths, prefix)
         }
-
         return paths
     }
 }

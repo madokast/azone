@@ -47,7 +47,7 @@ export class S3ObjectStorage implements ObjectStorage {
         }));
     }
 
-    public async list(prefix: string, options?: ListOptions): Promise<string[]> {
+    public async list(prefix: string): Promise<string[]> {
         if (prefix && !prefix.endsWith("/")) prefix += "/";
         const r = await this.client.send(new ListObjectsV2Command({
             Bucket: this.config.bucket,
@@ -56,23 +56,19 @@ export class S3ObjectStorage implements ObjectStorage {
         }));
 
         const paths: string[] = []
-        if (!options || options.file) {
-            const files: string[] = (r.Contents || [])
-                .filter(obj => obj.Key && obj.Key !== prefix) // 排除目录本身
-                .map(obj => obj.Key!);
-            paths.push(...files);
-        }
 
-        if (!options || options.directory) {
-            const folders: string[] = (r.CommonPrefixes || [])
-                .filter(p => p.Prefix)
-                .map(p => p.Prefix!);
-            paths.push(...folders);
-        }
+        const files: string[] = (r.Contents || [])
+            .filter(obj => obj.Key && obj.Key !== prefix) // 排除目录本身
+            .map(obj => obj.Key!);
+        paths.push(...files);
+
+        const folders: string[] = (r.CommonPrefixes || [])
+            .filter(p => p.Prefix)
+            .map(p => p.Prefix!);
+        paths.push(...folders);
 
         return paths;
     }
-
 }
 
 export function createS3ObjectStorage(config: Partial<S3Config>): S3ObjectStorage {

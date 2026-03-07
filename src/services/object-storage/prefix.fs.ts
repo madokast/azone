@@ -34,8 +34,8 @@ export default class PrefixObjectStorage implements ObjectStorage {
         await this.proxy.delete(this.addPrefix(path))
     }
 
-    async list(prefix: string, options?: ListOptions): Promise<string[]> {
-        return this.proxy.list(this.addPrefix(prefix), options)
+    async list(prefix: string): Promise<string[]> {
+        return this.proxy.list(this.addPrefix(prefix))
     }
 }
 
