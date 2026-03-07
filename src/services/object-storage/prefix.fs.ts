@@ -22,11 +22,11 @@ export default class PrefixObjectStorage implements ObjectStorage {
         return this.prefix + "/" + path;
     }
 
-    async get(path: string): Promise<ReadableStream<Uint8Array>> {
+    async get(path: string): Promise<ReadableStream<Uint8Array<ArrayBuffer>>> {
         return this.proxy.get(this.addPrefix(path))
     }
 
-    async put(path: string, data: ReadableStream<Uint8Array>): Promise<void> {
+    async put(path: string, data: ReadableStream<Uint8Array<ArrayBuffer>>): Promise<void> {
         await this.proxy.put(this.addPrefix(path), data)
     }
 

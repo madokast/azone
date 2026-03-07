@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import MemoryObjectStorage from "./memory.fs";
 
-function string2stream(str: string): ReadableStream<Uint8Array> {
+function string2stream(str: string): ReadableStream<Uint8Array<ArrayBuffer>> {
     return new ReadableStream({
         start(controller) {
             controller.enqueue(new TextEncoder().encode(str))

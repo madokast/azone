@@ -30,7 +30,7 @@ export default class SimpleCrypto {
   }
 
   // 核心加密方法，输入和输出都是 ArrayBuffer
-  private async encryptBuffer(data: ArrayBuffer): Promise<ArrayBuffer> {
+   async encryptBuffer(data: ArrayBuffer): Promise<ArrayBuffer> {
     const key = await this.keyPromise;
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const cipher = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, data);
@@ -41,7 +41,7 @@ export default class SimpleCrypto {
     return combined.buffer;
   }
 
-  private async decryptBuffer(data: ArrayBuffer): Promise<ArrayBuffer> {
+   async decryptBuffer(data: ArrayBuffer): Promise<ArrayBuffer> {
     const key = await this.keyPromise;
     const combined = new Uint8Array(data);
     const iv = combined.slice(0, 12);

@@ -37,7 +37,7 @@ export default class IndexDBObjectStorage implements ObjectStorage {
     this.proxy = proxy
   }
 
-  async get(path: string): Promise<ReadableStream<Uint8Array>> {
+  async get(path: string): Promise<ReadableStream<Uint8Array<ArrayBuffer>>> {
     const db = await this.dbPromise
     let buffer = await db.get(STORE_FILES, path)
 
@@ -55,7 +55,7 @@ export default class IndexDBObjectStorage implements ObjectStorage {
     });
   }
 
-  async put(key: string, data: ReadableStream<Uint8Array>): Promise<void> {
+  async put(key: string, data: ReadableStream<Uint8Array<ArrayBuffer>>): Promise<void> {
     const buffer = await new Response(data).arrayBuffer()
     { // 写入 proxy
       const stream = new ReadableStream({

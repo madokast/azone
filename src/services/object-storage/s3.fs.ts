@@ -27,12 +27,12 @@ export class S3ObjectStorage implements ObjectStorage {
         });
     }
 
-    public async get(path: string): Promise<ReadableStream<Uint8Array>> {
+    public async get(path: string): Promise<ReadableStream<Uint8Array<ArrayBuffer>>> {
         const r = await this.client.send(new GetObjectCommand({ Bucket: this.config.bucket, Key: path }));
-        return r.Body as ReadableStream<Uint8Array>;
+        return r.Body as ReadableStream<Uint8Array<ArrayBuffer>>;
     }
 
-    public async put(path: string, data: ReadableStream<Uint8Array>): Promise<void> {
+    public async put(path: string, data: ReadableStream<Uint8Array<ArrayBuffer>>): Promise<void> {
         await this.client.send(new PutObjectCommand({
             Bucket: this.config.bucket,
             Key: path,

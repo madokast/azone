@@ -4,7 +4,7 @@ export default class MemoryObjectStorage implements ObjectStorage {
 
     private storage = new Map<string, Uint8Array>();
 
-    async get(path: string): Promise<ReadableStream<Uint8Array>> {
+    async get(path: string): Promise<ReadableStream<Uint8Array<ArrayBuffer>>> {
         const data = this.storage.get(path);
         if (!data) throw new Error(`Not Found: ${path}`);
 
@@ -19,7 +19,7 @@ export default class MemoryObjectStorage implements ObjectStorage {
         });
     }
 
-    async put(path: string, data: ReadableStream<Uint8Array>): Promise<void> {
+    async put(path: string, data: ReadableStream<Uint8Array<ArrayBuffer>>): Promise<void> {
         const buffer = await new Response(data).arrayBuffer()
         this.storage.set(path, new Uint8Array(buffer))
         console.log(`MemoryObjectStorage put ${path}`)
