@@ -1,5 +1,5 @@
 import { DBSchema, IDBPDatabase, openDB } from "idb";
-import { ListOptions, ObjectStorage } from "./interface";
+import { ObjectStorage } from "./interface";
 
 const STORE_FILES = "files"
 const STORE_LISTS = "lists"

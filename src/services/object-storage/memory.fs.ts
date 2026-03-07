@@ -1,4 +1,4 @@
-import { ListOptions, ObjectStorage } from "./interface";
+import { ObjectStorage } from "./interface";
 
 export default class MemoryObjectStorage implements ObjectStorage {
 

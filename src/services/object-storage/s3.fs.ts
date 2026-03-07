@@ -1,4 +1,4 @@
-import { ListOptions, ObjectStorage } from "./interface";
+import { ObjectStorage } from "./interface";
 import { S3Client, PutObjectCommand, GetObjectCommand, ListObjectsV2Command, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 export interface S3Config {
