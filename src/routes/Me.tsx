@@ -2,7 +2,7 @@ import { Divider, Form, Segmented, Tag, Input, Button, Switch } from 'antd-mobil
 import { S3Config, type UiTheme } from '../services/settings';
 import { useState } from 'react';
 import { EyeInvisibleOutline, EyeOutline } from 'antd-mobile-icons'
-import { s3ConnectTest } from '../services/object-storage/s3.fs';
+import { createS3ObjectStorage } from '../services/object-storage/s3.fs';
 import { showToast } from '../components/toast';
 
 
@@ -31,7 +31,7 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange }:
   const testS3Config = async () => {
     setS3TestButtonDisabled(true);
     try {
-      await s3ConnectTest(s3ConfigState);
+      await createS3ObjectStorage(s3ConfigState).list("");
       showToast('S3 Connect Success');
     } catch (error) {
       showToast(`S3 Connect Failed: ${error}`);
@@ -105,7 +105,12 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange }:
             <Input onChange={(next) => setS3Config({ endpoint: next })} defaultValue={s3Config.endpoint} placeholder='Please input endpoint: https://' />
           </Form.Item>
         </Form>
-        <Form layout='horizontal' footer={
+        <Form layout='horizontal'>
+          <Form.Item name='ForcePathStyle' label='ForcePathStyle' initialValue={s3Config.forcePathStyle ? 'true' : 'false'} childElementPosition='right'>
+            <Switch defaultChecked={s3Config.forcePathStyle} onChange={(next) => setS3Config({ forcePathStyle: next })} />
+          </Form.Item>
+        </Form>
+        <Form layout='vertical'  footer={
           // 测试连接按钮
           <div style={{ textAlign: 'right' }}>
             <Button color='primary' fill='outline' onClick={testS3Config} disabled={s3TestButtonDisabled}>
@@ -113,8 +118,8 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange }:
             </Button>
           </div>
         }>
-          <Form.Item name='ForcePathStyle' label='ForcePathStyle' initialValue={s3Config.forcePathStyle ? 'true' : 'false'} childElementPosition='right'>
-            <Switch defaultChecked={s3Config.forcePathStyle} onChange={(next) => setS3Config({ forcePathStyle: next })} />
+          <Form.Item name='WorkDir' label='WorkDir' initialValue={s3Config.workDir}>
+            <Input onChange={(next) => setS3Config({ workDir: next })} defaultValue={s3Config.workDir} placeholder='Please input workDir' />
           </Form.Item>
         </Form>
       </>

@@ -75,7 +75,7 @@ export class S3ObjectStorage implements ObjectStorage {
 
 }
 
-export async function s3ConnectTest(config: Partial<S3Config>): Promise<void> {
+export function createS3ObjectStorage(config: Partial<S3Config>): S3ObjectStorage {
     if (!config.region) {
         throw new Error("S3 region is required");
     }
@@ -89,6 +89,5 @@ export async function s3ConnectTest(config: Partial<S3Config>): Promise<void> {
         throw new Error("S3 secret access key is required");
     }
     config.forcePathStyle = config.forcePathStyle || false;
-    const storage = new S3ObjectStorage(config as S3Config);
-    await storage.list("");
+    return new S3ObjectStorage(config as S3Config);
 }
