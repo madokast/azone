@@ -1,4 +1,4 @@
-import { Divider, Form, Segmented, Space, Tag, Input, Button, Switch } from 'antd-mobile';
+import { Divider, Form, Segmented, Tag, Input, Button, Switch } from 'antd-mobile';
 import { S3Config, type UiTheme } from '../services/settings';
 import { useState } from 'react';
 import { EyeInvisibleOutline, EyeOutline } from 'antd-mobile-icons'
