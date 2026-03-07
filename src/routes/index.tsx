@@ -1,9 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Home from './Home';
-import Media from './Media';
-import Me from './Me';
-import MainLayout from '../components/MainLayout';
 import { S3Config, type UiTheme } from '../services/settings';
+import React from 'react';
+
+const MainLayout = React.lazy(() => import('../components/MainLayout'));
+const Home = React.lazy(() => import('./Home'));
+const Media = React.lazy(() => import('./Media'));
+const Me = React.lazy(() => import('./Me'));
+
 
 type AppRouterProps = {
   theme: UiTheme;
