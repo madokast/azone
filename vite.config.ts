@@ -21,13 +21,6 @@ export default defineConfig({
         globPatterns: ["**\/*.{js,wasm,css,html,svg,webmanifest}"], // 要预缓存的文件匹配模式
         globIgnores: ["**\/node_modules\/**\/*"], // 忽略的文件
         runtimeCaching: [
-          // S3 ListObjectsV2: never cache
-          {
-            urlPattern: ({ url, request }) =>
-              request.method === "GET" &&
-              url.searchParams.get("list-type") === "2",
-            handler: "NetworkOnly"
-          },
           // Dev source files: prefer network, fallback to cache
           {
             urlPattern: ({ url, request }) =>
