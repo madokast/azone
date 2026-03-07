@@ -12,7 +12,7 @@ type StoragePostServiceForTest = PostService & {
 }
 
 function createStoragePostServiceForTest(): StoragePostServiceForTest {
-    return new StoragePostService("/posts", new MemoryObjectStorage()) as any as StoragePostServiceForTest;
+    return new StoragePostService("posts", new MemoryObjectStorage()) as any as StoragePostServiceForTest;
 }
 
 describe("oldestDate", () => {
@@ -84,7 +84,7 @@ describe("nextLoadPostDate", () => {
 
 describe("getPosts", () => {
     it("should return posts when posts is not empty", async () => {
-        const service = new StoragePostService("/posts", new MemoryObjectStorage());
+        const service = new StoragePostService("posts", new MemoryObjectStorage());
         const date20250101 = new Date("2025-01-01")
         await service.createPost({ content: "post1" }, date20250101)
         const posts = await service.getPosts(1, 10);
@@ -93,7 +93,7 @@ describe("getPosts", () => {
     })
 
     it("should return posts order by date desc", async () => {
-        const service = new StoragePostService("/posts", new MemoryObjectStorage());
+        const service = new StoragePostService("posts", new MemoryObjectStorage());
         const date20250101 = new Date("2025-01-01")
         const date20240503 = new Date("2024-05-03")
         await service.createPost({ content: "post1" }, date20250101)
@@ -105,7 +105,7 @@ describe("getPosts", () => {
     })
 
     it("should return posts order by date desc 2", async () => {
-        const service = new StoragePostService("/posts", new MemoryObjectStorage());
+        const service = new StoragePostService("posts", new MemoryObjectStorage());
         const date20250101 = new Date("2025-01-01")
         const date20240503 = new Date("2024-05-03")
         await service.createPost({ content: "post2" }, date20240503)
@@ -117,7 +117,7 @@ describe("getPosts", () => {
     })
 
     it("should return only one post", async () => {
-        const service = new StoragePostService("/posts", new MemoryObjectStorage());
+        const service = new StoragePostService("posts", new MemoryObjectStorage());
         const date20250101 = new Date("2025-01-01")
         const date20240503 = new Date("2024-05-03")
         await service.createPost({ content: "post2" }, date20240503)
@@ -128,7 +128,7 @@ describe("getPosts", () => {
     })
 
     it("should return only one post 2", async () => {
-        const service = new StoragePostService("/posts", new MemoryObjectStorage());
+        const service = new StoragePostService("posts", new MemoryObjectStorage());
         const date20250101 = new Date("2025-01-01")
         const date20240503 = new Date("2024-05-03")
         await service.createPost({ content: "post1" }, date20250101)
@@ -139,7 +139,7 @@ describe("getPosts", () => {
     })
 
     it("should return all posts", async () => {
-        const service = new StoragePostService("/posts", new MemoryObjectStorage());
+        const service = new StoragePostService("posts", new MemoryObjectStorage());
         const date20250101 = new Date("2025-01-01")
         const date20240503 = new Date("2024-05-03")
         await service.createPost({ content: "post1" }, date20250101)
@@ -158,7 +158,7 @@ describe("getPosts", () => {
     })
 
     it("should return all posts 2", async () => {
-        const service = new StoragePostService("/posts", new MemoryObjectStorage());
+        const service = new StoragePostService("posts", new MemoryObjectStorage());
         const date20250101 = new Date("2025-01-01")
         const date20240503 = new Date("2024-05-03")
         await service.createPost({ content: "post2" }, date20240503)
