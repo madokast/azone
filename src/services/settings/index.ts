@@ -8,6 +8,8 @@ export {
   CONFIG_VERSION,
   STORAGE_KEY,
   defaultConfig,
+  defaultS3Config,
+  defaultUiConfig,
 } from "./schema";
 export {
   getConfig,
@@ -17,7 +19,6 @@ export {
 } from "./core";
 export {
   getUiConfig,
-  setLanguage,
   setTheme,
   updateUiConfig,
 } from "./ui";

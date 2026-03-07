@@ -1,22 +1,22 @@
-import { S3Config } from "./schema";
+import { defaultS3Config, S3Config } from "./schema";
 import { getConfig, updateConfigWith } from "./core";
 
 /**
  * Read S3-specific settings.
  */
 export function getS3Config(): S3Config {
-  return getConfig().s3 ?? {};
+  return getConfig().s3 ?? defaultS3Config;
 }
-
 /**
  * Merge S3 settings and persist.
  */
 export async function updateS3Config(
   partial: Partial<S3Config>
-): Promise<void> {
-  await updateConfigWith((current) => ({
+): Promise<S3Config> {
+  const config = await updateConfigWith((current) => ({
     ...current,
-    s3: { ...current.s3, ...partial }
+    s3: { ...defaultS3Config, ...current.s3, ...partial },
   }));
+  return config.s3 ?? defaultS3Config;
 }
 

@@ -5,8 +5,7 @@
 export type UiTheme = "light" | "dark" | "system";
 
 export type UiConfig = {
-  theme?: UiTheme;
-  language?: string;
+  theme: UiTheme;
 };
 
 export type S3Config = {
@@ -15,7 +14,8 @@ export type S3Config = {
   bucket?: string;
   accessKeyId?: string;
   secretAccessKey?: string;
-  forcePathStyle?: boolean;
+  forcePathStyle: boolean;
+  workDir: string;
 };
 
 export type AppConfig = {
@@ -28,9 +28,18 @@ export type AppConfig = {
 export const STORAGE_KEY = "azone.config";
 export const CONFIG_VERSION = 1 as const;
 
+export const defaultUiConfig: UiConfig = {
+  theme: "system",
+};
+
+export const defaultS3Config: S3Config = {
+  workDir: "azone",
+  forcePathStyle: false,
+};
+
 export const defaultConfig: AppConfig = {
   version: CONFIG_VERSION,
   openCount: 0,
-  ui: { theme: "system" },
-  s3: {}
+  ui: defaultUiConfig,
+  s3: defaultS3Config,
 };

@@ -1,4 +1,4 @@
-import { AppConfig, CONFIG_VERSION, defaultConfig, STORAGE_KEY } from "./schema";
+import { AppConfig, CONFIG_VERSION, defaultConfig, defaultS3Config, defaultUiConfig, STORAGE_KEY } from "./schema";
 
 /**
  * Core settings access for local-only app configuration.
@@ -17,8 +17,8 @@ function normalizeConfig(config: Partial<AppConfig>): AppConfig {
   return {
     ...defaultConfig,
     ...config,
-    ui: { ...defaultConfig.ui, ...config.ui },
-    s3: { ...defaultConfig.s3, ...config.s3 },
+    ui: { ...defaultUiConfig, ...config.ui },
+    s3: { ...defaultS3Config, ...config.s3 },
     version: CONFIG_VERSION
   };
 }
@@ -84,8 +84,8 @@ export async function updateConfig(
   return updateConfigWith((current) => ({
     ...current,
     ...partial,
-    ui: { ...current.ui, ...partial.ui },
-    s3: { ...current.s3, ...partial.s3 }
+    ui: { ...defaultUiConfig, ...current.ui, ...partial.ui },
+    s3: { ...defaultS3Config, ...current.s3, ...partial.s3 }
   }));
 }
 

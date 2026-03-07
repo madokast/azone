@@ -1,11 +1,11 @@
-import { UiConfig } from "./schema";
+import { UiConfig, UiTheme, defaultUiConfig } from "./schema";
 import { getConfig, updateConfigWith } from "./core";
 
 /**
  * Read UI-specific settings.
  */
 export function getUiConfig(): UiConfig {
-  return getConfig().ui ?? {};
+  return getConfig().ui ?? defaultUiConfig;
 }
 
 /**
@@ -13,17 +13,15 @@ export function getUiConfig(): UiConfig {
  */
 export async function updateUiConfig(
   partial: Partial<UiConfig>
-): Promise<void> {
-  await updateConfigWith((current) => ({
+): Promise<UiConfig> {
+  const config = await updateConfigWith((current) => ({
     ...current,
-    ui: { ...current.ui, ...partial }
+    ui: { ...defaultUiConfig, ...current.ui, ...partial }
   }));
+  return config.ui ?? defaultUiConfig;
 }
 
-export async function setLanguage(language: string): Promise<void> {
-  await updateUiConfig({ language });
-}
-
-export async function setTheme(theme: UiConfig["theme"]): Promise<void> {
-  await updateUiConfig({ theme });
+export async function setTheme(theme: UiConfig["theme"]): Promise<UiTheme> {
+  const config = await updateUiConfig({ theme });
+  return config.theme ?? defaultUiConfig.theme;
 }
