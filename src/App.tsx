@@ -9,9 +9,16 @@ import {
   S3Config,
   defaultS3Config,
   defaultUiConfig,
+  updateEncryptConfig as persistEncryptConfig,
 } from "./services/settings";
 import { showToast } from "./components/toast";
 import AppRouter from "./routes";
+import { PrefixObjectStorage, StoragePostService } from "./services/posts";
+import { CryptoObjectStorage, IndexDBObjectStorage, MemoryObjectStorage, ObjectStorage } from "./services/object-storage";
+import { createS3ObjectStorage } from "./services/object-storage/s3.fs";
+import SimpleCrypto from "./services/crypto-wrapper";
+import { defaultEncryptConfig, EncryptConfig } from "./services/settings/schema";
+import { StorageAttachmentService } from "./services/attachments/storage.service";
 
 export default function App() {
   const [theme, setTheme] = useState<UiTheme>(() => {
@@ -22,6 +29,11 @@ export default function App() {
   const [s3Config, setS3Config] = useState<S3Config>(() => {
     const initialConfig = getConfig();
     return initialConfig.s3 ?? defaultS3Config;
+  });
+
+  const [encryptConfig, setEncryptConfig] = useState<EncryptConfig>(() => {
+    const initialConfig = getConfig();
+    return initialConfig.encrypt ?? defaultEncryptConfig;
   });
 
   useEffect(() => {
@@ -85,12 +97,35 @@ export default function App() {
     return;
   }, [theme]);
 
+
+  let objectStorage: ObjectStorage;
+
+  try {
+    objectStorage = createS3ObjectStorage(s3Config);
+    objectStorage = new PrefixObjectStorage(s3Config.workDir, objectStorage);
+  } catch (error) {
+    objectStorage = new MemoryObjectStorage();
+  }
+  if (encryptConfig.password && encryptConfig.password.length > 0) {
+    const crypto = new SimpleCrypto(encryptConfig.password);
+    objectStorage = new CryptoObjectStorage(crypto, objectStorage);
+  }
+  objectStorage = new IndexDBObjectStorage(s3Config.workDir, objectStorage);
+
+  
+  const attachmentService = new StorageAttachmentService("attachments", objectStorage);
+
+  const postService = new StoragePostService("posts", objectStorage, attachmentService);
+
   return (
     <AppRouter theme={theme} onThemeChange={nextTheme => {
       persistTheme(nextTheme).then(setTheme)
       showToast(`(${nextTheme})`);
     }} s3Config={s3Config} onS3ConfigChange={nextS3Config => {
       persistS3Config(nextS3Config).then(setS3Config)
+    }} postService={postService} attachmentService={attachmentService} 
+    encryptConfig={encryptConfig} onEncryptConfigChange={nextEncryptConfig => {
+      persistEncryptConfig(nextEncryptConfig).then(setEncryptConfig)
     }} />
   );
 }
