@@ -1,6 +1,6 @@
 import type { Post, CreatePostDto } from './schema';
 
-export interface PostService {
+export default interface PostService {
   createPost(postData: CreatePostDto): Promise<void>;
   deletePost(id: string): Promise<void>;
 
