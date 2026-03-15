@@ -1,12 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import Post from '../components/Post';
 import { List, InfiniteScroll, Button, Popup, Badge } from 'antd-mobile';
-import { PostServiceIns, type Post as PostType } from '../services/posts';
+import { PostService, type Post as PostType } from '../services/posts';
 import Publish from '../components/Publish';
 import { AddOutline } from 'antd-mobile-icons';
 import { showToast } from '../components/toast';
+import { AttachmentService } from '../services/attachments';
 
-export default function Home() {
+type HomeProps = {
+  postService: PostService;
+  attachmentService: AttachmentService;
+}
+
+export default function Home({ postService, attachmentService }: HomeProps) {
   const [data, setData] = useState<PostType[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -15,7 +21,7 @@ export default function Home() {
 
   const fetchInitialPosts = async () => {
     try {
-      const initialPosts = await PostServiceIns.getPosts(1, pageSize);
+      const initialPosts = await postService.getPosts(1, pageSize);
       setData(initialPosts);
       setHasMore(initialPosts.length === pageSize);
     } catch (error) {
@@ -35,7 +41,7 @@ export default function Home() {
     setLoading(true);
     try {
       const nextPage = page + 1;
-      const morePosts = await PostServiceIns.getPosts(nextPage, pageSize);
+      const morePosts = await postService.getPosts(nextPage, pageSize);
       setData(val => [...val, ...morePosts]);
       setHasMore(morePosts.length === pageSize);
       setPage(nextPage);
@@ -83,7 +89,7 @@ export default function Home() {
       <List>
         {data.map((post) => (
           <List.Item key={post.id}>
-            <Post post={post} />
+            <Post post={post} attachmentService={attachmentService} />
           </List.Item>
         ))}
       </List>
@@ -115,7 +121,7 @@ export default function Home() {
       >
         <Publish 
         onPublish={async (post) => {
-          await PostServiceIns.createPost(post).then(() => {
+          await postService.createPost(post).then(() => {
             showToast('Published');
           }).catch((error) => {
             showToast(`${error}`);

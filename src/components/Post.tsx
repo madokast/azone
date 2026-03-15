@@ -2,7 +2,7 @@ import { type Post as PostType } from '../services/posts';
 import { useEffect, useState } from 'react';
 
 import { Button, Image, Space } from 'antd-mobile';
-import { Attachment, AttachmentServiceIns, isImageMimeType } from '../services/attachments';
+import { Attachment, AttachmentService, isImageMimeType } from '../services/attachments';
 import AttachmentViewer from './AttachmentViewer';
 import { showToast } from './toast';
 import { unknowFileIcon, unknowPicIcon } from '../assets';
@@ -10,11 +10,12 @@ import { unknowFileIcon, unknowPicIcon } from '../assets';
 interface PostProps {
   post: PostType;
   imageSize?: string;
+  attachmentService: AttachmentService;
 }
 
 const attachmentLoadingFlag = "loading";
 
-export default function Post({ post, imageSize = "90px" }: PostProps) {
+export default function Post({ post, imageSize = "90px", attachmentService }: PostProps) {
 
   // 控制内容和附件的显示/折叠
   const collapseContentSize = 100;
@@ -38,14 +39,14 @@ useEffect(() => {
 
   // 异步加载
   initial.forEach((attachment, index) => {
-    AttachmentServiceIns.getAttachment(attachment).then((loaded) => {
+    attachmentService.getAttachment(attachment).then((loaded) => {
       setAttachments(prev =>
         prev.map((att, i) => i === index ? loaded : att)
       );
     }).catch((error) => showToast(`${error}`));
   });
 
-}, [post.attachments]);
+}, [post.attachments, attachmentService]);
 
   const shouldCollapseContent = post.content.length > collapseContentSize;
   const shouldCollapseAttachment = attachments.length > collapseAttachmentSize;
