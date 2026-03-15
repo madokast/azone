@@ -1,5 +1,5 @@
 import { Divider, Form, Segmented, Tag, Input, Button, Switch } from 'antd-mobile';
-import { S3Config, type UiTheme } from '../services/settings';
+import { EncryptConfig, S3Config, type UiTheme } from '../services/settings';
 import { useState } from 'react';
 import { EyeInvisibleOutline, EyeOutline } from 'antd-mobile-icons'
 import { createS3ObjectStorage } from '../services/object-storage/s3.fs';
@@ -11,9 +11,11 @@ type MeProps = {
   onThemeChange: (next: UiTheme) => void;
   s3Config: S3Config;
   onS3ConfigChange: (next: Partial<S3Config>) => void;
+  encryptConfig: EncryptConfig;
+  onEncryptConfigChange: (next: Partial<EncryptConfig>) => void;
 };
 
-export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange }: MeProps) {
+export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, encryptConfig, onEncryptConfigChange }: MeProps) {
 
   const [s3ConfigState, setS3ConfigState] = useState(s3Config);
 
@@ -31,6 +33,10 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange }:
   const testS3Config = async () => {
     setS3TestButtonDisabled(true);
     try {
+      if (s3ConfigState.workDir.length === 0) {
+        showToast('Please input workDir');
+        return;
+      }
       await createS3ObjectStorage(s3ConfigState).list("");
       showToast('S3 Connect Success');
     } catch (error) {
@@ -120,6 +126,15 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange }:
         }>
           <Form.Item name='WorkDir' label='WorkDir' initialValue={s3Config.workDir}>
             <Input onChange={(next) => setS3Config({ workDir: next })} defaultValue={s3Config.workDir} placeholder='Please input workDir' />
+          </Form.Item>
+        </Form>
+      </>
+
+      <Divider style={{ borderColor: 'rgba(0, 0, 0, 0)' }}>Encrypt Configuration</Divider>
+      <>
+        <Form layout='vertical'>
+          <Form.Item name='Password' label='Password' initialValue={encryptConfig.password}>
+            <Input onChange={(next) => onEncryptConfigChange({ password: next })} defaultValue={encryptConfig.password} placeholder='Please input password or leave it empty to disable encrypt' />
           </Form.Item>
         </Form>
       </>
