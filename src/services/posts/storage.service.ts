@@ -1,19 +1,20 @@
 import type { Post, PostService, CreatePostDto } from './index';
 import { extractYYYYMMDD, generateId } from '../identifier';
 import { formatDate } from './utils';
-
-import { AttachmentServiceIns } from '../attachments';
-import { ObjectStorageIns } from '../object-storage';
 import { ObjectStorage } from '../object-storage/interface';
+import { AttachmentService } from '../attachments';
 
 export default class StoragePostService implements PostService {
     private readonly rootDir: string;
     private objectStorage: ObjectStorage;
+    private attachmentService: AttachmentService;
+
     private posts: Post[] = [];
 
-    constructor(rootDir: string, objectStorage: ObjectStorage|null = null) {
+    constructor(rootDir: string, objectStorage: ObjectStorage, attachmentService: AttachmentService) {
         this.rootDir = rootDir;
-        this.objectStorage = objectStorage || ObjectStorageIns;
+        this.objectStorage = objectStorage;
+        this.attachmentService = attachmentService;
     }
 
     // 从 post.id 中获取 post 所在的文件路径
@@ -25,7 +26,7 @@ export default class StoragePostService implements PostService {
     public async createPost(postData: CreatePostDto, now: Date | null = null): Promise<void> {
         const attachments = await Promise.all(
             (postData.attachments || []).map(
-                attachment => AttachmentServiceIns.uploadAttachment(attachment))
+                attachment => this.attachmentService.uploadAttachment(attachment))
         );
 
         now = now || new Date();
@@ -46,7 +47,10 @@ export default class StoragePostService implements PostService {
         }));
         
         // 将新帖子添加到数组开头，确保getPosts返回最新的帖子
-        this.posts.unshift(newPost);
+        // this.posts.unshift(newPost);
+
+        // 2026年3月15日 添加后，需要重新加载全部 posts
+        this.posts = [];
     }
 
     public async deletePost(id: string): Promise<void> {
