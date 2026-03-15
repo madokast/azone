@@ -18,6 +18,11 @@ export {
   updateConfigWith,
 } from "./core";
 export {
+  getEncryptConfig,
+  updateEncryptConfig,
+  setEncryptPassword,
+} from "./encrypt";
+export {
   getUiConfig,
   setTheme,
   updateUiConfig,
