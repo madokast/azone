@@ -22,6 +22,7 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
   const [s3AccessKeyIdVisible, setS3AccessKeyIdVisible] = useState(false);
   const [s3SecretVisible, setS3SecretVisible] = useState(false);
   const [s3BucketVisible, setS3BucketVisible] = useState(false);
+  const [encryptPasswordVisible, setEncryptPasswordVisible] = useState(false);
 
   const [s3TestButtonDisabled, setS3TestButtonDisabled] = useState(false);
 
@@ -48,8 +49,8 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
 
   return (
     <div style={{ padding: 12 }}>
-      <div style={{textAlign: 'center'}}>
-        <Tag color='primary' fill='outline'>Dev</Tag> <span style={{margin: '0 4px'}}></span>
+      <div style={{ textAlign: 'center' }}>
+        <Tag color='primary' fill='outline'>Dev</Tag> <span style={{ margin: '0 4px' }}></span>
         <Tag color='primary' fill='outline'>Stat</Tag>
       </div>
 
@@ -116,7 +117,7 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
             <Switch defaultChecked={s3Config.forcePathStyle} onChange={(next) => setS3Config({ forcePathStyle: next })} />
           </Form.Item>
         </Form>
-        <Form layout='vertical'  footer={
+        <Form layout='vertical' footer={
           // 测试连接按钮
           <div style={{ textAlign: 'right' }}>
             <Button color='primary' fill='outline' onClick={testS3Config} disabled={s3TestButtonDisabled}>
@@ -133,8 +134,20 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
       <Divider style={{ borderColor: 'rgba(0, 0, 0, 0)' }}>Encrypt Configuration</Divider>
       <>
         <Form layout='vertical'>
-          <Form.Item name='Password' label='Password' initialValue={encryptConfig.password}>
-            <Input onChange={(next) => onEncryptConfigChange({ password: next })} defaultValue={encryptConfig.password} placeholder='Please input password or leave it empty to disable encrypt' />
+          <Form.Item name='Password' label='Password' initialValue={encryptConfig.password} extra={
+            // 显示密码可见性切换按钮
+            <div style={{ cursor: 'pointer' }}>
+              {!encryptPasswordVisible ? (
+                <EyeInvisibleOutline onClick={() => setEncryptPasswordVisible(true)} />
+              ) : (
+                <EyeOutline onClick={() => setEncryptPasswordVisible(false)} />
+              )}
+            </div>
+          }>
+            <Input onChange={(next) => onEncryptConfigChange({ password: next })}
+              defaultValue={encryptConfig.password}
+              placeholder='Please input password or leave it empty to disable encrypt'
+              type={encryptPasswordVisible ? 'text' : 'password'} />
           </Form.Item>
         </Form>
       </>
