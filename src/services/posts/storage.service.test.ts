@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import StoragePostService from "./storage.service";
 import { extractDate } from "../identifier";
 import MemoryObjectStorage from "../object-storage/memory.fs";
-import { PostService } from "./service.interface";
+import { PostService } from "./index";
 import { CreatePostDto } from "./schema";
 
 type StoragePostServiceForTest = PostService & {
