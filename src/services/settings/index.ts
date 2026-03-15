@@ -3,6 +3,7 @@ export type {
   S3Config,
   UiConfig,
   UiTheme,
+  EncryptConfig,
 } from "./schema";
 export {
   CONFIG_VERSION,
