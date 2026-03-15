@@ -44,6 +44,9 @@ export default class StoragePostService implements PostService {
                 controller.close();
             }
         }));
+        
+        // 将新帖子添加到数组开头，确保getPosts返回最新的帖子
+        this.posts.unshift(newPost);
     }
 
     public async deletePost(id: string): Promise<void> {
