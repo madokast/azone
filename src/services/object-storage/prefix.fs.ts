@@ -35,7 +35,17 @@ export default class PrefixObjectStorage implements ObjectStorage {
     }
 
     async list(prefix: string): Promise<string[]> {
-        return this.proxy.list(this.addPrefix(prefix))
+        const fullPrefix = this.addPrefix(prefix)
+        const paths = await this.proxy.list(fullPrefix)
+
+        const base = this.prefix + "/"
+
+        return paths.map((p) => {
+            if (!p.startsWith(base)) {
+                throw new Error(`Invalid path from proxy: ${p}, expected prefix ${base}`)
+            }
+            return p.slice(base.length)
+        })
     }
 }
 
