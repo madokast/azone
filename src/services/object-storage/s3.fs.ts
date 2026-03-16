@@ -36,7 +36,7 @@ export class S3ObjectStorage implements ObjectStorage {
         await this.client.send(new PutObjectCommand({
             Bucket: this.config.bucket,
             Key: path,
-            Body: data,
+            Body: await new Response(data).arrayBuffer(),
         }));
     }
 
