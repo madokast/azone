@@ -38,7 +38,8 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
         showToast('Please input workDir');
         return;
       }
-      await createS3ObjectStorage(s3ConfigState).list("");
+      const rootDirs = await createS3ObjectStorage(s3ConfigState).list("");
+      console.log(`rootDirs: ${rootDirs}`);
       showToast('S3 Connect Success');
     } catch (error) {
       showToast(`S3 Connect Failed: ${error}`);
