@@ -119,11 +119,13 @@ export default class StoragePostService implements PostService {
             while (allYearDirs.length > 0) {
                 const yearDir = allYearDirs.pop()!; // 最新的年份
                 const allMonthDirs: string[] = await this.objectStorage.list(yearDir);
+                console.log(`allMonthDirs: ${allMonthDirs}`)
                 if (allMonthDirs.length == 0) continue;
                 allMonthDirs.sort((a, b) => a.localeCompare(b)); // 按月份升序排序
                 while (allMonthDirs.length > 0) {
                     const monthDir = allMonthDirs.pop()!; // 最新的月份
                     const allDayDirs: string[] = await this.objectStorage.list(monthDir);
+                    console.log(`allDayDirs: ${allDayDirs}`)
                     if (allDayDirs.length == 0) continue;
                     allDayDirs.sort((a, b) => a.localeCompare(b)); // 按日期升序排序
                     let dayDir = allDayDirs.pop()!; // 最新的日期
