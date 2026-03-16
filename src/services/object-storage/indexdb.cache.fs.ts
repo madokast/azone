@@ -1,4 +1,4 @@
-import { DBSchema, IDBPDatabase, openDB } from "idb";
+import { DBSchema, IDBPDatabase, openDB, deleteDB } from "idb";
 import { ObjectStorage } from "./interface";
 
 const STORE_FILES = "files"
@@ -100,3 +100,7 @@ export default class IndexDBObjectStorage implements ObjectStorage {
   }
 }
 
+export async function clearIndexDB(dbName: string): Promise<void> {
+  console.log(`clearIndexDB: ${dbName}`)
+  await deleteDB(dbName)
+}

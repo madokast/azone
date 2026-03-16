@@ -19,6 +19,7 @@ import { createS3ObjectStorage } from "./services/object-storage/s3.fs";
 import SimpleCrypto from "./services/crypto-wrapper";
 import { defaultEncryptConfig, EncryptConfig } from "./services/settings/schema";
 import { StorageAttachmentService } from "./services/attachments/storage.service";
+import { clearIndexDB } from "./services/object-storage/indexdb.cache.fs";
 
 export default function App() {
   const [theme, setTheme] = useState<UiTheme>(() => {
@@ -26,10 +27,17 @@ export default function App() {
     return (initialConfig.ui?.theme ?? defaultUiConfig.theme) as UiTheme;
   });
 
-  const [s3Config, setS3Config] = useState<S3Config>(() => {
+  const [s3Config, setS3Config0] = useState<S3Config>(() => {
     const initialConfig = getConfig();
     return initialConfig.s3 ?? defaultS3Config;
   });
+
+  const setS3Config = (next: S3Config) => {
+    clearIndexDB(s3Config.workDir);
+    setS3Config0(next);
+  }
+
+
 
   const [encryptConfig, setEncryptConfig] = useState<EncryptConfig>(() => {
     const initialConfig = getConfig();
