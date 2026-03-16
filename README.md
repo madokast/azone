@@ -8,5 +8,6 @@
 npm run build
 
 # 部署到 Vercel
+npm i -g vercel
 vercel
 ```
