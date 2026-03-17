@@ -20,10 +20,11 @@ export default function Home({ postService, attachmentService }: HomeProps) {
   const pageSize = 10;
 
   const fetchInitialPosts = async () => {
+    setLoading(true);
     try {
-      const initialPosts = await postService.getPosts(1, pageSize);
-      setData(initialPosts);
-      setHasMore(initialPosts.length === pageSize);
+      const initialPosts = await postService.getPosts(1, pageSize+1);
+      setData(initialPosts.slice(0, pageSize));
+      setHasMore(initialPosts.length > pageSize);
     } catch (error) {
       console.error('Error fetching initial posts:', error);
     } finally {
