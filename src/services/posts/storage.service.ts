@@ -73,7 +73,7 @@ export default class StoragePostService implements PostService {
     }
 
     // 加载 posts，返回是否成功。即从 posts 最后一个的日期，加载更早的 num 个 posts
-    public async loadPosts(num: number): Promise<boolean> {
+    private async loadPosts(num: number): Promise<boolean> {
         const date = await this.nextLoadPostDate();
         console.log(`nextLoadPostDate: ${date}`);
         if (date === null) return false;
