@@ -20,6 +20,7 @@ import SimpleCrypto from "./services/crypto-wrapper";
 import { defaultEncryptConfig, EncryptConfig } from "./services/settings/schema";
 import { StorageAttachmentService } from "./services/attachments/storage.service";
 import { clearIndexDB } from "./services/object-storage/indexdb.cache.fs";
+import MutexPostService from "./services/posts/mutex.service";
 
 export default function App() {
   const [theme, setTheme] = useState<UiTheme>(() => {
@@ -123,7 +124,9 @@ export default function App() {
   
   const attachmentService = new StorageAttachmentService("attachments", objectStorage);
 
-  const postService = new StoragePostService("posts", objectStorage, attachmentService);
+  const postService = new MutexPostService(
+    new StoragePostService("posts", objectStorage, attachmentService)
+  );
 
   return (
     <AppRouter theme={theme} onThemeChange={nextTheme => {
