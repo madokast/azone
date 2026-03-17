@@ -26,7 +26,9 @@ export default function Home({ postService, attachmentService }: HomeProps) {
       setData(initialPosts.slice(0, pageSize));
       setHasMore(initialPosts.length > pageSize);
     } catch (error) {
-      console.error('Error fetching initial posts:', error);
+      setData([]);
+      setHasMore(false);
+      showToast(`${error}`);
     } finally {
       setLoading(false);
     }
