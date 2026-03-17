@@ -108,7 +108,7 @@ export default function Home({ postService, attachmentService }: HomeProps) {
           shape='rounded'
           onClick={() => setPublishVisible(true)}
         >
-          <Badge content={postLength}>
+          <Badge content={postLength > 0 ? postLength : undefined}>
           <AddOutline />
           </Badge>
         </Button>
