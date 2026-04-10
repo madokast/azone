@@ -113,6 +113,7 @@ export default function App() {
     objectStorage = createS3ObjectStorage(s3Config);
     objectStorage = new PrefixObjectStorage(s3Config.workDir, objectStorage);
   } catch (error) {
+    showToast(`S3 Conn Err. Use Memory Storage`);
     objectStorage = new MemoryObjectStorage();
   }
   if (encryptConfig.password && encryptConfig.password.length > 0) {
@@ -120,7 +121,6 @@ export default function App() {
     objectStorage = new CryptoObjectStorage(crypto, objectStorage);
   }
   objectStorage = new IndexDBObjectStorage(s3Config.workDir, objectStorage);
-
   
   const attachmentService = new StorageAttachmentService("attachments", objectStorage);
 
