@@ -1,12 +1,13 @@
 import { useRef, useState, useEffect } from 'react';
-import { TextArea, Button, Space, Image, Grid } from 'antd-mobile';
+import { TextArea, Button, Space, Image, Grid, Tag } from 'antd-mobile';
 import { TextAreaRef } from 'antd-mobile/es/components/text-area';
 import { UploadOutline, PictureOutline, PlayOutline, DeleteOutline } from 'antd-mobile-icons';
 import { CreatePostDto } from '../services/posts';
-import { Attachment } from '../services/attachments';
+import { Attachment as AttachmentDto } from '../services/attachments';
 import { isImageMimeType } from '../services/attachments';
 import AttachmentViewer from './AttachmentViewer';
 import { unknowFileIcon } from '../assets';
+import { readableSize } from '../tools/readable-size';
 
 
 interface PublishProps {
@@ -14,6 +15,10 @@ interface PublishProps {
   onChange: (post: CreatePostDto) => void;
   focus: boolean;
   imageSize?: string;
+}
+
+interface Attachment extends AttachmentDto {
+  size: number;
 }
 
 export default function Publish({ onPublish, onChange, focus, imageSize = "90px" }: PublishProps) {
@@ -40,6 +45,7 @@ export default function Publish({ onPublish, onChange, focus, imageSize = "90px"
         mimeType: file.type,
         thumbnailUrl,
         sourceUrl,
+        size: file.size,
       } as Attachment;
     });
     setAttachments([...attachments, ...newAttachments]);
@@ -134,7 +140,7 @@ export default function Publish({ onPublish, onChange, focus, imageSize = "90px"
       {/* 控制 */}
       <Grid columns={2}>
         <Grid.Item>
-          <Space justify="start" block>
+          <Space justify="start" align='center' block>
             {/* 图片视频选择 */}
             <Button
               color="primary"
@@ -162,6 +168,13 @@ export default function Publish({ onPublish, onChange, focus, imageSize = "90px"
             >
               <DeleteOutline />
             </Button>
+
+            {/* 显示文件总大小 */}
+            {attachments.length > 0 && (
+              <Tag color='primary' fill='outline'>
+                {readableSize(attachments.reduce((acc, cur) => acc + cur.size, 0))}
+              </Tag>
+            )}
           </Space>
         </Grid.Item>
         <Grid.Item>
