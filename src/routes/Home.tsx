@@ -22,7 +22,7 @@ export default function Home({ postService, attachmentService }: HomeProps) {
   const fetchInitialPosts = async () => {
     setLoading(true);
     try {
-      const initialPosts = await postService.getPosts(1, pageSize+1);
+      const initialPosts = await postService.getPosts(1, pageSize + 1);
       setData(initialPosts.slice(0, pageSize));
       setHasMore(initialPosts.length > pageSize);
     } catch (error) {
@@ -60,6 +60,7 @@ export default function Home({ postService, attachmentService }: HomeProps) {
   const lastScrollY = useRef(0);
   const [hidePostBottom, setHidePostBottom] = useState(false);
   const [postBottomOpacity, setPostBottomOpacity] = useState(1);
+  const [isPublished, setIsPublished] = useState<boolean | undefined>(undefined);
   useEffect(() => {
     const handleScroll = () => {
       const currScrollY = window.scrollY;
@@ -112,7 +113,7 @@ export default function Home({ postService, attachmentService }: HomeProps) {
           onClick={() => setPublishVisible(true)}
         >
           <Badge content={postLength > 0 ? postLength : undefined}>
-          <AddOutline />
+            <AddOutline />
           </Badge>
         </Button>
       </div>
@@ -122,18 +123,23 @@ export default function Home({ postService, attachmentService }: HomeProps) {
         onMaskClick={() => setPublishVisible(false)}
         position='bottom'
       >
-        <Publish 
-        onPublish={async (post) => {
-          await postService.createPost(post).then(() => {
-            showToast('Published');
-          }).catch((error) => {
-            showToast(`${error}`);
-          });
-          setPublishVisible(false);
-          fetchInitialPosts();
-        }}
-        onChange={({ content }) => setPostLength(content.length)}
-        focus={publishVisible} />
+        <Publish
+          onPublish={async (post) => {
+            await postService.createPost(post).then(() => {
+              showToast('Published');
+              setIsPublished(true);
+              setPublishVisible(false);
+              fetchInitialPosts();
+            }).catch((error) => {
+              console.error('Error publishing post:', error);
+              setIsPublished(false);
+              showToast('Publish Failed');
+            });
+          }}
+          onChange={({ content }) => setPostLength(content.length)}
+          isPublished={isPublished}
+          resetIsPublished={() => setIsPublished(undefined)}
+          focus={publishVisible} />
       </Popup>
 
     </>

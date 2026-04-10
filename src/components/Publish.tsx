@@ -12,8 +12,10 @@ import imageCompress from '../tools/image-compressor';
 
 
 interface PublishProps {
-  onPublish: (post: CreatePostDto) => void;
+  onPublish: (post: CreatePostDto) => Promise<void>;
   onChange: (post: CreatePostDto) => void;
+  isPublished: boolean | undefined;
+  resetIsPublished: () => void;
   focus: boolean;
   imageSize?: string;
 }
@@ -22,7 +24,7 @@ interface Attachment extends AttachmentDto {
   size: number;
 }
 
-export default function Publish({ onPublish, onChange, focus, imageSize = "90px" }: PublishProps) {
+export default function Publish({ onPublish, onChange, isPublished, resetIsPublished, focus, imageSize = "90px" }: PublishProps) {
   const [content, setContent] = useState('');
   const [attachments, setAttachments] = useState<Attachment[]>([]);
 
@@ -52,6 +54,7 @@ export default function Publish({ onPublish, onChange, focus, imageSize = "90px"
     setAttachments([...attachments, ...newAttachments]);
   };
 
+  // 压缩图片
   const handleCompress = async (attachments: Attachment[]) => {
     const compressedAttachments = await Promise.all(attachments.map(async (attachment) => {
       if (isImageMimeType(attachment.mimeType)) {
@@ -73,6 +76,7 @@ export default function Publish({ onPublish, onChange, focus, imageSize = "90px"
     setAttachments(compressedAttachments);
   };
 
+  // 清理附件
   const handleCleanAttachment = () => {
     attachments.forEach((attachment) => URL.revokeObjectURL(attachment.sourceUrl));
     setAttachments([]);
@@ -82,6 +86,7 @@ export default function Publish({ onPublish, onChange, focus, imageSize = "90px"
   const [attachmentViewerVisible, setAttachmentViewerVisible] = useState(false);
   const [attachmentCurrentIndex, setAttachmentCurrentIndex] = useState(0);
 
+  // 提交发布
   const handleSubmit = () => {
     if (content.trim()) {
       const publishAttachments = attachments.map((attachment) => {
@@ -89,10 +94,17 @@ export default function Publish({ onPublish, onChange, focus, imageSize = "90px"
         return rest;
       });
       onPublish({ content, attachments: publishAttachments });
-      handlePostChange({ content: '' });
-      handleCleanAttachment();
     }
   };
+
+  // 处理发布结果
+  useEffect(() => {
+    if (isPublished === true) {
+      handlePostChange({ content: '' });
+      handleCleanAttachment();
+      resetIsPublished();
+    }
+  }, [isPublished, resetIsPublished]);
 
   // 文本区域自动聚焦
   const textAreaRef = useRef<TextAreaRef>(null);
