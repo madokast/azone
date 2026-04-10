@@ -88,7 +88,7 @@ export default class StoragePostService implements PostService {
             const year = date.getFullYear().toString();
             const month = (date.getMonth() + 1).toString().padStart(2, '0');
             const day = date.getDate().toString().padStart(2, '0');
-            const dayDir = `${this.rootDir}/${year}/${month}/${day}`;
+            const dayDir = `${this.rootDir}/${year}/${month}/${day}/`;
             const allPostPaths: string[] = await this.objectStorage.list(dayDir);
             allPostPaths.sort((a, b) => b.localeCompare(a)); // 按日期降序排序
             // console.log(`allPostPaths: ${allPostPaths} in ${dayDir}`);
@@ -112,7 +112,7 @@ export default class StoragePostService implements PostService {
     private async nextLoadPostDate(): Promise<Date | null> {
         if (this.posts.length == 0) {
             // 找到最新的日期
-            const allYearDirs: string[] = await this.objectStorage.list(this.rootDir);
+            const allYearDirs: string[] = await this.objectStorage.list(this.rootDir + "/");
             console.log(`allYearDirs: ${allYearDirs}`)
             if (allYearDirs.length == 0) return null;
             allYearDirs.sort((a, b) => a.localeCompare(b)); // 按年份升序排序
@@ -149,7 +149,7 @@ export default class StoragePostService implements PostService {
 
     // 获取所有存储中 posts 最早的日期
     private async oldestDate(): Promise<Date | null> {
-        const allYearDirs: string[] = await this.objectStorage.list(this.rootDir);
+        const allYearDirs: string[] = await this.objectStorage.list(this.rootDir + "/");
         console.log(`allYearDirs: ${allYearDirs}`)
         if (allYearDirs.length == 0) return null;
         allYearDirs.sort((a, b) => b.localeCompare(a)); // 按年份降序排序
