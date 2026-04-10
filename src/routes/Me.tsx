@@ -121,7 +121,7 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
         <Form layout='vertical' footer={
           // 测试连接按钮
           <div style={{ textAlign: 'right' }}>
-            <Button color='primary' fill='outline' onClick={testS3Config} disabled={s3TestButtonDisabled}>
+            <Button color='primary' fill='outline' size='mini' onClick={testS3Config} disabled={s3TestButtonDisabled}>
               Test S3 Connection
             </Button>
           </div>
