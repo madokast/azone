@@ -38,8 +38,6 @@ export default function App() {
     setS3Config0(next);
   }
 
-
-
   const [encryptConfig, setEncryptConfig] = useState<EncryptConfig>(() => {
     const initialConfig = getConfig();
     return initialConfig.encrypt ?? defaultEncryptConfig;
