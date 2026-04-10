@@ -69,6 +69,15 @@ export default class IndexDBObjectStorage implements ObjectStorage {
     }
     const db = await this.dbPromise
     await db.put(STORE_FILES, buffer, key)
+
+    // 暂时先全部清空 STORE_LISTS
+    const tx = db.transaction(STORE_LISTS, "readwrite")
+    const store = tx.objectStore(STORE_LISTS)
+
+    for (const k of await store.getAllKeys()) {
+      await store.delete(k)
+    }
+    await tx.done
   }
 
   async delete(key: string): Promise<void> {
@@ -78,13 +87,12 @@ export default class IndexDBObjectStorage implements ObjectStorage {
 
     await db.delete(STORE_FILES, key)
 
+    // 暂时先全部清空 STORE_LISTS
     const tx = db.transaction(STORE_LISTS, "readwrite")
     const store = tx.objectStore(STORE_LISTS)
 
-    for (const prefix of await store.getAllKeys()) {
-      if (prefix.startsWith(key)) {
-        await store.delete(prefix)
-      }
+    for (const k of await store.getAllKeys()) {
+      await store.delete(k)
     }
     await tx.done
   }
