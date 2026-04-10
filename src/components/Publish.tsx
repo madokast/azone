@@ -1,13 +1,14 @@
 import { useRef, useState, useEffect } from 'react';
 import { TextArea, Button, Space, Image, Grid, Tag } from 'antd-mobile';
 import { TextAreaRef } from 'antd-mobile/es/components/text-area';
-import { UploadOutline, PictureOutline, PlayOutline, DeleteOutline } from 'antd-mobile-icons';
+import { UploadOutline, PictureOutline, PlayOutline, DeleteOutline, GiftOutline } from 'antd-mobile-icons';
 import { CreatePostDto } from '../services/posts';
 import { Attachment as AttachmentDto } from '../services/attachments';
 import { isImageMimeType } from '../services/attachments';
 import AttachmentViewer from './AttachmentViewer';
 import { unknowFileIcon } from '../assets';
 import { readableSize } from '../tools/readable-size';
+import imageCompress from '../tools/image-compressor';
 
 
 interface PublishProps {
@@ -41,7 +42,7 @@ export default function Publish({ onPublish, onChange, focus, imageSize = "90px"
         thumbnailUrl = sourceUrl;
       }
       return {
-        id: file.name.replace(/\.[^/.]+$/, ""), // 文件名作为ID
+        id: file.name, // 文件名作为ID
         mimeType: file.type,
         thumbnailUrl,
         sourceUrl,
@@ -49,6 +50,27 @@ export default function Publish({ onPublish, onChange, focus, imageSize = "90px"
       } as Attachment;
     });
     setAttachments([...attachments, ...newAttachments]);
+  };
+
+  const handleCompress = async (attachments: Attachment[]) => {
+    const compressedAttachments = await Promise.all(attachments.map(async (attachment) => {
+      if (isImageMimeType(attachment.mimeType)) {
+        const res = await fetch(attachment.sourceUrl);
+        const blob = await res.blob();
+        const file = new File([blob], attachment.id, { type: attachment.mimeType });
+        const compressedFile = await imageCompress(file);
+        URL.revokeObjectURL(attachment.sourceUrl);
+        const compressedUrl = URL.createObjectURL(compressedFile);
+        return {
+          ...attachment,
+          sourceUrl: compressedUrl,
+          thumbnailUrl: compressedUrl,
+          size: compressedFile.size,
+        };
+      }
+      return attachment;
+    }));
+    setAttachments(compressedAttachments);
   };
 
   const handleCleanAttachment = () => {
@@ -157,6 +179,16 @@ export default function Publish({ onPublish, onChange, focus, imageSize = "90px"
               onClick={() => fileInputRef.current?.click()}
             >
               <UploadOutline />
+            </Button>
+
+            {/* 压缩图片视频 */}
+            <Button
+              color="primary"
+              fill="none"
+              onClick={() => handleCompress(attachments)}
+              disabled={attachments.length === 0}
+            >
+              <GiftOutline />
             </Button>
 
             {/* 清空媒体资源 */}
