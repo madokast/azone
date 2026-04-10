@@ -1,7 +1,7 @@
 {
   "name": "azone",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,6 +12,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1003.0",
     "antd-mobile": "^5.42.3",
+    "browser-image-compression": "^2.0.2",
     "idb": "^8.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -22,8 +23,8 @@
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",
     "typescript": "^5.4.5",
-    "vite": "^5.2.10",
-    "vite-plugin-pwa": "^0.20.5",
+    "vite": "^8.0.8",
+    "vite-plugin-pwa": "^0.19.8",
     "vite-plugin-singlefile": "^2.0.2",
     "vitest": "^4.0.18"
   }
