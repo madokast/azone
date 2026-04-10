@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { EyeInvisibleOutline, EyeOutline } from 'antd-mobile-icons'
 import { createS3ObjectStorage } from '../services/object-storage/s3.fs';
 import { showToast } from '../components/toast';
+import { downloadJson } from '../tools/download';
+import { readFile, selectFile } from '../tools/upload';
 
 
 type MeProps = {
@@ -15,9 +17,17 @@ type MeProps = {
   onEncryptConfigChange: (next: Partial<EncryptConfig>) => void;
 };
 
+interface AllConfig {
+  s3Config: S3Config;
+  encryptConfig: EncryptConfig;
+  theme: UiTheme;
+}
+
 export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, encryptConfig, onEncryptConfigChange }: MeProps) {
 
+  const [themeState, setThemeState] = useState(theme);
   const [s3ConfigState, setS3ConfigState] = useState(s3Config);
+  const [encryptConfigState, setEncryptConfigState] = useState(encryptConfig);
 
   const [s3AccessKeyIdVisible, setS3AccessKeyIdVisible] = useState(false);
   const [s3SecretVisible, setS3SecretVisible] = useState(false);
@@ -26,9 +36,39 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
 
   const [s3TestButtonDisabled, setS3TestButtonDisabled] = useState(false);
 
+  const setTheme = (next: any) => { // 这里 any 是适配框架，实际是 string
+    setThemeState(next as UiTheme);
+    onThemeChange(next as UiTheme);
+  }
+
+  const setEncryptConfig = (next: Partial<EncryptConfig>) => {
+    setEncryptConfigState((prev) => ({ ...prev, ...next }));
+    onEncryptConfigChange(next);
+  }
+
   const setS3Config = (next: Partial<S3Config>) => {
     setS3ConfigState((prev) => ({ ...prev, ...next }));
     onS3ConfigChange(next);
+  }
+
+  const downloadAllConfig = () => {
+    downloadJson('azone-config.json', { s3Config: s3ConfigState, encryptConfig: encryptConfigState, theme: themeState } as AllConfig);
+  }
+
+  const importAllConfig = async () => {
+    try {
+      const file = await selectFile('application/json');
+      const content = await readFile(file);
+      const config = JSON.parse(content) as AllConfig;
+      setS3Config(config.s3Config);
+      setEncryptConfig(config.encryptConfig);
+      setTheme(config.theme);
+      // showToast('Import Config Success');
+      window.location.reload();
+    } catch (error) {
+      console.error(`Import Config Failed: ${error}`);
+      showToast(`Import Config Failed`);
+    }
   }
 
   const testS3Config = async () => {
@@ -105,17 +145,17 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
             </div>
           }>
             <Input onChange={(next) => setS3Config({ bucket: next })}
-              defaultValue={s3Config.bucket}
+              defaultValue={s3ConfigState.bucket}
               placeholder='Please input bucket'
               type={s3BucketVisible ? 'text' : 'password'} />
           </Form.Item>
-          <Form.Item name='Endpoint' label='Endpoint' initialValue={s3Config.endpoint}>
-            <Input onChange={(next) => setS3Config({ endpoint: next })} defaultValue={s3Config.endpoint} placeholder='Please input endpoint: https://' />
+          <Form.Item name='Endpoint' label='Endpoint' initialValue={s3ConfigState.endpoint}>
+            <Input onChange={(next) => setS3Config({ endpoint: next })} defaultValue={s3ConfigState.endpoint} placeholder='Please input endpoint: https://' />
           </Form.Item>
         </Form>
         <Form layout='horizontal'>
-          <Form.Item name='ForcePathStyle' label='ForcePathStyle' initialValue={s3Config.forcePathStyle ? 'true' : 'false'} childElementPosition='right'>
-            <Switch defaultChecked={s3Config.forcePathStyle} onChange={(next) => setS3Config({ forcePathStyle: next })} />
+          <Form.Item name='ForcePathStyle' label='ForcePathStyle' initialValue={s3ConfigState.forcePathStyle ? 'true' : 'false'} childElementPosition='right'>
+            <Switch defaultChecked={s3ConfigState.forcePathStyle} onChange={(next) => setS3Config({ forcePathStyle: next })} />
           </Form.Item>
         </Form>
         <Form layout='vertical' footer={
@@ -126,8 +166,8 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
             </Button>
           </div>
         }>
-          <Form.Item name='WorkDir' label='WorkDir' initialValue={s3Config.workDir}>
-            <Input onChange={(next) => setS3Config({ workDir: next })} defaultValue={s3Config.workDir} placeholder='Please input workDir' />
+          <Form.Item name='WorkDir' label='WorkDir' initialValue={s3ConfigState.workDir}>
+            <Input onChange={(next) => setS3Config({ workDir: next })} defaultValue={s3ConfigState.workDir} placeholder='Please input workDir' />
           </Form.Item>
         </Form>
       </>
@@ -145,8 +185,8 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
               )}
             </div>
           }>
-            <Input onChange={(next) => onEncryptConfigChange({ password: next })}
-              defaultValue={encryptConfig.password}
+            <Input onChange={(next) => setEncryptConfig({ password: next })}
+              defaultValue={encryptConfigState.password}
               placeholder='Please input password or leave it empty to disable encrypt'
               type={encryptPasswordVisible ? 'text' : 'password'} />
           </Form.Item>
@@ -156,20 +196,32 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
       <Divider style={{ borderColor: 'rgba(0, 0, 0, 0)' }}>UI Configuration</Divider>
 
       <Form layout='horizontal'>
-        <Form.Item name='theme' label='Theme' childElementPosition='right' initialValue={theme}>
+        <Form.Item name='theme' label='Theme' childElementPosition='right' initialValue={themeState}>
           <Segmented
             options={[
               { label: 'System', value: 'system' },
               { label: 'Light', value: 'light' },
               { label: 'Dark', value: 'dark' }
             ]}
-            defaultValue={theme}
-            onChange={(next) => {
-              onThemeChange(next as UiTheme);
-            }}
+            defaultValue={themeState}
+            onChange={setTheme}
           />
         </Form.Item>
       </Form>
+
+      <Form layout='vertical' footer={
+          // 测试连接按钮
+          <div style={{ textAlign: 'right' }}>
+            <Button color='primary' fill='outline' size='mini' onClick={importAllConfig} disabled={s3TestButtonDisabled}>
+              Import Config
+            </Button>
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <Button color='primary' fill='outline' size='mini' onClick={downloadAllConfig} disabled={s3TestButtonDisabled}>
+              Export Config
+            </Button>
+          </div>
+        }>
+        </Form>
     </div>
   );
 }
