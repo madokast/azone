@@ -4,18 +4,29 @@ import { formatDate } from './utils';
 import { ObjectStorage } from '../object-storage/interface';
 import { AttachmentService } from '../attachments';
 
+// 统一时间来源的类型，便于在生产环境用真实时间、在测试中注入可控时间。
+export type Clock = () => Date;
+
 export default class StoragePostService implements PostService {
     private readonly rootDir: string;
+    // 通过注入时钟替代直接 new Date()，避免业务接口夹带测试参数。
+    private readonly nowDateProvider: Clock;
     private objectStorage: ObjectStorage;
     private attachmentService: AttachmentService;
 
     // 缓存的 posts，日期最新的在前
     private posts: Post[] = [];
 
-    constructor(rootDir: string, objectStorage: ObjectStorage, attachmentService: AttachmentService) {
+    constructor(
+        rootDir: string,
+        objectStorage: ObjectStorage,
+        attachmentService: AttachmentService,
+        nowDateProvider: Clock = () => new Date(),
+    ) {
         this.rootDir = rootDir;
         this.objectStorage = objectStorage;
         this.attachmentService = attachmentService;
+        this.nowDateProvider = nowDateProvider;
     }
 
     // 从 post.id 中获取 post 所在的文件路径
@@ -24,13 +35,14 @@ export default class StoragePostService implements PostService {
         return `${this.rootDir}/${yyyy}/${mm}/${dd}/${id}.dat`;
     }
 
-    public async createPost(postData: CreatePostDto, now: Date | null = null): Promise<void> {
+    public async createPost(postData: CreatePostDto): Promise<void> {
         const attachments = await Promise.all(
             (postData.attachments || []).map(
                 attachment => this.attachmentService.uploadAttachment(attachment))
         );
 
-        now = now || new Date();
+        // 所有创建时间都从注入时钟读取，确保行为可预测、可测试。
+        const now = this.nowDateProvider();
         const newPost: Post = {
             id: generateId(now),
             createdAt: formatDate(now),

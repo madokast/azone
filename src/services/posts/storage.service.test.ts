@@ -1,31 +1,48 @@
 import { describe, it, expect } from "vitest";
 import StoragePostService from "./storage.service";
+import type { Clock } from "./storage.service";
 import { extractDate } from "../identifier";
 import MemoryObjectStorage from "../object-storage/memory.fs";
 import { PostService } from "./index";
-import { CreatePostDto } from "./schema";
 import { MemoryAttachmentService } from "../attachments/memory.service";
 
 type StoragePostServiceForTest = PostService & {
-    createPost(postData: CreatePostDto, now: Date | null): Promise<void>
     nextLoadPostDate(): Promise<Date | null>
     oldestDate(): Promise<Date | null>
 }
 
-function createStoragePostServiceForTest(): StoragePostServiceForTest {
-    return new StoragePostService("posts", new MemoryObjectStorage(), new MemoryAttachmentService()
+type TestNowState = {
+    value: Date
+};
+
+// 测试用法：
+// 1) 通过 nowState.value 维护当前“时间”；
+// 2) clock 每次调用都读取 nowState.value；
+// 3) 在一次测试中反复修改 nowState.value，即可驱动 createPost 使用不同时间。
+function createStoragePostServiceForTest(initialNow: Date = new Date()): {
+    service: StoragePostServiceForTest,
+    nowState: TestNowState
+} {
+    const nowState: TestNowState = { value: initialNow };
+    const nowDateProvider: Clock = () => nowState.value;
+    const service = new StoragePostService(
+        "posts",
+        new MemoryObjectStorage(),
+        new MemoryAttachmentService(),
+        nowDateProvider
     ) as any as StoragePostServiceForTest;
+    return { service, nowState };
 }
 
 describe("oldestDate", () => {
     it("should return null when posts is empty", async () => {
-        const service = createStoragePostServiceForTest();
+        const { service } = createStoragePostServiceForTest();
         const date = await service.oldestDate();
         expect(date).toBeNull();
     })
 
     it("should return the oldest date when posts is not empty", async () => {
-        const service = createStoragePostServiceForTest();
+        const { service } = createStoragePostServiceForTest();
         const now = new Date()
         await service.createPost({ content: "post1" })
         await service.createPost({ content: "post2" })
@@ -37,11 +54,13 @@ describe("oldestDate", () => {
     })
 
     it("should return the oldest date when posts contain different dates", async () => {
-        const service = createStoragePostServiceForTest();
         const date20250101 = new Date("2025-01-01")
+        const { service, nowState } = createStoragePostServiceForTest(date20250101);
         const date20240503 = new Date("2024-05-03")
-        await service.createPost({ content: "post1" }, date20250101)
-        await service.createPost({ content: "post2" }, date20240503)
+        nowState.value = date20250101;
+        await service.createPost({ content: "post1" })
+        nowState.value = date20240503;
+        await service.createPost({ content: "post2" })
 
         const oldest = await service.oldestDate();
         expect(oldest?.getFullYear()).toBe(date20240503.getFullYear());
@@ -52,16 +71,18 @@ describe("oldestDate", () => {
 
 describe("nextLoadPostDate", () => {
     it("should return null when posts is empty", async () => {
-        const service = createStoragePostServiceForTest();
+        const { service } = createStoragePostServiceForTest();
         const date = await service.nextLoadPostDate();
         expect(date).toBeNull();
     })
 
     it("should return one day before oldest cached date when posts share same date", async () => {
-        const service = createStoragePostServiceForTest();
         const date20260303 = new Date("2026-03-03")
-        await service.createPost({ content: "post1" }, date20260303)
-        await service.createPost({ content: "post2" }, date20260303)
+        const { service, nowState } = createStoragePostServiceForTest(date20260303);
+        nowState.value = date20260303;
+        await service.createPost({ content: "post1" })
+        nowState.value = date20260303;
+        await service.createPost({ content: "post2" })
 
         const nextLoadDate = await service.nextLoadPostDate();
         expect(nextLoadDate?.getFullYear()).toBe(date20260303.getFullYear());
@@ -70,11 +91,13 @@ describe("nextLoadPostDate", () => {
     })
 
     it("should return one day before oldest cached date when posts have different dates", async () => {
-        const service = createStoragePostServiceForTest();
         const date20250101 = new Date("2025-01-01")
+        const { service, nowState } = createStoragePostServiceForTest(date20250101);
         const date20240503 = new Date("2024-05-03")
-        await service.createPost({ content: "post1" }, date20250101)
-        await service.createPost({ content: "post2" }, date20240503)
+        nowState.value = date20250101;
+        await service.createPost({ content: "post1" })
+        nowState.value = date20240503;
+        await service.createPost({ content: "post2" })
 
         const nextLoadDate = await service.nextLoadPostDate();
         expect(nextLoadDate?.getFullYear()).toBe(date20240503.getFullYear());
@@ -85,36 +108,40 @@ describe("nextLoadPostDate", () => {
 
 describe("getPosts", () => {
     it("should insert newly created post into cached posts in date desc order", async () => {
-        const service = createStoragePostServiceForTest();
         const oldDate = new Date("2024-05-03")
         const newDate = new Date("2025-01-01")
+        const { service, nowState } = createStoragePostServiceForTest(oldDate);
 
-        await service.createPost({ content: "old-post" }, oldDate)
+        nowState.value = oldDate;
+        await service.createPost({ content: "old-post" })
         const firstPageBefore = await service.getPosts(1, 1);
         expect(firstPageBefore.length).toBe(1);
         expect(extractDate(firstPageBefore[0].id)).toStrictEqual(oldDate);
 
-        await service.createPost({ content: "new-post" }, newDate)
+        nowState.value = newDate;
+        await service.createPost({ content: "new-post" })
         const firstPageAfter = await service.getPosts(1, 1);
         expect(firstPageAfter.length).toBe(1);
         expect(extractDate(firstPageAfter[0].id)).toStrictEqual(newDate);
     })
 
     it("should return posts when posts is not empty", async () => {
-        const service = createStoragePostServiceForTest();
         const date20250101 = new Date("2025-01-01")
-        await service.createPost({ content: "post1" }, date20250101)
+        const { service } = createStoragePostServiceForTest(date20250101);
+        await service.createPost({ content: "post1" })
         const posts = await service.getPosts(1, 10);
         expect(posts.length).toBe(1);
         expect(extractDate(posts[0].id)).toStrictEqual(date20250101);
     })
 
     it("should return posts order by date desc", async () => {
-        const service = createStoragePostServiceForTest();
         const date20250101 = new Date("2025-01-01")
         const date20240503 = new Date("2024-05-03")
-        await service.createPost({ content: "post1" }, date20250101)
-        await service.createPost({ content: "post2" }, date20240503)
+        const { service, nowState } = createStoragePostServiceForTest(date20250101);
+        nowState.value = date20250101;
+        await service.createPost({ content: "post1" })
+        nowState.value = date20240503;
+        await service.createPost({ content: "post2" })
         const posts = await service.getPosts(1, 10);
         expect(posts.length).toBe(2);
         expect(extractDate(posts[0].id)).toStrictEqual(date20250101);
@@ -122,11 +149,13 @@ describe("getPosts", () => {
     })
 
     it("should return posts order by date desc 2", async () => {
-        const service = createStoragePostServiceForTest();
         const date20250101 = new Date("2025-01-01")
         const date20240503 = new Date("2024-05-03")
-        await service.createPost({ content: "post2" }, date20240503)
-        await service.createPost({ content: "post1" }, date20250101)
+        const { service, nowState } = createStoragePostServiceForTest(date20240503);
+        nowState.value = date20240503;
+        await service.createPost({ content: "post2" })
+        nowState.value = date20250101;
+        await service.createPost({ content: "post1" })
         const posts = await service.getPosts(1, 10);
         expect(posts.length).toBe(2);
         expect(extractDate(posts[0].id)).toStrictEqual(date20250101);
@@ -134,33 +163,39 @@ describe("getPosts", () => {
     })
 
     it("should return only one post", async () => {
-        const service = createStoragePostServiceForTest();
         const date20250101 = new Date("2025-01-01")
         const date20240503 = new Date("2024-05-03")
-        await service.createPost({ content: "post2" }, date20240503)
-        await service.createPost({ content: "post1" }, date20250101)
+        const { service, nowState } = createStoragePostServiceForTest(date20240503);
+        nowState.value = date20240503;
+        await service.createPost({ content: "post2" })
+        nowState.value = date20250101;
+        await service.createPost({ content: "post1" })
         const posts = await service.getPosts(1, 1);
         expect(posts.length).toBe(1);
         expect(extractDate(posts[0].id)).toStrictEqual(date20250101);
     })
 
     it("should return only one post 2", async () => {
-        const service = createStoragePostServiceForTest();
         const date20250101 = new Date("2025-01-01")
         const date20240503 = new Date("2024-05-03")
-        await service.createPost({ content: "post1" }, date20250101)
-        await service.createPost({ content: "post2" }, date20240503)
+        const { service, nowState } = createStoragePostServiceForTest(date20250101);
+        nowState.value = date20250101;
+        await service.createPost({ content: "post1" })
+        nowState.value = date20240503;
+        await service.createPost({ content: "post2" })
         const posts = await service.getPosts(1, 1);
         expect(posts.length).toBe(1);
         expect(extractDate(posts[0].id)).toStrictEqual(date20250101);
     })
 
     it("should return all posts", async () => {
-        const service = createStoragePostServiceForTest();
         const date20250101 = new Date("2025-01-01")
         const date20240503 = new Date("2024-05-03")
-        await service.createPost({ content: "post1" }, date20250101)
-        await service.createPost({ content: "post2" }, date20240503)
+        const { service, nowState } = createStoragePostServiceForTest(date20250101);
+        nowState.value = date20250101;
+        await service.createPost({ content: "post1" })
+        nowState.value = date20240503;
+        await service.createPost({ content: "post2" })
         {
             const posts = await service.getPosts(1, 1);
             expect(posts.length).toBe(1);
@@ -175,11 +210,13 @@ describe("getPosts", () => {
     })
 
     it("should return all posts 2", async () => {
-        const service = createStoragePostServiceForTest();
         const date20250101 = new Date("2025-01-01")
         const date20240503 = new Date("2024-05-03")
-        await service.createPost({ content: "post2" }, date20240503)
-        await service.createPost({ content: "post1" }, date20250101)
+        const { service, nowState } = createStoragePostServiceForTest(date20240503);
+        nowState.value = date20240503;
+        await service.createPost({ content: "post2" })
+        nowState.value = date20250101;
+        await service.createPost({ content: "post1" })
         {
             const posts = await service.getPosts(1, 1);
             expect(posts.length).toBe(1);
