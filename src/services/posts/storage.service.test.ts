@@ -57,20 +57,19 @@ describe("nextLoadPostDate", () => {
         expect(date).toBeNull();
     })
 
-    it("should return the next load post date when posts is not empty", async () => {
+    it("should return one day before oldest cached date when posts share same date", async () => {
         const service = createStoragePostServiceForTest();
         const date20260303 = new Date("2026-03-03")
         await service.createPost({ content: "post1" }, date20260303)
         await service.createPost({ content: "post2" }, date20260303)
 
         const nextLoadDate = await service.nextLoadPostDate();
-        console.log(`nextLoadDate: ${nextLoadDate}`)
         expect(nextLoadDate?.getFullYear()).toBe(date20260303.getFullYear());
         expect(nextLoadDate?.getMonth()).toBe(date20260303.getMonth());
-        expect(nextLoadDate?.getDate()).toBe(date20260303.getDate());
+        expect(nextLoadDate?.getDate()).toBe(date20260303.getDate() - 1);
     })
 
-    it("should return the next load post date when posts contain different dates", async () => {
+    it("should return one day before oldest cached date when posts have different dates", async () => {
         const service = createStoragePostServiceForTest();
         const date20250101 = new Date("2025-01-01")
         const date20240503 = new Date("2024-05-03")
@@ -78,13 +77,29 @@ describe("nextLoadPostDate", () => {
         await service.createPost({ content: "post2" }, date20240503)
 
         const nextLoadDate = await service.nextLoadPostDate();
-        expect(nextLoadDate?.getFullYear()).toBe(date20250101.getFullYear());
-        expect(nextLoadDate?.getMonth()).toBe(date20250101.getMonth());
-        expect(nextLoadDate?.getDate()).toBe(date20250101.getDate());
+        expect(nextLoadDate?.getFullYear()).toBe(date20240503.getFullYear());
+        expect(nextLoadDate?.getMonth()).toBe(date20240503.getMonth());
+        expect(nextLoadDate?.getDate()).toBe(date20240503.getDate() - 1);
     })
 })
 
 describe("getPosts", () => {
+    it("should insert newly created post into cached posts in date desc order", async () => {
+        const service = createStoragePostServiceForTest();
+        const oldDate = new Date("2024-05-03")
+        const newDate = new Date("2025-01-01")
+
+        await service.createPost({ content: "old-post" }, oldDate)
+        const firstPageBefore = await service.getPosts(1, 1);
+        expect(firstPageBefore.length).toBe(1);
+        expect(extractDate(firstPageBefore[0].id)).toStrictEqual(oldDate);
+
+        await service.createPost({ content: "new-post" }, newDate)
+        const firstPageAfter = await service.getPosts(1, 1);
+        expect(firstPageAfter.length).toBe(1);
+        expect(extractDate(firstPageAfter[0].id)).toStrictEqual(newDate);
+    })
+
     it("should return posts when posts is not empty", async () => {
         const service = createStoragePostServiceForTest();
         const date20250101 = new Date("2025-01-01")

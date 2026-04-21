@@ -9,6 +9,7 @@ export default class StoragePostService implements PostService {
     private objectStorage: ObjectStorage;
     private attachmentService: AttachmentService;
 
+    // 缓存的 posts，日期最新的在前
     private posts: Post[] = [];
 
     constructor(rootDir: string, objectStorage: ObjectStorage, attachmentService: AttachmentService) {
@@ -46,11 +47,14 @@ export default class StoragePostService implements PostService {
             }
         }));
         
-        // 将新帖子添加到数组开头，确保getPosts返回最新的帖子
-        // this.posts.unshift(newPost);
+        // 按照 id 倒序插入
+        const insertIndex = this.posts.findIndex((post) => post.id < newPost.id);
+        if (insertIndex === -1) {
+            this.posts.push(newPost);
+        } else {
+            this.posts.splice(insertIndex, 0, newPost);
+        }
 
-        // 2026年3月15日 添加后，需要重新加载全部 posts
-        this.posts = [];
     }
 
     public async deletePost(id: string): Promise<void> {
@@ -72,7 +76,8 @@ export default class StoragePostService implements PostService {
         return Promise.resolve(this.posts.slice(startIndex, endIndex));
     }
 
-    // 加载 posts，返回是否成功。即从 posts 最后一个的日期，加载更早的 num 个 posts
+    // 加载 posts 到 this.posts 中，返回是否有新增
+    // 即从 this.posts 最后一个的日期，加载更早的 num 个 posts
     private async loadPosts(num: number): Promise<boolean> {
         const date = await this.nextLoadPostDate();
         console.log(`nextLoadPostDate: ${date}`);
@@ -93,9 +98,7 @@ export default class StoragePostService implements PostService {
             allPostPaths.sort((a, b) => b.localeCompare(a)); // 按日期降序排序
             // console.log(`allPostPaths: ${allPostPaths} in ${dayDir}`);
             for (const postPath of allPostPaths) {
-                const postData = await this.objectStorage.get(postPath);
-                const postText = await new Response(postData).text();
-                const post: Post = JSON.parse(postText);
+                const post: Post = await this.loadPost(postPath);
                 console.log(`push post: ${JSON.stringify(post)}`);
                 posts.push(post);
             }
@@ -106,6 +109,13 @@ export default class StoragePostService implements PostService {
         if (posts.length == 0) return false;
         this.posts = this.posts.concat(posts);
         return true;
+    }
+
+    private async loadPost(postPath: string): Promise<Post> {
+        const postData = await this.objectStorage.get(postPath);
+        const postText = await new Response(postData).text();
+        const post: Post = JSON.parse(postText);
+        return post;
     }
 
     // 获取需要加载 post 时，搜索的日期
