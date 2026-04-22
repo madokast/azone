@@ -230,3 +230,51 @@ describe("getPosts", () => {
         }
     })
 })
+
+describe("StoragePostService.getLatestPosts", () => {
+    it("should return all posts when limit is large enough", async () => {
+        const date1 = new Date("2024-05-03T01:02:03")
+        const date2 = new Date("2025-01-01T04:05:06")
+        const { service, nowState } = createStoragePostServiceForTest(date1);
+
+        nowState.value = date1;
+        await service.createPost({ content: "post1" })
+        nowState.value = date2;
+        await service.createPost({ content: "post2" })
+
+        const posts = await service.getLatestPosts(10);
+        expect(posts).toHaveLength(2);
+    })
+
+    it("should return posts in id desc order when older is created first", async () => {
+        const olderDate = new Date("2024-05-03T01:02:03")
+        const newerDate = new Date("2025-01-01T04:05:06")
+        const { service, nowState } = createStoragePostServiceForTest(olderDate);
+
+        nowState.value = olderDate;
+        await service.createPost({ content: "old-post" })
+        nowState.value = newerDate;
+        await service.createPost({ content: "new-post" })
+
+        const posts = await service.getLatestPosts(10);
+        expect(posts).toHaveLength(2);
+        expect(extractDate(posts[0].id)).toStrictEqual(newerDate);
+        expect(extractDate(posts[1].id)).toStrictEqual(olderDate);
+    })
+
+    it("should return posts in id desc order when newer is created first", async () => {
+        const olderDate = new Date("2024-05-03T01:02:03")
+        const newerDate = new Date("2025-01-01T04:05:06")
+        const { service, nowState } = createStoragePostServiceForTest(newerDate);
+
+        nowState.value = newerDate;
+        await service.createPost({ content: "new-post" })
+        nowState.value = olderDate;
+        await service.createPost({ content: "old-post" })
+
+        const posts = await service.getLatestPosts(10);
+        expect(posts).toHaveLength(2);
+        expect(extractDate(posts[0].id)).toStrictEqual(newerDate);
+        expect(extractDate(posts[1].id)).toStrictEqual(olderDate);
+    })
+})

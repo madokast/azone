@@ -88,8 +88,32 @@ export default class StoragePostService implements PostService {
         return Promise.resolve(this.posts.slice(startIndex, endIndex));
     }
 
-    public getLatestPosts(_limit: number): Promise<Post[]> {
-        throw new Error("not implemented");
+    // 不依赖 this.posts 缓存，直接从 ObjectStorage 按 yyyy/mm/dd 倒序遍历，
+    // 凑够 limit 条立即返回。底层 IndexDBObjectStorage 已经做了 list/get 的缓存，
+    // 所以这里没必要再在 service 层维护一份完整数组。
+    public async getLatestPosts(limit: number): Promise<Post[]> {
+        const result: Post[] = [];
+        const yearDirs = await this.objectStorage.list(this.rootDir + "/");
+        yearDirs.sort((a, b) => b.localeCompare(a)); // 年份降序
+        for (const yearDir of yearDirs) {
+            const monthDirs = await this.objectStorage.list(yearDir);
+            monthDirs.sort((a, b) => b.localeCompare(a)); // 月份降序
+            for (const monthDir of monthDirs) {
+                const dayDirs = await this.objectStorage.list(monthDir);
+                dayDirs.sort((a, b) => b.localeCompare(a)); // 日期降序
+                for (const dayDir of dayDirs) {
+                    const dir = dayDir.endsWith("/") ? dayDir : dayDir + "/";
+                    const postPaths = await this.objectStorage.list(dir);
+                    postPaths.sort((a, b) => b.localeCompare(a)); // post id 降序
+                    for (const postPath of postPaths) {
+                        const post = await this.loadPost(postPath);
+                        result.push(post);
+                        if (result.length >= limit) return result;
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     public getPostsBefore(_beforeId: string, _limit: number): Promise<Post[]> {
