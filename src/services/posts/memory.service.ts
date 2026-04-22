@@ -33,12 +33,8 @@ export class MemoryPostService implements PostService {
       attachments: attachments,
     };
 
-    const insertIndex = this.posts.findIndex((post) => post.id < newPost.id);
-    if (insertIndex === -1) {
-      this.posts.push(newPost);
-    } else {
-      this.posts.splice(insertIndex, 0, newPost);
-    }
+    const insertIndex = this.findFirstIndexBefore(newPost.id);
+    this.posts.splice(insertIndex, 0, newPost);
     return Promise.resolve();
   }
 
@@ -58,15 +54,15 @@ export class MemoryPostService implements PostService {
   }
 
   getPostsBefore(beforeId: string, limit: number): Promise<Post[]> {
-    // posts 已按 id 倒序维护，这里先用最简单的线性扫描，后续可以换二分。
-    const result: Post[] = [];
-    for (const post of this.posts) {
-      if (post.id < beforeId) {
-        result.push(post);
-        if (result.length >= limit) break;
-      }
-    }
-    return Promise.resolve(result);
+    const startIndex = this.findFirstIndexBefore(beforeId);
+    return Promise.resolve(this.posts.slice(startIndex, startIndex + limit));
+  }
+
+  // 返回第一个满足 post.id < id 的下标；若不存在则返回 posts.length。
+  // 当前实现是线性扫描，后续可在这里统一替换为二分搜索。
+  private findFirstIndexBefore(id: string): number {
+    const index = this.posts.findIndex((post) => post.id < id);
+    return index === -1 ? this.posts.length : index;
   }
 }
 
