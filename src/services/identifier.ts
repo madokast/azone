@@ -1,16 +1,17 @@
 
-export function generateId(now: Date|null = null): string {
-  now = now || new Date();
+// 生成属于 date 日期的唯一 ID，格式：YYYYMMDD-HHmmss-随机6位。
+// 字典序与时间序一致，可直接用字符串比较排序。
+// date 为 null 时取当前时间。
+export function generateId(date: Date | null = null): string {
+  const d = date || new Date();
   
-  // Format date and time
-  const year = now.getFullYear().toString();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  const seconds = String(now.getSeconds()).padStart(2, '0');
+  const year = d.getFullYear().toString();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  const seconds = String(d.getSeconds()).padStart(2, '0');
   
-  // Generate random 6-character alphanumeric string
   const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let randomPart = '';
   for (let i = 0; i < 6; i++) {
