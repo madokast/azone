@@ -25,7 +25,7 @@ describe("MemoryPostService.createPost", () => {
 
     await service.createPost({ content: "post1" })
 
-    const posts = await service.getPosts(1, 1);
+    const posts = await service.getLatestPosts(1);
     expect(posts).toHaveLength(1);
     expect(extractDate(posts[0].id)).toStrictEqual(date);
     expect(posts[0].createdAt).toBe(formatDate(date));
@@ -41,7 +41,7 @@ describe("MemoryPostService.createPost", () => {
     nowState.value = newDate;
     await service.createPost({ content: "new-post" })
 
-    const posts = await service.getPosts(1, 2);
+    const posts = await service.getLatestPosts(2);
     expect(posts).toHaveLength(2);
     expect(extractDate(posts[0].id)).toStrictEqual(newDate);
     expect(posts[0].createdAt).toBe(formatDate(newDate));
@@ -59,7 +59,7 @@ describe("MemoryPostService.createPost", () => {
     nowState.value = olderDate;
     await service.createPost({ content: "old-post" })
 
-    const posts = await service.getPosts(1, 2);
+    const posts = await service.getLatestPosts(2);
     expect(posts).toHaveLength(2);
     expect(extractDate(posts[0].id)).toStrictEqual(newerDate);
     expect(extractDate(posts[1].id)).toStrictEqual(olderDate);
