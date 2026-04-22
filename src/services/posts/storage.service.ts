@@ -76,18 +76,6 @@ export default class StoragePostService implements PostService {
         this.posts = this.posts.filter(post => post.id !== id);
     }
 
-    public async getPosts(page: number, pageSize: number): Promise<Post[]> {
-        const startIndex = (page - 1) * pageSize;
-        const endIndex = startIndex + pageSize;
-        while (endIndex > this.posts.length) {
-            const hasmore = await this.loadPosts(pageSize);
-            if (!hasmore) {
-                break;
-            }
-        }
-        return Promise.resolve(this.posts.slice(startIndex, endIndex));
-    }
-
     // 不依赖 this.posts 缓存，直接从 ObjectStorage 按 yyyy/mm/dd 倒序遍历，
     // 凑够 limit 条立即返回。底层 IndexDBObjectStorage 已经做了 list/get 的缓存，
     // 所以这里没必要再在 service 层维护一份完整数组。

@@ -43,12 +43,6 @@ export class MemoryPostService implements PostService {
     return Promise.resolve();
   }
 
-  getPosts(page: number, pageSize: number): Promise<Post[]> {
-    const startIndex = (page - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    return Promise.resolve(this.posts.slice(startIndex, endIndex));
-  }
-
   getLatestPosts(limit: number): Promise<Post[]> {
     return Promise.resolve(this.posts.slice(0, limit));
   }

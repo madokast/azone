@@ -18,10 +18,6 @@ export default class MutexPostService implements PostService {
         return this.mutex.withLock(() => this.proxy.deletePost(id));
     }
 
-    public async getPosts(num: number, pageSize: number): Promise<Post[]> {
-        return this.mutex.withLock(() => this.proxy.getPosts(num, pageSize));
-    }
-
     public async getLatestPosts(limit: number): Promise<Post[]> {
         return this.mutex.withLock(() => this.proxy.getLatestPosts(limit));
     }
