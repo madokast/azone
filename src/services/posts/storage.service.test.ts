@@ -277,6 +277,57 @@ describe("StoragePostService.getLatestPosts", () => {
         expect(extractDate(posts[0].id)).toStrictEqual(newerDate);
         expect(extractDate(posts[1].id)).toStrictEqual(olderDate);
     })
+
+    // limit < 总数：只返 limit 条，且必须是最新的
+    it("should return at most limit posts", async () => {
+        const olderDate = new Date("2024-05-03T01:02:03")
+        const newerDate = new Date("2025-01-01T04:05:06")
+        const { service, nowState } = createStoragePostServiceForTest(olderDate);
+
+        nowState.value = olderDate;
+        await service.createPost({ content: "old-post" })
+        nowState.value = newerDate;
+        await service.createPost({ content: "new-post" })
+
+        const posts = await service.getLatestPosts(1);
+        expect(posts).toHaveLength(1);
+        expect(extractDate(posts[0].id)).toStrictEqual(newerDate);
+    })
+})
+
+describe("StoragePostService cursor pagination", () => {
+    // 联合分页：getLatestPosts + getPostsBefore 能完整翻完所有数据
+    it("should walk through all posts using getLatestPosts then getPostsBefore", async () => {
+        const dates = [
+            new Date("2024-01-01T01:00:00"),
+            new Date("2024-02-01T01:00:00"),
+            new Date("2024-03-01T01:00:00"),
+            new Date("2024-04-01T01:00:00"),
+        ]
+        const { service, nowState } = createStoragePostServiceForTest(dates[0]);
+        for (const d of dates) {
+            nowState.value = d
+            await service.createPost({ content: d.toISOString() })
+        }
+
+        const collected: string[] = [];
+        const first = await service.getLatestPosts(1);
+        expect(first).toHaveLength(1);
+        collected.push(first[0].id);
+
+        while (true) {
+            const next = await service.getPostsBefore(collected[collected.length - 1], 1);
+            if (next.length === 0) break;
+            collected.push(next[0].id);
+        }
+
+        expect(collected).toHaveLength(4);
+        for (let i = 0; i < collected.length - 1; i++) {
+            expect(collected[i] > collected[i + 1]).toBe(true);
+        }
+        expect(extractDate(collected[0])).toStrictEqual(dates[3]);
+        expect(extractDate(collected[collected.length - 1])).toStrictEqual(dates[0]);
+    })
 })
 
 describe("StoragePostService.getPostsBefore", () => {
