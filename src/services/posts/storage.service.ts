@@ -18,7 +18,7 @@ export default class StoragePostService implements PostService {
     private posts: Post[] = [];
 
     constructor(
-        rootDir: string,
+        rootDir: string, // 根目录，不要末尾 / 分隔符
         objectStorage: ObjectStorage,
         attachmentService: AttachmentService,
         nowDateProvider: Clock = () => new Date(),
