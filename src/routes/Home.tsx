@@ -126,16 +126,19 @@ export default function Home({ postService, attachmentService }: HomeProps) {
       >
         <Publish
           onPublish={async (post) => {
-            await postService.createPost(post).then(() => {
+            try {
+              await postService.createPost(post);
               showToast('Published');
               setIsPublished(true);
               setPublishVisible(false);
-              fetchInitialPosts();
-            }).catch((error) => {
+              // 先等数据回来，再滚到顶部，避免"先空滚一段再 pop 出新数据"的两段式动画
+              await fetchInitialPosts();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (error) {
               console.error('Error publishing post:', error);
               setIsPublished(false);
               showToast('Publish Failed');
-            });
+            }
           }}
           onChange={({ content }) => setPostLength(content.length)}
           isPublished={isPublished}
