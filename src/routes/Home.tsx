@@ -16,15 +16,16 @@ export default function Home({ postService, attachmentService }: HomeProps) {
   const [data, setData] = useState<PostType[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
   const pageSize = 10;
 
   const fetchInitialPosts = async () => {
     setLoading(true);
     try {
-      const initialPosts = await postService.getPosts(1, pageSize + 1);
-      setData(initialPosts.slice(0, pageSize));
-      setHasMore(initialPosts.length > pageSize);
+      const initialPosts = await postService.getLatestPosts(pageSize);
+      setData(initialPosts);
+      // 取够 pageSize 条就乐观认为还可能有更多；不够就肯定没了。
+      // 边界：如果总数恰好是 pageSize 的整数倍，会多发一次返回空的请求，体验无感。
+      setHasMore(initialPosts.length === pageSize);
     } catch (error) {
       setData([]);
       setHasMore(false);
@@ -40,14 +41,14 @@ export default function Home({ postService, attachmentService }: HomeProps) {
 
   async function loadMore() {
     if (loading) return;
+    if (data.length === 0) return; // 没有锚点（首屏空数据）就不请求
 
     setLoading(true);
     try {
-      const nextPage = page + 1;
-      const morePosts = await postService.getPosts(nextPage, pageSize);
+      const lastId = data[data.length - 1].id;
+      const morePosts = await postService.getPostsBefore(lastId, pageSize);
       setData(val => [...val, ...morePosts]);
       setHasMore(morePosts.length === pageSize);
-      setPage(nextPage);
     } catch (error) {
       console.error('Error loading more posts:', error);
     } finally {
