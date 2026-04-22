@@ -59,10 +59,22 @@ export class MemoryPostService implements PostService {
   }
 
   // 返回第一个满足 post.id < id 的下标；若不存在则返回 posts.length。
-  // 当前实现是线性扫描，后续可在这里统一替换为二分搜索。
+  // 利用 posts 已按 id 倒序的不变量，使用二分查找在 [0, posts.length] 内定位。
+  // 不变式：循环结束时 lo === hi，且
+  //   - 所有 i < lo  → posts[i].id >= id
+  //   - 所有 i >= lo → posts[i].id <  id
   private findFirstIndexBefore(id: string): number {
-    const index = this.posts.findIndex((post) => post.id < id);
-    return index === -1 ? this.posts.length : index;
+    let lo = 0;
+    let hi = this.posts.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (this.posts[mid].id < id) {
+        hi = mid;
+      } else {
+        lo = mid + 1;
+      }
+    }
+    return lo;
   }
 }
 
