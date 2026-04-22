@@ -88,6 +88,14 @@ export default class StoragePostService implements PostService {
         return Promise.resolve(this.posts.slice(startIndex, endIndex));
     }
 
+    public getLatestPosts(_limit: number): Promise<Post[]> {
+        throw new Error("not implemented");
+    }
+
+    public getPostsBefore(_beforeId: string, _limit: number): Promise<Post[]> {
+        throw new Error("not implemented");
+    }
+
     // 加载 posts 到 this.posts 中，返回是否有新增
     // 即从 this.posts 最后一个的日期，加载更早的 num 个 posts
     private async loadPosts(num: number): Promise<boolean> {

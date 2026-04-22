@@ -21,4 +21,12 @@ export default class MutexPostService implements PostService {
     public async getPosts(num: number, pageSize: number): Promise<Post[]> {
         return this.mutex.withLock(() => this.proxy.getPosts(num, pageSize));
     }
+
+    public getLatestPosts(_limit: number): Promise<Post[]> {
+        throw new Error("not implemented");
+    }
+
+    public getPostsBefore(_beforeId: string, _limit: number): Promise<Post[]> {
+        throw new Error("not implemented");
+    }
 }
