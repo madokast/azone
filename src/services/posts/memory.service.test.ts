@@ -113,3 +113,135 @@ describe("MemoryPostService.getLatestPosts", () => {
     expect(extractDate(posts[1].id)).toStrictEqual(olderDate);
   })
 })
+
+describe("MemoryPostService.getPostsBefore", () => {
+  // A1: 不包含锚点本身
+  it("should not include the anchor post itself", async () => {
+    const date1 = new Date("2024-01-01T01:00:00")
+    const date2 = new Date("2024-02-01T01:00:00")
+    const date3 = new Date("2024-03-01T01:00:00")
+    const { service, nowState } = createMemoryPostServiceForTest(date1);
+
+    nowState.value = date1; await service.createPost({ content: "p1" })
+    nowState.value = date2; await service.createPost({ content: "p2" })
+    nowState.value = date3; await service.createPost({ content: "p3" })
+
+    const all = await service.getLatestPosts(10);
+    const middleId = all[1].id;
+
+    const posts = await service.getPostsBefore(middleId, 10);
+    expect(posts.find(p => p.id === middleId)).toBeUndefined();
+  })
+
+  // A2: 所有结果严格 < beforeId
+  it("should only return posts with id strictly less than beforeId", async () => {
+    const date1 = new Date("2024-01-01T01:00:00")
+    const date2 = new Date("2024-02-01T01:00:00")
+    const date3 = new Date("2024-03-01T01:00:00")
+    const { service, nowState } = createMemoryPostServiceForTest(date1);
+
+    nowState.value = date1; await service.createPost({ content: "p1" })
+    nowState.value = date2; await service.createPost({ content: "p2" })
+    nowState.value = date3; await service.createPost({ content: "p3" })
+
+    const all = await service.getLatestPosts(10);
+    const middleId = all[1].id;
+
+    const posts = await service.getPostsBefore(middleId, 10);
+    for (const p of posts) {
+      expect(p.id < middleId).toBe(true);
+    }
+  })
+
+  // A3: 结果按 id 倒序
+  it("should return posts in id desc order", async () => {
+    const date1 = new Date("2024-01-01T01:00:00")
+    const date2 = new Date("2024-02-01T01:00:00")
+    const date3 = new Date("2024-03-01T01:00:00")
+    const date4 = new Date("2024-04-01T01:00:00")
+    const { service, nowState } = createMemoryPostServiceForTest(date1);
+
+    nowState.value = date1; await service.createPost({ content: "p1" })
+    nowState.value = date2; await service.createPost({ content: "p2" })
+    nowState.value = date3; await service.createPost({ content: "p3" })
+    nowState.value = date4; await service.createPost({ content: "p4" })
+
+    const all = await service.getLatestPosts(10);
+    const anchorId = all[0].id;
+
+    const posts = await service.getPostsBefore(anchorId, 10);
+    expect(posts).toHaveLength(3);
+    for (let i = 0; i < posts.length - 1; i++) {
+      expect(posts[i].id > posts[i + 1].id).toBe(true);
+    }
+  })
+
+  // A4: 尊重 limit 上限
+  it("should return at most limit posts", async () => {
+    const dates = [
+      new Date("2024-01-01T01:00:00"),
+      new Date("2024-02-01T01:00:00"),
+      new Date("2024-03-01T01:00:00"),
+      new Date("2024-04-01T01:00:00"),
+      new Date("2024-05-01T01:00:00"),
+    ]
+    const { service, nowState } = createMemoryPostServiceForTest(dates[0]);
+    for (const d of dates) {
+      nowState.value = d
+      await service.createPost({ content: d.toISOString() })
+    }
+
+    const all = await service.getLatestPosts(10);
+    const anchorId = all[0].id;
+
+    const posts = await service.getPostsBefore(anchorId, 2);
+    expect(posts).toHaveLength(2);
+  })
+
+  // B5: 锚点之前的数据少于 limit，应返回实际数量
+  it("should return fewer than limit when not enough older posts exist", async () => {
+    const date1 = new Date("2024-01-01T01:00:00")
+    const date2 = new Date("2024-02-01T01:00:00")
+    const { service, nowState } = createMemoryPostServiceForTest(date1);
+
+    nowState.value = date1; await service.createPost({ content: "p1" })
+    nowState.value = date2; await service.createPost({ content: "p2" })
+
+    const all = await service.getLatestPosts(10);
+    const anchorId = all[0].id;
+
+    const posts = await service.getPostsBefore(anchorId, 10);
+    expect(posts).toHaveLength(1);
+  })
+
+  // B6: 锚点已经是最旧帖子，返回空数组
+  it("should return empty array when anchor is the oldest post", async () => {
+    const date1 = new Date("2024-01-01T01:00:00")
+    const date2 = new Date("2024-02-01T01:00:00")
+    const { service, nowState } = createMemoryPostServiceForTest(date1);
+
+    nowState.value = date1; await service.createPost({ content: "p1" })
+    nowState.value = date2; await service.createPost({ content: "p2" })
+
+    const all = await service.getLatestPosts(10);
+    const oldestId = all[1].id;
+
+    const posts = await service.getPostsBefore(oldestId, 10);
+    expect(posts).toHaveLength(0);
+  })
+
+  // D7: 锚点 id 不存在，按字符串比较返回严格小于该 id 的帖子
+  it("should work as a string comparison when anchor id does not exist", async () => {
+    const date1 = new Date("2024-01-01T01:00:00")
+    const date2 = new Date("2024-03-01T01:00:00")
+    const { service, nowState } = createMemoryPostServiceForTest(date1);
+
+    nowState.value = date1; await service.createPost({ content: "p1" })
+    nowState.value = date2; await service.createPost({ content: "p2" })
+
+    const syntheticAnchor = "20240201-000000-zzzzzz";
+    const posts = await service.getPostsBefore(syntheticAnchor, 10);
+    expect(posts).toHaveLength(1);
+    expect(extractDate(posts[0].id)).toStrictEqual(date1);
+  })
+})

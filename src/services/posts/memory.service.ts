@@ -57,8 +57,16 @@ export class MemoryPostService implements PostService {
     return Promise.resolve(this.posts.slice(0, limit));
   }
 
-  getPostsBefore(_beforeId: string, _limit: number): Promise<Post[]> {
-    throw new Error("not implemented");
+  getPostsBefore(beforeId: string, limit: number): Promise<Post[]> {
+    // posts 已按 id 倒序维护，这里先用最简单的线性扫描，后续可以换二分。
+    const result: Post[] = [];
+    for (const post of this.posts) {
+      if (post.id < beforeId) {
+        result.push(post);
+        if (result.length >= limit) break;
+      }
+    }
+    return Promise.resolve(result);
   }
 }
 
