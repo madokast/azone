@@ -1,4 +1,5 @@
 import { ObjectStorage } from "./interface";
+import { mustEndWithSlash } from "./asserts";
 
 export default class MemoryObjectStorage implements ObjectStorage {
 
@@ -30,7 +31,7 @@ export default class MemoryObjectStorage implements ObjectStorage {
     }
 
     async list(prefix: string): Promise<string[]> {
-        if (!prefix.endsWith("/")) prefix += "/"
+        mustEndWithSlash(prefix);
 
         const seenDirs = new Set<string>()
         const paths: string[] = []

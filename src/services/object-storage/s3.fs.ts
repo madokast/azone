@@ -1,4 +1,5 @@
 import { ObjectStorage } from "./interface";
+import { mustEndWithSlash } from "./asserts";
 import { S3Client, PutObjectCommand, GetObjectCommand, ListObjectsV2Command, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 export interface S3Config {
@@ -48,7 +49,7 @@ export class S3ObjectStorage implements ObjectStorage {
     }
 
     public async list(prefix: string): Promise<string[]> {
-        if (prefix && !prefix.endsWith("/")) prefix += "/";
+        mustEndWithSlash(prefix);
         const r = await this.client.send(new ListObjectsV2Command({
             Bucket: this.config.bucket,
             Prefix: prefix,

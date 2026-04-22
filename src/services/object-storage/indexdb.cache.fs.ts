@@ -1,5 +1,6 @@
 import { DBSchema, IDBPDatabase, openDB, deleteDB } from "idb";
 import { ObjectStorage } from "./interface";
+import { mustEndWithSlash } from "./asserts";
 
 const STORE_FILES = "files"
 const STORE_LISTS = "lists"
@@ -98,6 +99,7 @@ export default class IndexDBObjectStorage implements ObjectStorage {
   }
 
   async list(prefix: string): Promise<string[]> {
+    mustEndWithSlash(prefix);
     const db = await this.dbPromise
     let paths = await db.get(STORE_LISTS, prefix)
     if (paths === undefined) {

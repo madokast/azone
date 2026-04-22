@@ -1,4 +1,5 @@
 import { ObjectStorage } from "./interface";
+import { mustEndWithSlash } from "./asserts";
 
 export default class PrefixObjectStorage implements ObjectStorage {
     private prefix: string;
@@ -35,6 +36,7 @@ export default class PrefixObjectStorage implements ObjectStorage {
     }
 
     async list(prefix: string): Promise<string[]> {
+        mustEndWithSlash(prefix);
         const fullPrefix = this.addPrefix(prefix)
         const paths = await this.proxy.list(fullPrefix)
 

@@ -1,4 +1,5 @@
 import { ObjectStorage } from "./interface";
+import { mustEndWithSlash } from "./asserts";
 import CryptoWrapper from "../crypto-wrapper";
 
 export default class CryptoObjectStorage implements ObjectStorage {
@@ -44,6 +45,7 @@ export default class CryptoObjectStorage implements ObjectStorage {
     }
 
     async list(prefix: string): Promise<string[]> {
+        mustEndWithSlash(prefix);
         return this.proxy.list(prefix);
     }
 }
