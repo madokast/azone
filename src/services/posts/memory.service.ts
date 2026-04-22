@@ -3,6 +3,7 @@ import { generateId } from '../identifier';
 import { formatDate } from './utils';
 import { MemoryAttachmentService } from '../attachments/memory.service';
 
+type Clock = () => Date;
 
 /**
  * In-memory implementation of PostService for testing purposes.
@@ -11,6 +12,12 @@ import { MemoryAttachmentService } from '../attachments/memory.service';
 export class MemoryPostService implements PostService {
   private posts: Post[] = [];
   private attachmentService = new MemoryAttachmentService();
+  // 通过注入时钟让测试可以稳定控制 createPost 使用的时间。
+  private readonly nowDateProvider: Clock;
+
+  constructor(nowDateProvider: Clock = () => new Date()) {
+    this.nowDateProvider = nowDateProvider;
+  }
 
   async createPost(postData: CreatePostDto): Promise<void> {
 
@@ -18,14 +25,20 @@ export class MemoryPostService implements PostService {
       (postData.attachments || []).map(attachment => this.attachmentService.uploadAttachment(attachment))
     );
 
+    const now = this.nowDateProvider();
     const newPost: Post = {
-      id: generateId(),
-      createdAt: formatDate(new Date()),
+      id: generateId(now),
+      createdAt: formatDate(now),
       content: postData.content,
       attachments: attachments,
     };
 
-    this.posts.unshift(newPost);
+    const insertIndex = this.posts.findIndex((post) => post.id < newPost.id);
+    if (insertIndex === -1) {
+      this.posts.push(newPost);
+    } else {
+      this.posts.splice(insertIndex, 0, newPost);
+    }
     return Promise.resolve();
   }
 
