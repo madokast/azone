@@ -53,8 +53,8 @@ export class MemoryPostService implements PostService {
     return Promise.resolve(this.posts.slice(startIndex, endIndex));
   }
 
-  getLatestPosts(_limit: number): Promise<Post[]> {
-    throw new Error("not implemented");
+  getLatestPosts(limit: number): Promise<Post[]> {
+    return Promise.resolve(this.posts.slice(0, limit));
   }
 
   getPostsBefore(_beforeId: string, _limit: number): Promise<Post[]> {
