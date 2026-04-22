@@ -116,8 +116,34 @@ export default class StoragePostService implements PostService {
         return result;
     }
 
-    public getPostsBefore(_beforeId: string, _limit: number): Promise<Post[]> {
-        throw new Error("not implemented");
+    // 与 getLatestPosts 同样按 yyyy/mm/dd 倒序遍历，只是多了一道筛选：
+    // 仅收集 id < beforeId 的帖子，并在凑齐 limit 条时立即返回。
+    // 当前先用最朴素的遍历，后续可按 id 前缀剪枝整段日/月/年目录来优化。
+    public async getPostsBefore(beforeId: string, limit: number): Promise<Post[]> {
+        const result: Post[] = [];
+        const yearDirs = await this.objectStorage.list(this.rootDir + "/");
+        yearDirs.sort((a, b) => b.localeCompare(a)); // 年份降序
+        for (const yearDir of yearDirs) {
+            const monthDirs = await this.objectStorage.list(yearDir);
+            monthDirs.sort((a, b) => b.localeCompare(a)); // 月份降序
+            for (const monthDir of monthDirs) {
+                const dayDirs = await this.objectStorage.list(monthDir);
+                dayDirs.sort((a, b) => b.localeCompare(a)); // 日期降序
+                for (const dayDir of dayDirs) {
+                    const dir = dayDir.endsWith("/") ? dayDir : dayDir + "/";
+                    const postPaths = await this.objectStorage.list(dir);
+                    postPaths.sort((a, b) => b.localeCompare(a)); // post id 降序
+                    for (const postPath of postPaths) {
+                        const post = await this.loadPost(postPath);
+                        if (post.id < beforeId) {
+                            result.push(post);
+                            if (result.length >= limit) return result;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     // 加载 posts 到 this.posts 中，返回是否有新增
