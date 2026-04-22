@@ -78,7 +78,10 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
         showToast('Please input workDir');
         return;
       }
-      const rootDirs = await createS3ObjectStorage(s3ConfigState).list("/");
+      // 用 workDir + "/" 作为前缀：既符合 list 的 "必须以 / 结尾" 约定，
+      // 也能顺带验证 workDir 真的可访问。容忍用户输入末/首带斜杠。
+      const workDir = s3ConfigState.workDir.replace(/^\/+|\/+$/g, '');
+      const rootDirs = await createS3ObjectStorage(s3ConfigState).list(workDir + "/");
       console.log(`rootDirs: ${rootDirs}`);
       showToast('S3 Connect Success');
     } catch (error) {
