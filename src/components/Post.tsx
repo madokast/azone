@@ -26,6 +26,11 @@ export default function Post({ post, imageSize = "90px", attachmentService }: Po
 useEffect(() => {
   if (!post.attachments || post.attachments.length === 0) return;
 
+  // 组件卸载或依赖变更时由 cleanup 置为 true，阻止飞行中的 Promise 写入旧 effect 的状态
+  let cancelled = false;
+  // 收集本轮 effect 已加载的 blob URL，供 cleanup 统一 revoke；用 Set 避免 image 的 sourceUrl === thumbnailUrl 被双重 revoke
+  const loadedUrls = new Set<string>();
+
   // 构造初始附件
   const initial = post.attachments.map(attachment => ({
     ...attachment,
@@ -40,12 +45,25 @@ useEffect(() => {
   // 异步加载
   initial.forEach((attachment, index) => {
     attachmentService.getAttachment(attachment).then((loaded) => {
+      if (cancelled) {
+        // effect 已失效：立即释放本次加载的 blob URL，不更新状态
+        URL.revokeObjectURL(loaded.sourceUrl);
+        URL.revokeObjectURL(loaded.thumbnailUrl);
+        return;
+      }
+      loadedUrls.add(loaded.sourceUrl);
+      loadedUrls.add(loaded.thumbnailUrl);
       setAttachments(prev =>
         prev.map((att, i) => i === index ? loaded : att)
       );
     }).catch((error) => showToast(`${error}`));
   });
 
+  return () => {
+    cancelled = true; // 告知飞行中的 Promise 本轮 effect 已作废
+    loadedUrls.forEach(url => URL.revokeObjectURL(url)); // 释放已加载的 blob URL
+    setAttachments([]); // 清空旧附件，避免依赖变更时短暂展示过期数据
+  };
 }, [post.attachments, attachmentService]);
 
   const shouldCollapseContent = post.content.length > collapseContentSize;
