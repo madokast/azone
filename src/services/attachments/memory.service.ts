@@ -10,6 +10,16 @@ interface StoredAttachment {
 }
 
 /**
+ * Object URL provider abstraction so non-browser environments (e.g. Node test
+ * runners without happy-dom URL polyfill) and leak detection harnesses can
+ * supply their own implementation.
+ */
+export interface ObjectURLProvider {
+  createObjectURL(blob: Blob): string;
+  revokeObjectURL(url: string): void;
+}
+
+/**
  * In-memory implementation of AttachmentService for testing purposes.
  *
  * ## Blob URL 所有权说明
@@ -18,20 +28,25 @@ interface StoredAttachment {
  * - **uploadAttachment**：fetch sourceUrl 拿到 Blob 存入 Map，不持有也不释放调用方的 URL。
  * - **getAttachment**：每次调用从 Blob 创建新的 blob URL，所有权转交调用方，
  *   调用方使用完毕后须调用 Attachments.dispose(attachment) 释放。
- * - **deleteAttachment / clear**：直接移除 Map 条目，Blob 内存由 GC 回收，无需 revoke URL。
+ * - **deleteAttachment**：直接移除 Map 条目，Blob 内存由 GC 回收，无需 revoke URL。
  */
 export class MemoryAttachmentService implements AttachmentService {
   // 存储 Blob 对象而非 blob URL，getAttachment 按需创建新 URL 并转交调用方
   private attachments = new Map<string, StoredAttachment>();
+  private readonly url: ObjectURLProvider;
+
+  constructor(url: ObjectURLProvider = URL) {
+    this.url = url;
+  }
 
   getAttachment(meta: MetaAttachment): Promise<Attachment> {
     const stored = this.attachments.get(meta.id);
     if (!stored) {
       return Promise.reject(new Error(`Attachment with ID ${meta.id} not found`));
     }
-    const sourceUrl = URL.createObjectURL(stored.blob);
+    const sourceUrl = this.url.createObjectURL(stored.blob);
     const thumbnailUrl = isImageMimeType(stored.mimeType)
-      ? URL.createObjectURL(stored.blob)
+      ? this.url.createObjectURL(stored.blob)
       : unknowFileIcon;
     return Promise.resolve({ id: meta.id, mimeType: stored.mimeType, sourceUrl, thumbnailUrl });
   }
@@ -52,8 +67,8 @@ export class MemoryAttachmentService implements AttachmentService {
     if (rejected.length > 0) {
       // Revoke all blob URLs already created to prevent leaks before throwing
       for (const attachment of fulfilled) {
-        URL.revokeObjectURL(attachment.sourceUrl);
-        URL.revokeObjectURL(attachment.thumbnailUrl);
+        this.url.revokeObjectURL(attachment.sourceUrl);
+        this.url.revokeObjectURL(attachment.thumbnailUrl);
       }
       throw rejected[0];
     }
