@@ -77,19 +77,6 @@ export class MemoryAttachmentService implements AttachmentService {
     return { id, mimeType: attachment.mimeType };
   }
 
-  /**
-   * Clears all attachments from memory (for testing purposes).
-   */
-  clear(): void {
-    this.attachments.clear();
-  }
-
-  /**
-   * Gets the internal attachments map (for testing purposes).
-   */
-  getInternalAttachments(): Map<string, StoredAttachment> {
-    return new Map(this.attachments);
-  }
 }
 
 
