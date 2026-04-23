@@ -30,7 +30,9 @@ export class MemoryAttachmentService implements AttachmentService {
       return Promise.reject(new Error(`Attachment with ID ${meta.id} not found`));
     }
     const sourceUrl = URL.createObjectURL(stored.blob);
-    const thumbnailUrl = isImageMimeType(stored.mimeType) ? sourceUrl : unknowFileIcon;
+    const thumbnailUrl = isImageMimeType(stored.mimeType)
+      ? URL.createObjectURL(stored.blob)
+      : unknowFileIcon;
     return Promise.resolve({ id: meta.id, mimeType: stored.mimeType, sourceUrl, thumbnailUrl });
   }
 
