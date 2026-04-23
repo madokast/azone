@@ -18,6 +18,11 @@ export class StorageAttachmentService implements AttachmentService {
         return `${this.rootDir}/${id}.dat`;
     }
 
+    /**
+     * 从持久化存储读取数据并创建新的 blob URL，所有权转交给调用方。
+     * 调用方使用完毕后须调用 Attachments.dispose(attachment) 释放，
+     * 本服务不缓存返回的 URL，无法代为管理其生命周期。
+     */
     async getAttachment(meta: MetaAttachment): Promise<Attachment> {
         const path = this.getPath(meta.id);
         const stream = await this.objectStorage.get(path);
@@ -40,6 +45,10 @@ export class StorageAttachmentService implements AttachmentService {
         await this.objectStorage.delete(path);
     }
 
+    /**
+     * 读取 sourceUrl 内容写入持久化存储，不持有也不释放传入的 blob URL。
+     * sourceUrl 的所有权归调用方，上传完成后由调用方自行 revoke。
+     */
     async uploadAttachment(attachment: Omit<Attachment, 'id'>): Promise<MetaAttachment> {
         const id = generateId();
         const path = this.getPath(id);
