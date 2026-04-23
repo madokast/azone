@@ -36,8 +36,29 @@ export class MemoryAttachmentService implements AttachmentService {
     return Promise.resolve({ id: meta.id, mimeType: stored.mimeType, sourceUrl, thumbnailUrl });
   }
 
-  getAttachments(metas: MetaAttachment[]): Promise<Attachment[]> {
-    return Promise.all(metas.map(m => this.getAttachment(m)));
+  async getAttachments(metas: MetaAttachment[]): Promise<Attachment[]> {
+    const results = await Promise.allSettled(metas.map(m => this.getAttachment(m)));
+
+    const fulfilled: Attachment[] = [];
+    const rejected: unknown[] = [];
+    for (const result of results) {
+      if (result.status === 'fulfilled') {
+        fulfilled.push(result.value);
+      } else {
+        rejected.push(result.reason);
+      }
+    }
+
+    if (rejected.length > 0) {
+      // Revoke all blob URLs already created to prevent leaks before throwing
+      for (const attachment of fulfilled) {
+        URL.revokeObjectURL(attachment.sourceUrl);
+        URL.revokeObjectURL(attachment.thumbnailUrl);
+      }
+      throw rejected[0];
+    }
+
+    return fulfilled;
   }
 
   deleteAttachment(id: string): Promise<void> {
