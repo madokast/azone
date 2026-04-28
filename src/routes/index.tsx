@@ -19,13 +19,14 @@ type AppRouterProps = {
   onEncryptConfigChange: (next: Partial<EncryptConfig>) => void;
   postService: PostService;
   attachmentService: AttachmentService;
+  onClearCache: () => Promise<void>;
 };
 
 export default function AppRouter(
   { theme, onThemeChange,
     s3Config, onS3ConfigChange,
     encryptConfig, onEncryptConfigChange,
-    postService, attachmentService }: AppRouterProps) {
+    postService, attachmentService, onClearCache }: AppRouterProps) {
   return (
     <BrowserRouter>
       <Routes>
@@ -40,6 +41,7 @@ export default function AppRouter(
             theme={theme} onThemeChange={onThemeChange}
             s3Config={s3Config} onS3ConfigChange={onS3ConfigChange}
             encryptConfig={encryptConfig} onEncryptConfigChange={onEncryptConfigChange}
+            onClearCache={onClearCache}
           />} />
         </Route>
 

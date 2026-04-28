@@ -19,7 +19,6 @@ import { createS3ObjectStorage } from "./services/object-storage/s3.fs";
 import SimpleCrypto from "./services/crypto-wrapper";
 import { defaultEncryptConfig, EncryptConfig } from "./services/settings/schema";
 import { StorageAttachmentService } from "./services/attachments/storage.service";
-import { clearIndexDB } from "./services/object-storage/indexdb.cache.fs";
 import MutexPostService from "./services/posts/mutex.service";
 
 export default function App() {
@@ -32,11 +31,6 @@ export default function App() {
     const initialConfig = getConfig();
     return initialConfig.s3 ?? defaultS3Config;
   });
-
-  const setS3Config = (next: S3Config) => {
-    clearIndexDB(s3Config.workDir);
-    setS3Config0(next);
-  }
 
   const [encryptConfig, setEncryptConfig] = useState<EncryptConfig>(() => {
     const initialConfig = getConfig();
@@ -118,7 +112,13 @@ export default function App() {
     const crypto = new SimpleCrypto(encryptConfig.password);
     objectStorage = new CryptoObjectStorage(crypto, objectStorage);
   }
-  objectStorage = new IndexDBObjectStorage(s3Config.workDir, objectStorage);
+  const cacheStorage = new IndexDBObjectStorage(s3Config.workDir, objectStorage);
+  objectStorage = cacheStorage;
+
+  const setS3Config = async (next: S3Config) => {
+    await cacheStorage.clearAll();
+    setS3Config0(next);
+  }
   
   const attachmentService = new StorageAttachmentService("attachments", objectStorage);
 
@@ -132,7 +132,7 @@ export default function App() {
       showToast(`(${nextTheme})`);
     }} s3Config={s3Config} onS3ConfigChange={nextS3Config => {
       persistS3Config(nextS3Config).then(setS3Config)
-    }} postService={postService} attachmentService={attachmentService} 
+    }} onClearCache={() => cacheStorage.clearAll()} postService={postService} attachmentService={attachmentService} 
     encryptConfig={encryptConfig} onEncryptConfigChange={nextEncryptConfig => {
       persistEncryptConfig(nextEncryptConfig).then(setEncryptConfig)
     }} />

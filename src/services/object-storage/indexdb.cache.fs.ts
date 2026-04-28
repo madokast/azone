@@ -1,4 +1,4 @@
-import { DBSchema, IDBPDatabase, openDB, deleteDB } from "idb";
+import { DBSchema, IDBPDatabase, openDB } from "idb";
 import { ObjectStorage } from "./interface";
 import { mustEndWithSlash } from "./asserts";
 
@@ -17,7 +17,9 @@ interface DB extends DBSchema {
 }
 
 async function getDB(dbName: string): Promise<IDBPDatabase<DB>> {
-  return openDB<DB>(dbName, 1, {
+  let database: IDBPDatabase<DB>;
+
+  database = await openDB<DB>(dbName, 1, {
     upgrade(db) {
       if (!db.objectStoreNames.contains(STORE_FILES)) {
         db.createObjectStore(STORE_FILES)
@@ -25,8 +27,13 @@ async function getDB(dbName: string): Promise<IDBPDatabase<DB>> {
       if (!db.objectStoreNames.contains(STORE_LISTS)) {
         db.createObjectStore(STORE_LISTS)
       }
-    }
+    },
+    blocking() {
+      database.close()
+    },
   })
+
+  return database
 }
 
 export default class IndexDBObjectStorage implements ObjectStorage {
@@ -108,9 +115,14 @@ export default class IndexDBObjectStorage implements ObjectStorage {
     }
     return paths
   }
-}
 
-export async function clearIndexDB(dbName: string): Promise<void> {
-  console.log(`clearIndexDB: ${dbName}`)
-  await deleteDB(dbName)
+  async clearAll(): Promise<void> {
+    const db = await this.dbPromise
+    const tx = db.transaction([STORE_FILES, STORE_LISTS], "readwrite")
+    await Promise.all([
+      tx.objectStore(STORE_FILES).clear(),
+      tx.objectStore(STORE_LISTS).clear(),
+    ])
+    await tx.done
+  }
 }
