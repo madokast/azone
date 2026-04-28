@@ -114,7 +114,7 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
             </div>
           }>
             <Input onChange={(next) => setS3Config({ accessKeyId: next })}
-              defaultValue={s3ConfigState.accessKeyId}
+              value={s3ConfigState.accessKeyId}
               placeholder='Please input accessKeyId'
               type={s3AccessKeyIdVisible ? 'text' : 'password'} />
           </Form.Item>
@@ -129,13 +129,13 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
             </div>
           }>
             <Input onChange={(next) => setS3Config({ secretAccessKey: next })}
-              defaultValue={s3ConfigState.secretAccessKey}
+              value={s3ConfigState.secretAccessKey}
               placeholder='Please input secretAccessKey'
               type={s3SecretVisible ? 'text' : 'password'}
             />
           </Form.Item>
           <Form.Item name='Region' label='Region' initialValue={s3ConfigState.region}>
-            <Input onChange={(next) => setS3Config({ region: next })} defaultValue={s3ConfigState.region} placeholder='Please input region' />
+            <Input onChange={(next) => setS3Config({ region: next })} value={s3ConfigState.region} placeholder='Please input region' />
           </Form.Item>
           <Form.Item name='Bucket' label='Bucket' initialValue={s3ConfigState.bucket} extra={
             // 显示密码可见性切换按钮
@@ -148,17 +148,17 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
             </div>
           }>
             <Input onChange={(next) => setS3Config({ bucket: next })}
-              defaultValue={s3ConfigState.bucket}
+              value={s3ConfigState.bucket}
               placeholder='Please input bucket'
               type={s3BucketVisible ? 'text' : 'password'} />
           </Form.Item>
           <Form.Item name='Endpoint' label='Endpoint' initialValue={s3ConfigState.endpoint}>
-            <Input onChange={(next) => setS3Config({ endpoint: next })} defaultValue={s3ConfigState.endpoint} placeholder='Please input endpoint: https://' />
+            <Input onChange={(next) => setS3Config({ endpoint: next })} value={s3ConfigState.endpoint} placeholder='Please input endpoint: https://' />
           </Form.Item>
         </Form>
         <Form layout='horizontal'>
           <Form.Item name='ForcePathStyle' label='ForcePathStyle' initialValue={s3ConfigState.forcePathStyle ? 'true' : 'false'} childElementPosition='right'>
-            <Switch defaultChecked={s3ConfigState.forcePathStyle} onChange={(next) => setS3Config({ forcePathStyle: next })} />
+            <Switch checked={s3ConfigState.forcePathStyle} onChange={(next) => setS3Config({ forcePathStyle: next })} />
           </Form.Item>
         </Form>
         <Form layout='vertical' footer={
@@ -170,7 +170,7 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
           </div>
         }>
           <Form.Item name='WorkDir' label='WorkDir' initialValue={s3ConfigState.workDir}>
-            <Input onChange={(next) => setS3Config({ workDir: next })} defaultValue={s3ConfigState.workDir} placeholder='Please input workDir' />
+            <Input onChange={(next) => setS3Config({ workDir: next })} value={s3ConfigState.workDir} placeholder='Please input workDir' />
           </Form.Item>
         </Form>
       </>
@@ -189,7 +189,7 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
             </div>
           }>
             <Input onChange={(next) => setEncryptConfig({ password: next })}
-              defaultValue={encryptConfigState.password}
+              value={encryptConfigState.password}
               placeholder='Please input password or leave it empty to disable encrypt'
               type={encryptPasswordVisible ? 'text' : 'password'} />
           </Form.Item>
@@ -206,7 +206,7 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
               { label: 'Light', value: 'light' },
               { label: 'Dark', value: 'dark' }
             ]}
-            defaultValue={themeState}
+            value={themeState}
             onChange={setTheme}
           />
         </Form.Item>
