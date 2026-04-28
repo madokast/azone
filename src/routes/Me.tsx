@@ -1,6 +1,6 @@
 import { Divider, Form, Segmented, Tag, Input, Button, Switch } from 'antd-mobile';
 import { EncryptConfig, S3Config, type UiTheme } from '../services/settings';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { EyeInvisibleOutline, EyeOutline } from 'antd-mobile-icons'
 import { createS3ObjectStorage } from '../services/object-storage/s3.fs';
 import { showToast } from '../components/toast';
@@ -29,6 +29,9 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
   const [themeState, setThemeState] = useState(theme);
   const [s3ConfigState, setS3ConfigState] = useState(s3Config);
   const [encryptConfigState, setEncryptConfigState] = useState(encryptConfig);
+  const s3ConfigRef = useRef(s3Config);
+  const s3ConfigDirtyRef = useRef(false);
+  const onS3ConfigChangeRef = useRef(onS3ConfigChange);
 
   const [s3AccessKeyIdVisible, setS3AccessKeyIdVisible] = useState(false);
   const [s3SecretVisible, setS3SecretVisible] = useState(false);
@@ -48,9 +51,25 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
   }
 
   const setS3Config = (next: Partial<S3Config>) => {
-    setS3ConfigState((prev) => ({ ...prev, ...next }));
-    onS3ConfigChange(next);
+    setS3ConfigState((prev) => {
+      const merged = { ...prev, ...next };
+      s3ConfigRef.current = merged;
+      s3ConfigDirtyRef.current = true;
+      return merged;
+    });
   }
+
+  useEffect(() => {
+    onS3ConfigChangeRef.current = onS3ConfigChange;
+  }, [onS3ConfigChange]);
+
+  useEffect(() => {
+    return () => {
+      if (s3ConfigDirtyRef.current) {
+        onS3ConfigChangeRef.current(s3ConfigRef.current);
+      }
+    };
+  }, []);
 
   const downloadAllConfig = () => {
     downloadJson('azone-config.json', { s3Config: s3ConfigState, encryptConfig: encryptConfigState, theme: themeState } as AllConfig);
@@ -61,7 +80,10 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
       const file = await selectFile('application/json');
       const content = await readFile(file);
       const config = JSON.parse(content) as AllConfig;
-      setS3Config(config.s3Config);
+      setS3ConfigState(config.s3Config);
+      s3ConfigRef.current = config.s3Config;
+      s3ConfigDirtyRef.current = false;
+      onS3ConfigChange(config.s3Config);
       setEncryptConfig(config.encryptConfig);
       setTheme(config.theme);
       // showToast('Import Config Success');
