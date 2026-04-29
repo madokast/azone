@@ -3,6 +3,7 @@ import { extractDate } from "../identifier";
 import { MemoryPostService } from "./memory.service";
 import { formatDate } from "./utils";
 import type { AttachmentService, Attachment, MetaAttachment } from "../attachments";
+import { MemoryAttachmentService, type ObjectURLProvider } from "../attachments/memory.service";
 
 type TestNowState = {
   value: Date
@@ -40,6 +41,51 @@ class StubAttachmentService implements AttachmentService {
       id: `stub-${this.uploaded.length}`,
       mimeType: attachment.mimeType,
     });
+  }
+}
+
+function createTrackedURLProvider(): {
+  provider: ObjectURLProvider;
+  resolveBlob: (url: string) => Blob | undefined;
+  aliveUrls: () => string[];
+} {
+  const live = new Map<string, Blob>();
+  let counter = 0;
+  const provider: ObjectURLProvider = {
+    createObjectURL(blob: Blob): string {
+      const url = `blob:fake/${++counter}`;
+      live.set(url, blob);
+      return url;
+    },
+    revokeObjectURL(url: string): void {
+      live.delete(url);
+    },
+  };
+  return {
+    provider,
+    resolveBlob: (url) => live.get(url),
+    aliveUrls: () => [...live.keys()],
+  };
+}
+
+function bytesToDataURL(bytes: Uint8Array, mimeType: string): string {
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return `data:${mimeType};base64,${btoa(binary)}`;
+}
+
+async function blobBytes(blob: Blob): Promise<Uint8Array> {
+  return new Uint8Array(await blob.arrayBuffer());
+}
+
+function expectBytesEqual(actual: Uint8Array, expected: Uint8Array): void {
+  expect(actual.length).toBe(expected.length);
+  for (let i = 0; i < expected.length; i++) {
+    if (actual[i] !== expected[i]) {
+      throw new Error(`bytes differ at index ${i}: actual=${actual[i]} expected=${expected[i]}`);
+    }
   }
 }
 
@@ -107,6 +153,37 @@ describe("MemoryPostService.createPost", () => {
     const posts = await service.getLatestPosts(1);
     expect(attachmentService.uploaded).toEqual([attachment]);
     expect(posts[0].attachments).toEqual([{ id: "stub-1", mimeType: "image/png" }]);
+  })
+
+  it("should create posts with MemoryAttachmentService and read attachment bytes back", async () => {
+    const { provider, resolveBlob, aliveUrls } = createTrackedURLProvider();
+    const attachmentService = new MemoryAttachmentService(provider);
+    const service = new MemoryPostService(
+      () => new Date("2025-01-01T12:34:56"),
+      attachmentService,
+    );
+    const bytes = new Uint8Array([1, 3, 5, 7, 9]);
+
+    await service.createPost({
+      content: "post with readable attachment",
+      attachments: [{
+        mimeType: "image/png",
+        sourceUrl: bytesToDataURL(bytes, "image/png"),
+        thumbnailUrl: bytesToDataURL(bytes, "image/png"),
+      }],
+    });
+
+    const posts = await service.getLatestPosts(1);
+    expect(posts[0].attachments).toHaveLength(1);
+
+    const attachment = await attachmentService.getAttachment(posts[0].attachments![0]);
+    const blob = resolveBlob(attachment.sourceUrl);
+    expect(blob).toBeDefined();
+    expectBytesEqual(await blobBytes(blob!), bytes);
+
+    provider.revokeObjectURL(attachment.sourceUrl);
+    provider.revokeObjectURL(attachment.thumbnailUrl);
+    expect(aliveUrls()).toEqual([]);
   })
 })
 
