@@ -35,4 +35,12 @@ describe("ZipBuilder", () => {
 
     expect(() => zip.add("2.txt", "world")).toThrow("Cannot add files after generate");
   });
+
+  it("should reject duplicate zip paths", () => {
+    const zip = new ZipBuilder();
+
+    zip.add("same.txt", "hello");
+
+    expect(() => zip.add("same.txt", "world")).toThrow("Duplicate zip path");
+  });
 });

@@ -9,6 +9,7 @@ export interface UnzippedFile {
 
 export class ZipBuilder {
   private readonly zip = new JSZip();
+  private readonly paths = new Set<string>();
   private generated = false;
 
   add(path: string, data: ZipData): this {
@@ -17,6 +18,11 @@ export class ZipBuilder {
     }
 
     assertSafeZipPath(path);
+    if (this.paths.has(path)) {
+      throw new Error(`Duplicate zip path: ${path}`);
+    }
+
+    this.paths.add(path);
     this.zip.file(path, data);
     return this;
   }
