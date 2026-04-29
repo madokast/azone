@@ -2,6 +2,7 @@ import type { Post, PostService, CreatePostDto } from './index';
 import { generateId } from '../identifier';
 import { formatDate } from './utils';
 import { MemoryAttachmentService } from '../attachments/memory.service';
+import type { AttachmentService } from '../attachments';
 
 type Clock = () => Date;
 
@@ -11,12 +12,16 @@ type Clock = () => Date;
  */
 export class MemoryPostService implements PostService {
   private posts: Post[] = [];
-  private attachmentService = new MemoryAttachmentService();
+  private attachmentService: AttachmentService;
   // 通过注入时钟让测试可以稳定控制 createPost 使用的时间。
   private readonly nowDateProvider: Clock;
 
-  constructor(nowDateProvider: Clock = () => new Date()) {
+  constructor(
+    nowDateProvider: Clock = () => new Date(),
+    attachmentService: AttachmentService = new MemoryAttachmentService(),
+  ) {
     this.nowDateProvider = nowDateProvider;
+    this.attachmentService = attachmentService;
   }
 
   async createPost(postData: CreatePostDto): Promise<void> {

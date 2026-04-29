@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { extractDate } from "../identifier";
 import { MemoryPostService } from "./memory.service";
 import { formatDate } from "./utils";
+import type { AttachmentService, Attachment, MetaAttachment } from "../attachments";
 
 type TestNowState = {
   value: Date
@@ -14,8 +15,32 @@ function createMemoryPostServiceForTest(initialNow: Date = new Date()): {
 } {
   const nowState: TestNowState = { value: initialNow };
   const nowDateProvider = () => nowState.value;
-  const service = new (MemoryPostService as any)(nowDateProvider) as MemoryPostService;
+  const service = new MemoryPostService(nowDateProvider);
   return { service, nowState };
+}
+
+class StubAttachmentService implements AttachmentService {
+  uploaded: Omit<Attachment, 'id'>[] = [];
+
+  getAttachment(_meta: MetaAttachment): Promise<Attachment> {
+    throw new Error("Not implemented");
+  }
+
+  deleteAttachment(_id: string): Promise<void> {
+    throw new Error("Not implemented");
+  }
+
+  getAttachments(_metas: MetaAttachment[]): Promise<Attachment[]> {
+    throw new Error("Not implemented");
+  }
+
+  uploadAttachment(attachment: Omit<Attachment, 'id'>): Promise<MetaAttachment> {
+    this.uploaded.push(attachment);
+    return Promise.resolve({
+      id: `stub-${this.uploaded.length}`,
+      mimeType: attachment.mimeType,
+    });
+  }
 }
 
 describe("MemoryPostService.createPost", () => {
@@ -63,6 +88,25 @@ describe("MemoryPostService.createPost", () => {
     expect(posts).toHaveLength(2);
     expect(extractDate(posts[0].id)).toStrictEqual(newerDate);
     expect(extractDate(posts[1].id)).toStrictEqual(olderDate);
+  })
+
+  it("should use injected attachment service when creating posts with attachments", async () => {
+    const attachmentService = new StubAttachmentService();
+    const service = new MemoryPostService(() => new Date("2025-01-01T12:34:56"), attachmentService);
+    const attachment: Omit<Attachment, 'id'> = {
+      mimeType: "image/png",
+      sourceUrl: "blob:source",
+      thumbnailUrl: "blob:thumbnail",
+    };
+
+    await service.createPost({
+      content: "post with injected attachment service",
+      attachments: [attachment],
+    });
+
+    const posts = await service.getLatestPosts(1);
+    expect(attachmentService.uploaded).toEqual([attachment]);
+    expect(posts[0].attachments).toEqual([{ id: "stub-1", mimeType: "image/png" }]);
   })
 })
 
