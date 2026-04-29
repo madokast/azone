@@ -1,4 +1,5 @@
 import type { MetaAttachment } from "../attachments";
+import type { ArchiveManifestHeader } from "./schema";
 
 export const ARCHIVE_SCHEMA_VERSION = 1;
 export const ARCHIVE_POSTS_FILE = "posts.json";
@@ -20,7 +21,7 @@ export interface ArchiveAttachmentEntry extends MetaAttachment {
   sha256?: string;
 }
 
-export interface ArchiveManifest {
+export interface ArchiveManifest extends ArchiveManifestHeader {
   schemaVersion: typeof ARCHIVE_SCHEMA_VERSION;
   exportedAt: string;
   postsFile: typeof ARCHIVE_POSTS_FILE;
