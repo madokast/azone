@@ -20,7 +20,7 @@ import SimpleCrypto from "./services/crypto-wrapper";
 import { defaultEncryptConfig, EncryptConfig } from "./services/settings/schema";
 import { StorageAttachmentService } from "./services/attachments/storage.service";
 import MutexPostService from "./services/posts/mutex.service";
-import { ZipArchiveService } from "./services/archive";
+import { ZipArchiveService, createArchiveFileName } from "./services/archive";
 import { downloadBlob } from "./tools/download";
 
 export default function App() {
@@ -132,7 +132,7 @@ export default function App() {
     const archiveService = new ZipArchiveService();
     const data = await archiveService.exportPosts(postService, attachmentService);
     const blobData = new Uint8Array(data).buffer;
-    downloadBlob(exportFileName(new Date()), new Blob([blobData], { type: "application/zip" }));
+    downloadBlob(createArchiveFileName(new Date()), new Blob([blobData], { type: "application/zip" }));
   }
 
   return (
@@ -146,14 +146,4 @@ export default function App() {
       persistEncryptConfig(nextEncryptConfig).then(setEncryptConfig)
     }} />
   );
-}
-
-function exportFileName(date: Date): string {
-  const yyyy = date.getFullYear();
-  const mm = String(date.getMonth() + 1).padStart(2, "0");
-  const dd = String(date.getDate()).padStart(2, "0");
-  const hh = String(date.getHours()).padStart(2, "0");
-  const min = String(date.getMinutes()).padStart(2, "0");
-  const ss = String(date.getSeconds()).padStart(2, "0");
-  return `azone-export-${yyyy}-${mm}-${dd}-${hh}-${min}-${ss}.zip`;
 }
