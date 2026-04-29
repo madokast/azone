@@ -20,13 +20,14 @@ type AppRouterProps = {
   postService: PostService;
   attachmentService: AttachmentService;
   onClearCache: () => Promise<void>;
+  onExport: () => Promise<void>;
 };
 
 export default function AppRouter(
   { theme, onThemeChange,
     s3Config, onS3ConfigChange,
     encryptConfig, onEncryptConfigChange,
-    postService, attachmentService, onClearCache }: AppRouterProps) {
+    postService, attachmentService, onClearCache, onExport }: AppRouterProps) {
   return (
     <BrowserRouter>
       <Routes>
@@ -42,6 +43,7 @@ export default function AppRouter(
             s3Config={s3Config} onS3ConfigChange={onS3ConfigChange}
             encryptConfig={encryptConfig} onEncryptConfigChange={onEncryptConfigChange}
             onClearCache={onClearCache}
+            onExport={onExport}
           />} />
         </Route>
 

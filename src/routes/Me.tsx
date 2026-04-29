@@ -16,6 +16,7 @@ type MeProps = {
   encryptConfig: EncryptConfig;
   onEncryptConfigChange: (next: Partial<EncryptConfig>) => void;
   onClearCache: () => Promise<void>;
+  onExport: () => Promise<void>;
 };
 
 interface AllConfig {
@@ -24,7 +25,7 @@ interface AllConfig {
   theme: UiTheme;
 }
 
-export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, encryptConfig, onEncryptConfigChange, onClearCache }: MeProps) {
+export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, encryptConfig, onEncryptConfigChange, onClearCache, onExport }: MeProps) {
 
   const [themeState, setThemeState] = useState(theme);
   const [s3ConfigState, setS3ConfigState] = useState(s3Config);
@@ -97,6 +98,16 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
   const clearCache = async () => {
     await onClearCache();
     showToast('Cache cleared');
+  }
+
+  const exportData = async () => {
+    try {
+      await onExport();
+      showToast('Export Data Success');
+    } catch (error) {
+      console.error(`Export Data Failed: ${error}`);
+      showToast('Export Data Failed');
+    }
   }
 
   const testS3Config = async () => {
@@ -243,6 +254,10 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
       <Form layout='vertical' footer={
           // 测试连接按钮
           <div style={{ textAlign: 'right' }}>
+            <Button color='primary' fill='outline' size='mini' onClick={exportData} disabled={s3TestButtonDisabled}>
+              Export Data
+            </Button>
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <Button color='primary' fill='outline' size='mini' onClick={clearCache} disabled={s3TestButtonDisabled}>
               Clear Cache
             </Button>

@@ -20,6 +20,8 @@ import SimpleCrypto from "./services/crypto-wrapper";
 import { defaultEncryptConfig, EncryptConfig } from "./services/settings/schema";
 import { StorageAttachmentService } from "./services/attachments/storage.service";
 import MutexPostService from "./services/posts/mutex.service";
+import { ZipArchiveService } from "./services/archive";
+import { downloadBlob } from "./tools/download";
 
 export default function App() {
   const [theme, setTheme] = useState<UiTheme>(() => {
@@ -126,15 +128,32 @@ export default function App() {
     new StoragePostService("posts", objectStorage, attachmentService)
   );
 
+  const onExport = async () => {
+    const archiveService = new ZipArchiveService();
+    const data = await archiveService.exportPosts(postService, attachmentService);
+    const blobData = new Uint8Array(data).buffer;
+    downloadBlob(exportFileName(new Date()), new Blob([blobData], { type: "application/zip" }));
+  }
+
   return (
     <AppRouter theme={theme} onThemeChange={nextTheme => {
       persistTheme(nextTheme).then(setTheme)
       showToast(`(${nextTheme})`);
     }} s3Config={s3Config} onS3ConfigChange={nextS3Config => {
       persistS3Config(nextS3Config).then(setS3Config)
-    }} onClearCache={() => cacheStorage.clearAll()} postService={postService} attachmentService={attachmentService} 
+    }} onClearCache={() => cacheStorage.clearAll()} onExport={onExport} postService={postService} attachmentService={attachmentService} 
     encryptConfig={encryptConfig} onEncryptConfigChange={nextEncryptConfig => {
       persistEncryptConfig(nextEncryptConfig).then(setEncryptConfig)
     }} />
   );
+}
+
+function exportFileName(date: Date): string {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  const hh = String(date.getHours()).padStart(2, "0");
+  const min = String(date.getMinutes()).padStart(2, "0");
+  const ss = String(date.getSeconds()).padStart(2, "0");
+  return `azone-export-${yyyy}-${mm}-${dd}-${hh}-${min}-${ss}.zip`;
 }
