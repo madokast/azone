@@ -1,4 +1,4 @@
-import { ZipArchiveService } from "./export.service";
+import { ZipArchiveService } from "./zip.service";
 
 export type { ArchiveService, ExportPostsOptions } from "./service.interface";
 export type { ArchiveAttachmentEntry, ArchiveManifest, ArchivePostEntry } from "./schema";
