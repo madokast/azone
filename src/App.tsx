@@ -20,7 +20,7 @@ import SimpleCrypto from "./services/crypto-wrapper";
 import { defaultEncryptConfig, EncryptConfig } from "./services/settings/schema";
 import { StorageAttachmentService } from "./services/attachments/storage.service";
 import MutexPostService from "./services/posts/mutex.service";
-import { ZipArchiveService, createArchiveFileName } from "./services/archive";
+import { createArchiveFileName } from "./services/archive/utils";
 import { downloadBlob } from "./tools/download";
 
 export default function App() {
@@ -129,6 +129,7 @@ export default function App() {
   );
 
   const onExport = async () => {
+    const { ZipArchiveService } = await import("./services/archive/zip.service");
     const archiveService = new ZipArchiveService();
     const data = await archiveService.exportPosts(postService, attachmentService);
     const blobData = new Uint8Array(data).buffer;
