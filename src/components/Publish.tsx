@@ -55,25 +55,33 @@ export default function Publish({ onPublish, onChange, isPublished, resetIsPubli
   };
 
   // 压缩图片
+  const [inHandleCompress, setInHandleCompress] = useState(false);
   const handleCompress = async (attachments: Attachment[]) => {
-    const compressedAttachments = await Promise.all(attachments.map(async (attachment) => {
-      if (isImageMimeType(attachment.mimeType)) {
-        const res = await fetch(attachment.sourceUrl);
-        const blob = await res.blob();
-        const file = new File([blob], attachment.id, { type: attachment.mimeType });
-        const compressedFile = await imageCompress(file);
-        URL.revokeObjectURL(attachment.sourceUrl);
-        const compressedUrl = URL.createObjectURL(compressedFile);
-        return {
-          ...attachment,
-          sourceUrl: compressedUrl,
-          thumbnailUrl: compressedUrl,
-          size: compressedFile.size,
-        };
-      }
-      return attachment;
-    }));
-    setAttachments(compressedAttachments);
+    setInHandleCompress(true);
+    try {
+      const compressedAttachments = await Promise.all(
+        attachments.map(async (attachment) => {
+          if (isImageMimeType(attachment.mimeType)) {
+            const res = await fetch(attachment.sourceUrl);
+            const blob = await res.blob();
+            const file = new File([blob], attachment.id, { type: attachment.mimeType });
+            const compressedFile = await imageCompress(file);
+            URL.revokeObjectURL(attachment.sourceUrl);
+            const compressedUrl = URL.createObjectURL(compressedFile);
+            return {
+              ...attachment,
+              sourceUrl: compressedUrl,
+              thumbnailUrl: compressedUrl,
+              size: compressedFile.size,
+            };
+          }
+          return attachment;
+        })
+      );
+      setAttachments(compressedAttachments);
+    } finally {
+      setInHandleCompress(false);
+    }
   };
 
   // 清理附件
@@ -180,6 +188,7 @@ export default function Publish({ onPublish, onChange, isPublished, resetIsPubli
               color="primary"
               fill="none"
               onClick={() => imageInputRef.current?.click()}
+              disabled={inHandleCompress}
             >
               <PictureOutline />
             </Button>
@@ -189,6 +198,7 @@ export default function Publish({ onPublish, onChange, isPublished, resetIsPubli
               color="primary"
               fill="none"
               onClick={() => fileInputRef.current?.click()}
+              disabled={inHandleCompress}
             >
               <UploadOutline />
             </Button>
@@ -198,7 +208,7 @@ export default function Publish({ onPublish, onChange, isPublished, resetIsPubli
               color="primary"
               fill="none"
               onClick={() => handleCompress(attachments)}
-              disabled={attachments.length === 0}
+              disabled={attachments.length === 0 || inHandleCompress}
             >
               <GiftOutline />
             </Button>
@@ -208,7 +218,7 @@ export default function Publish({ onPublish, onChange, isPublished, resetIsPubli
               color="primary"
               fill="none"
               onClick={handleCleanAttachment}
-              disabled={attachments.length === 0}
+              disabled={attachments.length === 0 || inHandleCompress}
             >
               <DeleteOutline />
             </Button>
@@ -229,7 +239,7 @@ export default function Publish({ onPublish, onChange, isPublished, resetIsPubli
               color="primary"
               fill="none"
               onClick={handleSubmit}
-              disabled={!content.trim()}
+              disabled={!content.trim() || inHandleCompress}
             >
               <PlayOutline />
             </Button>
