@@ -102,8 +102,8 @@ export default function Home({ postService, attachmentService }: HomeProps) {
 
       <div style={{
         position: 'fixed',
-        bottom: 100,
-        right: 100,
+        bottom: 'calc(72px + max(16px, env(safe-area-inset-bottom)))',
+        right: 'max(16px, env(safe-area-inset-right))',
         opacity: postBottomOpacity,
         transition: 'opacity 1s ease'
       }} hidden={publishVisible || hidePostBottom}>
