@@ -22,6 +22,7 @@ import { StorageAttachmentService } from "./services/attachments/storage.service
 import MutexPostService from "./services/posts/mutex.service";
 import { createArchiveFileName } from "./services/archive/utils";
 import { downloadBlob } from "./tools/download";
+import { subscribeMediaQueryChange } from "./tools/media-query-listener";
 
 export default function App() {
   const [theme, setTheme] = useState<UiTheme>(() => {
@@ -87,17 +88,7 @@ export default function App() {
 
     syncFromSystem(media.matches);
 
-    if (media.addEventListener) {
-      media.addEventListener("change", handleChange);
-      return () => media.removeEventListener("change", handleChange);
-    }
-
-    if (media.addEventListener) {
-      media.addEventListener("change", handleChange);
-      return () => media.removeEventListener("change", handleChange);
-    }
-
-    return;
+    return subscribeMediaQueryChange(media, handleChange);
   }, [theme]);
 
 
