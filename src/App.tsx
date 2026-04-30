@@ -15,7 +15,7 @@ import { showToast } from "./components/toast";
 import AppRouter from "./routes";
 import { PrefixObjectStorage, StoragePostService } from "./services/posts";
 import { CryptoObjectStorage, IndexDBObjectStorage, MemoryObjectStorage, ObjectStorage } from "./services/object-storage";
-import { createS3ObjectStorage } from "./services/object-storage/s3.fs";
+import { createS3ObjectStorage } from "./services/object-storage/s3-sdk.fs";
 import SimpleCrypto from "./services/crypto-wrapper";
 import { defaultEncryptConfig, EncryptConfig } from "./services/settings/schema";
 import { StorageAttachmentService } from "./services/attachments/storage.service";

@@ -2,7 +2,7 @@ import { Divider, Form, Segmented, Tag, Input, Button, Switch } from 'antd-mobil
 import { EncryptConfig, S3Config, type UiTheme } from '../services/settings';
 import { useEffect, useRef, useState } from 'react';
 import { EyeInvisibleOutline, EyeOutline } from 'antd-mobile-icons'
-import { createS3ObjectStorage } from '../services/object-storage/s3.fs';
+import { createS3ObjectStorage } from '../services/object-storage/s3-sdk.fs';
 import { showToast } from '../components/toast';
 import { downloadJson } from '../tools/download';
 import { readFile, selectFile } from '../tools/upload';

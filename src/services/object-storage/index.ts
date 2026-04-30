@@ -1,6 +1,6 @@
 import { ObjectStorage } from "./interface"
 import MemoryObjectStorage from "./memory.fs"
-import {S3ObjectStorage, S3Config} from "./s3.fs"
+import {S3ObjectStorage, S3Config} from "./s3-sdk.fs"
 import CryptoObjectStorage from "./crypto.fs"
 import IndexDBObjectStorage from "./indexdb.cache.fs"
 
