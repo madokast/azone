@@ -9,6 +9,7 @@ import AttachmentViewer from './AttachmentViewer';
 import { unknowFileIcon } from '../assets';
 import { readableSize } from '../tools/readable-size';
 import imageCompress from '../tools/image-compressor';
+import { asyncRun } from '../tools/async-run';
 
 
 interface PublishProps {
@@ -86,8 +87,11 @@ export default function Publish({ onPublish, onChange, isPublished, resetIsPubli
 
   // 清理附件
   const handleCleanAttachment = () => {
-    attachments.forEach((attachment) => URL.revokeObjectURL(attachment.sourceUrl));
+    const sourceUrls = attachments.map((attachment) => attachment.sourceUrl);
     setAttachments([]);
+    asyncRun(() => {
+      sourceUrls.forEach((sourceUrl) => URL.revokeObjectURL(sourceUrl));
+    });
   };
 
   // 控制附件查看器的显示/隐藏
