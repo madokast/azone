@@ -34,10 +34,11 @@ export class S3ObjectStorage implements ObjectStorage {
     }
 
     public async put(path: string, data: ReadableStream<Uint8Array<ArrayBuffer>>): Promise<void> {
+        const body = new Uint8Array(await new Response(data).arrayBuffer());
         await this.client.send(new PutObjectCommand({
             Bucket: this.config.bucket,
             Key: path,
-            Body: await new Response(data).arrayBuffer(),
+            Body: body,
         }));
     }
 
