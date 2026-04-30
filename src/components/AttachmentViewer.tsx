@@ -19,12 +19,12 @@ export default function AttachmentViewer({
   onClose,
   viewContainer,
 }: AttachmentViewerProps) {
-  if (attachments.length === 0) return null;
-
   const ref = useRef<MultiImageViewerRef>(null);
   useEffect(() => {
     ref.current?.swipeTo(currentIndex);
   }, [visible, currentIndex]);
+
+  if (attachments.length === 0) return null;
 
   const images = attachments.map(attachment =>
     isImageMimeType(attachment.mimeType) ? attachment.sourceUrl : attachment.thumbnailUrl
