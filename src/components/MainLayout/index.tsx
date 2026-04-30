@@ -1,9 +1,10 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { NavBar, TabBar } from 'antd-mobile';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { AppOutline, PicturesOutline, UserSetOutline } from 'antd-mobile-icons';
-import { type UiTheme } from '../services/settings';
-import { appColor } from '../styles/theme-tokens'
+import { type UiTheme } from '../../services/settings';
+import { appColor } from '../../styles/theme-tokens'
+import { useAutoHideTabBar } from './useAutoHideTabBar';
 
 type MainLayoutProps = {
   theme: UiTheme;
@@ -38,32 +39,7 @@ export default function MainLayout({ theme, onThemeChange }: MainLayoutProps) {
     if (key === 'me') navigate('/me');
   };
 
-  // 处理滚动事件
-  const lastScrollY = useRef(0);
-  const [tabBarOpacity, setTabBarOpacity] = useState(1);
-  const [hideTabBar, setHideTabBar] = useState(false);
-  useEffect(() => {
-    const handleScroll = () => {
-      const currScrollY = window.scrollY;
-      // 当滚动方向为上时，显示 TabBar；否则隐藏
-      setTabBarOpacity(currScrollY > lastScrollY.current ? 0 : 1);
-      lastScrollY.current = currScrollY;
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-  useEffect(() => {
-    if (tabBarOpacity === 0) {
-      setTimeout(() => {
-        setHideTabBar(true);
-      }, 300);
-    } else {
-      setHideTabBar(false);
-    }
-  }, [tabBarOpacity]);
+  const isTabBarVisible = useAutoHideTabBar();
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -85,9 +61,13 @@ export default function MainLayout({ theme, onThemeChange }: MainLayoutProps) {
         position: 'sticky',
         bottom: 0,
         backgroundColor: appColor.bg,
-        opacity: tabBarOpacity,
-        transition: 'opacity 1s ease'
-      }} hidden={hideTabBar}>
+        opacity: isTabBarVisible ? 1 : 0,
+        pointerEvents: isTabBarVisible ? 'auto' : 'none',
+        transform: isTabBarVisible ? 'translateY(0)' : 'translateY(8px)',
+        visibility: isTabBarVisible ? 'visible' : 'hidden',
+        transition: `opacity 200ms ease, transform 200ms ease, visibility 0s linear ${isTabBarVisible ? '0s' : '200ms'}`,
+        willChange: 'opacity, transform',
+      }}>
         <TabBar
           activeKey={activeKey}
           onChange={handleTabBarChange}
