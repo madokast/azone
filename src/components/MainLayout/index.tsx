@@ -5,6 +5,7 @@ import { AppOutline, PicturesOutline, UserSetOutline } from 'antd-mobile-icons';
 import { type UiTheme } from '../../services/settings';
 import { appColor } from '../../styles/theme-tokens'
 import { useAutoHideTabBar } from './useAutoHideTabBar';
+import AppShell from '../AppShell';
 
 type MainLayoutProps = {
   theme: UiTheme;
@@ -42,7 +43,7 @@ export default function MainLayout({ theme, onThemeChange }: MainLayoutProps) {
   const isTabBarVisible = useAutoHideTabBar();
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <AppShell>
       <NavBar back={null}>
         {path === '/home' && 'Home'}
         {path === '/media' && 'Media'}
@@ -88,6 +89,6 @@ export default function MainLayout({ theme, onThemeChange }: MainLayoutProps) {
           />
         </TabBar>
       </div>
-    </div>
+    </AppShell>
   );
 }
