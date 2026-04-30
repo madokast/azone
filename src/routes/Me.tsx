@@ -253,19 +253,16 @@ export default function Me({ theme, onThemeChange, s3Config, onS3ConfigChange, e
 
       <Form layout='vertical' footer={
           // 测试连接按钮
-          <div style={{ textAlign: 'right' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 8 }}>
             <Button color='primary' fill='outline' size='mini' onClick={exportData} disabled={s3TestButtonDisabled}>
               Export Data
             </Button>
-            <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <Button color='primary' fill='outline' size='mini' onClick={clearCache} disabled={s3TestButtonDisabled}>
               Clear Cache
             </Button>
-            <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <Button color='primary' fill='outline' size='mini' onClick={importAllConfig} disabled={s3TestButtonDisabled}>
               Import Config
             </Button>
-            <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <Button color='primary' fill='outline' size='mini' onClick={downloadAllConfig} disabled={s3TestButtonDisabled}>
               Export Config
             </Button>
