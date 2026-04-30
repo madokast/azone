@@ -3,7 +3,7 @@ import Post from '../components/Post';
 import { List, InfiniteScroll, Button, Popup, Badge } from 'antd-mobile';
 import { PostService, type Post as PostType } from '../services/posts';
 import Publish from '../components/Publish';
-import { AddOutline } from 'antd-mobile-icons';
+import { AddSquareOutline } from 'antd-mobile-icons';
 import { showToast } from '../components/toast';
 import { AttachmentService } from '../services/attachments';
 
@@ -102,8 +102,8 @@ export default function Home({ postService, attachmentService }: HomeProps) {
 
       <div style={{
         position: 'fixed',
-        bottom: 'calc(72px + max(16px, env(safe-area-inset-bottom)))',
-        right: 'max(16px, env(safe-area-inset-right))',
+        bottom: 'calc(120px + max(16px, env(safe-area-inset-bottom)))',
+        right: 'max(32px, env(safe-area-inset-right))',
         opacity: postBottomOpacity,
         transition: 'opacity 1s ease'
       }} hidden={publishVisible || hidePostBottom}>
@@ -114,7 +114,7 @@ export default function Home({ postService, attachmentService }: HomeProps) {
           onClick={() => setPublishVisible(true)}
         >
           <Badge content={postLength > 0 ? postLength : undefined}>
-            <AddOutline />
+            <AddSquareOutline />
           </Badge>
         </Button>
       </div>
