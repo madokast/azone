@@ -37,7 +37,7 @@ export default function AppRouter(
         {/* 带 TabBar */}
         <Route element={<MainLayout theme={theme} onThemeChange={onThemeChange} />}>
           <Route path="/home" element={<Home postService={postService} attachmentService={attachmentService} />} />
-          <Route path="/media" element={<Media />} />
+          <Route path="/media" element={<Media postService={postService} attachmentService={attachmentService} />} />
           <Route path="/me" element={<Me
             theme={theme} onThemeChange={onThemeChange}
             s3Config={s3Config} onS3ConfigChange={onS3ConfigChange}
