@@ -28,6 +28,7 @@ interface Attachment extends AttachmentDto {
 export default function Publish({ onPublish, onChange, isPublished, resetIsPublished, focus, imageSize = "90px" }: PublishProps) {
   const [content, setContent] = useState('');
   const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [inBusy, setInBusy] = useState(false);
 
   const handlePostChange = ({ content }: CreatePostDto) => {
     setContent(content);
@@ -56,9 +57,8 @@ export default function Publish({ onPublish, onChange, isPublished, resetIsPubli
   };
 
   // 压缩图片
-  const [inHandleCompress, setInHandleCompress] = useState(false);
   const handleCompress = async (attachments: Attachment[]) => {
-    setInHandleCompress(true);
+    setInBusy(true);
     try {
       const compressedAttachments = await Promise.all(
         attachments.map(async (attachment) => {
@@ -81,7 +81,7 @@ export default function Publish({ onPublish, onChange, isPublished, resetIsPubli
       );
       setAttachments(compressedAttachments);
     } finally {
-      setInHandleCompress(false);
+      setInBusy(false);
     }
   };
 
@@ -99,13 +99,18 @@ export default function Publish({ onPublish, onChange, isPublished, resetIsPubli
   const [attachmentCurrentIndex, setAttachmentCurrentIndex] = useState(0);
 
   // 提交发布
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (content.trim()) {
-      const publishAttachments = attachments.map((attachment) => {
-        const {id, ...rest} = attachment;
-        return rest;
-      });
-      onPublish({ content, attachments: publishAttachments });
+      setInBusy(true);
+      try {
+        const publishAttachments = attachments.map((attachment) => {
+          const {id, ...rest} = attachment;
+          return rest;
+        });
+        await onPublish({ content, attachments: publishAttachments });
+      } finally {
+        setInBusy(false);
+      }
     }
   };
 
@@ -143,6 +148,7 @@ export default function Publish({ onPublish, onChange, isPublished, resetIsPubli
         value={content}
         onChange={(content) => handlePostChange({ content })}
         autoSize={{ minRows: 2, maxRows: 8 }}
+        disabled={inBusy}
       />
 
       {/* 媒体上传（不可见）*/}
@@ -192,7 +198,7 @@ export default function Publish({ onPublish, onChange, isPublished, resetIsPubli
               color="primary"
               fill="none"
               onClick={() => imageInputRef.current?.click()}
-              disabled={inHandleCompress}
+              disabled={inBusy}
             >
               <PictureOutline />
             </Button>
@@ -202,7 +208,7 @@ export default function Publish({ onPublish, onChange, isPublished, resetIsPubli
               color="primary"
               fill="none"
               onClick={() => fileInputRef.current?.click()}
-              disabled={inHandleCompress}
+              disabled={inBusy}
             >
               <UploadOutline />
             </Button>
@@ -212,7 +218,7 @@ export default function Publish({ onPublish, onChange, isPublished, resetIsPubli
               color="primary"
               fill="none"
               onClick={() => handleCompress(attachments)}
-              disabled={attachments.length === 0 || inHandleCompress}
+              disabled={attachments.length === 0 || inBusy}
             >
               <GiftOutline />
             </Button>
@@ -222,7 +228,7 @@ export default function Publish({ onPublish, onChange, isPublished, resetIsPubli
               color="primary"
               fill="none"
               onClick={handleCleanAttachment}
-              disabled={attachments.length === 0 || inHandleCompress}
+              disabled={attachments.length === 0 || inBusy}
             >
               <DeleteOutline />
             </Button>
@@ -243,7 +249,7 @@ export default function Publish({ onPublish, onChange, isPublished, resetIsPubli
               color="primary"
               fill="none"
               onClick={handleSubmit}
-              disabled={!content.trim() || inHandleCompress}
+              disabled={!content.trim() || inBusy}
             >
               <PlayOutline />
             </Button>
